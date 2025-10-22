@@ -1,0 +1,112 @@
+/* Section */
+.ts-section {
+  background: #ffffff;
+  padding: 44px 20px 56px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #111;
+}
+
+.ts-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Heading/subtitle */
+.ts-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1b1b1b;
+  margin: 0 0 6px 0;
+}
+.ts-subtitle {
+  font-size: 12.5px;
+  color: #6a6a6a;
+  margin: 0 0 20px 0;
+}
+
+/* Grid: three cards */
+.ts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  justify-items: center;
+}
+
+/* Card */
+.ts-card {
+  width: 100%;
+  max-width: 320px;
+  background: #fff;
+  border: 1px solid #ebeaf2;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+  padding: 16px 16px 14px;
+  text-align: left;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.ts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+}
+
+/* Stars row */
+.ts-stars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.star-filled {
+  color: #7b2cbf;
+  font-size: 14px;
+}
+
+/* Quote text */
+.ts-text {
+  color: #6a6a6a;
+  font-size: 12.5px;
+  line-height: 1.55;
+  min-height: 44px;         /* keeps rows even like the image */
+  white-space: pre-line;    /* allow the middle card to wrap line breaks */
+  margin-bottom: 14px;
+}
+
+/* Author row */
+.ts-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ts-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #7b2cbf;
+  color: #fff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.ts-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ts-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1c1c1c;
+}
+.ts-since {
+  font-size: 11.5px;
+  color: #9a9aa3;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .ts-grid { grid-template-columns: 1fr; }
+  .ts-card { max-width: 520px; }
+}

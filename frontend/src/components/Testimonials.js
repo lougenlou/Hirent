@@ -7,56 +7,51 @@ const Testimonials = () => {
     {
       id: 1,
       name: 'Maria Santos',
-      since: 'Member since 2023',
+      date: 'Rented on June 2023',
       rating: 5,
-      text:
-        'Super easy to use and the products I rented was of good quality!',
+      text: 'Super easy to use and the products I found were just like the description! Highly recommend.',
       avatar: 'M'
     },
     {
       id: 2,
       name: 'John Reyes',
-      since: 'Member since 2022',
+      date: 'Listed item on May 2023',
       rating: 5,
-      text:
-        'Mabait ang mga sellers \nat very approachable and trustworthy.',
+      text: 'Listing was easy, why haven\'t done this sooner? Great way to make extra cash!',
       avatar: 'J'
     },
     {
       id: 3,
       name: 'Sarah Chen',
-      since: 'Member since 2024',
+      date: 'Rented on August 2023',
       rating: 5,
-      text:
-        'Good place to find clothes for events.',
+      text: 'Quick delivery, my items were in great condition, I\'ll definitely rent again!',
       avatar: 'S'
     }
   ];
 
   return (
-    <section className="ts-section">
-      <div className="ts-container">
-        <h2 className="ts-title">Our Happy Customers</h2>
-        <p className="ts-subtitle">
-          Real stories from real members who transformed their lives at Hirent
+    <section className="testimonials">
+      <div className="container">
+        <h2 className="section-title">Our Happy Customers</h2>
+        <p className="section-subtitle">
+          Real stories from real members who transformed their lives with Hirent
         </p>
-
-        <div className="ts-grid">
-          {testimonials.map((t) => (
-            <div key={t.id} className="ts-card">
-              <div className="ts-stars">
-                {[...Array(t.rating)].map((_, i) => (
+        
+        <div className="testimonials-grid">
+          {testimonials.map((testimonial) => (
+            <div key={testimonial.id} className="testimonial-card">
+              <div className="testimonial-rating">
+                {[...Array(testimonial.rating)].map((_, i) => (
                   <FaStar key={i} className="star-filled" />
                 ))}
               </div>
-
-              <p className="ts-text">{t.text}</p>
-
-              <div className="ts-author">
-                <div className="ts-avatar">{t.avatar}</div>
-                <div className="ts-meta">
-                  <div className="ts-name">{t.name}</div>
-                  <div className="ts-since">{t.since}</div>
+              <p className="testimonial-text">{testimonial.text}</p>
+              <div className="testimonial-author">
+                <div className="author-avatar">{testimonial.avatar}</div>
+                <div className="author-info">
+                  <h4 className="author-name">{testimonial.name}</h4>
+                  <p className="author-date">{testimonial.date}</p>
                 </div>
               </div>
             </div>

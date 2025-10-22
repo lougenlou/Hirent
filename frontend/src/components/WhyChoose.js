@@ -8,41 +8,38 @@ const WhyChoose = () => {
       id: 1,
       icon: <FaMoneyBillWave />,
       title: 'Save Money',
-      description:
-        'Why buy when you can rent? Access what you need at a fraction of the cost. Perfect for one-time events or temporary needs.'
+      description: 'Why buy when you can rent? Save money by renting items only when you need them for temporary or occasional use.'
     },
     {
       id: 2,
       icon: <FaHandHoldingUsd />,
       title: 'Earn Income',
-      description:
-        'Turn your unused items into cash. List what you own and start earning passive income from items sitting idle in your home.'
+      description: 'Turn your unused items into cash. List what you own and start earning passive income from items sitting idle in your home.'
     },
     {
       id: 3,
       icon: <FaLeaf />,
       title: 'Support Sustainability',
-      description:
-        'Reduce waste and your carbon footprint. By sharing resources, we create a more sustainable future for everyone.'
+      description: 'Reduce waste and your carbon footprint by sharing resources. Be part of a community that values sustainability over single-use ownership.'
     }
   ];
 
   return (
-    <section className="wc-section">
-      <div className="wc-container">
-        <h2 className="wc-title">Why Choose Hirent?</h2>
-        <p className="wc-subtitle">
+    <section className="why-choose">
+      <div className="container">
+        <h2 className="section-title">Why Choose Hirent?</h2>
+        <p className="section-subtitle">
           Join thousands of users who are already saving money and earning income
         </p>
-
-        <div className="wc-grid">
-          {reasons.map((r) => (
-            <div key={r.id} className="wc-card">
-              <div className="wc-iconwrap">
-                <div className="wc-icon">{r.icon}</div>
+        
+        <div className="reasons-grid">
+          {reasons.map((reason) => (
+            <div key={reason.id} className="reason-card">
+              <div className="reason-icon-svg">
+                {reason.icon}
               </div>
-              <div className="wc-card-title">{r.title}</div>
-              <p className="wc-card-desc">{r.description}</p>
+              <h3 className="reason-title">{reason.title}</h3>
+              <p className="reason-description">{reason.description}</p>
             </div>
           ))}
         </div>

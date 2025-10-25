@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Testimonials = () => {
+  const [isDragging, setIsDragging] = useState(false);
+  const scrollRef = useRef(null);
+  const [scrollDirection, setScrollDirection] = useState(1); // 1 for right, -1 for left
+  const dragStartRef = useRef(0);
+
   const createStarIcon = () => {
     return React.createElement(
       'svg',
@@ -32,16 +37,83 @@ const Testimonials = () => {
       name: 'Sarah Chen',
       role: '5 star renter since 2023',
       rating: 5,
-      comment: 'Great service to buy cameras for makoto',
+      comment: 'Great service to rent cameras for my project',
       avatar: 'SC',
       bgColor: 'bg-purple-600',
     },
   ];
 
+  // Duplicate testimonials to create seamless loop
+  const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials];
+
+  // Auto-scroll effect
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer || isDragging) return;
+
+    const scroll = () => {
+      if (scrollDirection === 1) {
+        // Scrolling right
+        scrollContainer.scrollLeft += 1;
+        
+        // Check if we've scrolled past the first set of testimonials
+        const maxScroll = scrollContainer.scrollWidth / 3;
+        if (scrollContainer.scrollLeft >= maxScroll) {
+          scrollContainer.scrollLeft = 0;
+        }
+      } else {
+        // Scrolling left
+        scrollContainer.scrollLeft -= 1;
+        
+        // Check if we've scrolled to the beginning
+        if (scrollContainer.scrollLeft <= 0) {
+          const maxScroll = scrollContainer.scrollWidth / 3;
+          scrollContainer.scrollLeft = maxScroll;
+        }
+      }
+    };
+
+    const intervalId = setInterval(scroll, 20); // Adjust speed here (lower = faster)
+
+    return () => clearInterval(intervalId);
+  }, [isDragging, scrollDirection]);
+
+  // Change direction every 10 seconds
+  useEffect(() => {
+    const directionInterval = setInterval(() => {
+      setScrollDirection(prev => prev * -1);
+    }, 10000); // Change direction every 10 seconds
+
+    return () => clearInterval(directionInterval);
+  }, []);
+
+  // Drag/Swipe handlers
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    dragStartRef.current = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+  };
+
+  const handleDragMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+    const diff = dragStartRef.current - currentX;
+    scrollRef.current.scrollLeft += diff;
+    dragStartRef.current = currentX;
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
   const createTestimonialCard = (testimonial, index) => {
     return React.createElement(
       'div',
-      { key: index, className: 'bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition' },
+      { 
+        key: index, 
+        className: 'bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition flex-shrink-0',
+        style: { minWidth: '350px', width: '350px' }
+      },
       
       // Stars
       React.createElement(
@@ -74,7 +146,7 @@ const Testimonials = () => {
 
   return React.createElement(
     'section',
-    { className: 'py-16 px-6 md:px-16 lg:px-24 bg-gray-50' },
+    { className: 'py-16 px-6 md:px-16 lg:px-24 bg-gray-50 overflow-hidden' },
     React.createElement(
       'div',
       { className: 'max-w-7xl mx-auto' },
@@ -87,11 +159,25 @@ const Testimonials = () => {
         React.createElement('p', { className: 'text-base md:text-lg font-inter text-gray-600' }, 'Real stories from real members who transformed their lives with Hirent')
       ),
       
-      // Testimonials Grid
+      // Testimonials Carousel
       React.createElement(
         'div',
-        { className: 'grid grid-cols-1 md:grid-cols-3 gap-8' },
-        ...testimonials.map(createTestimonialCard)
+        { 
+          ref: scrollRef,
+          className: 'flex gap-8 overflow-x-hidden cursor-grab active:cursor-grabbing select-none',
+          style: { 
+            scrollBehavior: 'auto',
+            WebkitOverflowScrolling: 'touch'
+          },
+          onMouseDown: handleDragStart,
+          onMouseMove: handleDragMove,
+          onMouseUp: handleDragEnd,
+          onMouseLeave: handleDragEnd,
+          onTouchStart: handleDragStart,
+          onTouchMove: handleDragMove,
+          onTouchEnd: handleDragEnd
+        },
+        ...duplicatedTestimonials.map(createTestimonialCard)
       )
     )
   );

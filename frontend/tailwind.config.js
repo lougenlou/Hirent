@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}", // ← ensures Tailwind scans all your React files
+    "./src/assets/**/*.css", 
   ],
   theme: {
     extend: {},

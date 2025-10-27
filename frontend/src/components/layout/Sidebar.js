@@ -13,43 +13,44 @@ const DashboardIconActive = "/assets/icons/dashboard.png";
 const ListingsIcon = "/assets/icons/listing.png";
 const BookingsIcon = "/assets/icons/bookings.png";
 const ProfileIcon = "/assets/icons/profile.png";
+const ProfileIconActive = "/assets/icons/profile1.png"; // Active profile icon
 
 const items = [
   { 
     label: "Dashboard", 
     icon: DashboardIcon,
     iconActive: DashboardIconActive,
-    path: "/ownerdashboard"
+    path: "/owner"
   },
   { 
     label: "My Listings", 
     icon: ListingsIcon,
     iconActive: ListingsIcon,
-    path: "/ownerdashboard/listings"
+    path: "/owner/listings"
   },
   { 
     label: "Add Item", 
     icon: AddIcon,
     iconActive: AddIconActive,
-    path: "/ownerdashboard/add-item"
+    path: "/owner/add-item"
   },
   { 
     label: "Bookings", 
     icon: BookingsIcon,
     iconActive: BookingsIcon,
-    path: "/ownerdashboard/bookings"
+    path: "/owner/bookings"
   },
   { 
     label: "Earnings", 
     icon: EarningsIcon,
     iconActive: EarningsIcon,
-    path: "/ownerdashboard/earnings"
+    path: "/owner/earnings"
   },
   { 
     label: "Profile", 
     icon: ProfileIcon,
-    iconActive: ProfileIcon,
-    path: "/ownerdashboard/profile"
+    iconActive: ProfileIconActive, // Using profile1.png when active
+    path: "/owner/profile"
   },
 ];
 

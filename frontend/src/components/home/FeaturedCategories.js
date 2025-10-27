@@ -130,13 +130,13 @@ const FeaturedCategories = () => {
           createCategoryCard(
             'Clothes',
             'Designer wear for<br />every occasion',
-            ['/categories/clothes.png'],
+            ['/assets/categories/clothes.png'],
             { className: 'min-h-[220px]' }
           ),
           createCategoryCard(
             'Homes & Apartments',
             'Short-term and long-<br />term stays',
-            ['/categories/house.png'],
+            ['/assets/categories/house.png'],
             { className: 'min-h-[200px]', imageHeightAdjust: 10 } 
           )
         ),
@@ -147,13 +147,13 @@ const FeaturedCategories = () => {
           createCategoryCard(
             'Vehicles',
             'From compact to luxury vehicles',
-            ['/categories/car.png'],
+            ['/assets/categories/car.png'],
             { className: 'min-h-[190px] mt-2', imageHeightAdjust: 52 } 
           ),
           createCategoryCard(
             'Gadgets',
             'Latest tech and<br />electronics',
-            ['/categories/gadgets.png'],
+            ['/assets/categories/gadgets.png'],
             { className: 'min-h-[220px]' }
           )
         )

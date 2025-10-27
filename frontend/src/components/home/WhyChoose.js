@@ -5,17 +5,17 @@ const WhyChoose = () => {
     {
       title: 'Save Money',
       description: 'Why buy when you can rent? Access what you need at a fraction of the cost. Perfect for one-time events or temporary needs.',
-      icon: '/icons/savemoney.png',
+      icon: '/assets/icons/savemoney.png',
     },
     {
       title: 'Earn Income',
       description: 'Turn your unused items into cash. List what you own and start earning passive income from items sitting idle in your home.',
-      icon: '/icons/earnmoney.png',
+      icon: '/assets/icons/earnmoney.png',
     },
     {
       title: 'Support Sustainability',
       description: 'Reduce waste and your carbon footprint. By sharing resources, we create a more sustainable future for everyone.',
-      icon: '/icons/supportsus.png',
+      icon: '/assets/icons/supportsus.png',
     },
   ];
 

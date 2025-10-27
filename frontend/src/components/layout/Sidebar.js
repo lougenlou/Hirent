@@ -3,16 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 // External URLs for "Add", "Earnings", and "Logout" icons
 const AddIcon = "https://cdn-icons-png.flaticon.com/128/3914/3914337.png";
-const AddIconActive = "/icons/add1.png"; // Active state icon
+const AddIconActive = "/assets/icons/add1.png";
 const EarningsIcon = "https://cdn-icons-png.flaticon.com/128/3916/3916701.png";
 const LogoutIcon = "https://cdn-icons-png.flaticon.com/128/5528/5528185.png";
 
 // Local imports for other icons
-const DashboardIcon = "/icons/dashboardb.png";
-const DashboardIconActive = "/icons/dashboard.png"; // Active state icon
-const ListingsIcon = "/icons/listing.png";
-const BookingsIcon = "/icons/bookings.png";
-const ProfileIcon = "/icons/profile.png";
+const DashboardIcon = "/assets/icons/dashboardb.png";
+const DashboardIconActive = "/assets/icons/dashboard.png";
+const ListingsIcon = "/assets/icons/listing.png";
+const BookingsIcon = "/assets/icons/bookings.png";
+const ProfileIcon = "/assets/icons/profile.png";
 
 const items = [
   { 
@@ -24,7 +24,7 @@ const items = [
   { 
     label: "My Listings", 
     icon: ListingsIcon,
-    iconActive: ListingsIcon, // Use same icon if no active version
+    iconActive: ListingsIcon,
     path: "/ownerdashboard/listings"
   },
   { 
@@ -36,19 +36,19 @@ const items = [
   { 
     label: "Bookings", 
     icon: BookingsIcon,
-    iconActive: BookingsIcon, // Use same icon if no active version
+    iconActive: BookingsIcon,
     path: "/ownerdashboard/bookings"
   },
   { 
     label: "Earnings", 
     icon: EarningsIcon,
-    iconActive: EarningsIcon, // Use same icon if no active version
+    iconActive: EarningsIcon,
     path: "/ownerdashboard/earnings"
   },
   { 
     label: "Profile", 
     icon: ProfileIcon,
-    iconActive: ProfileIcon, // Use same icon if no active version
+    iconActive: ProfileIcon,
     path: "/ownerdashboard/profile"
   },
 ];
@@ -67,11 +67,11 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="h-screen w-64 bg-white border-r flex flex-col overflow-hidden">
+    <aside className="h-screen w-64 bg-white border-r flex flex-col fixed left-0 top-0">
       {/* Logo section */}
-      <div className="px-6 py-6 border-b mb-4 flex flex-col items-start">
+      <div className="px-6 py-6 border-b mb-4 flex flex-col items-start flex-shrink-0">
         <img
-          src="/icons/owner_logo.png"
+          src="/assets/icons/owner_logo.png"
           alt="Owner Logo"
           className="h-16 mb-2"
           style={{ objectFit: "contain" }}
@@ -80,7 +80,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col gap-1 px-2">
+      <nav className="flex flex-col gap-1 px-2 flex-1 overflow-y-auto">
         {items.map((item) => {
           const isActive = location.pathname === item.path;
           
@@ -108,7 +108,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="mt-auto px-2 pb-6">
+      <div className="px-2 pb-6 flex-shrink-0">
         <button 
           onClick={handleLogout}
           className="flex items-center gap-2 text-gray-500 hover:text-red-500 px-4 py-2 rounded transition text-sm w-full"

@@ -10,7 +10,7 @@ const BrowseItems = () => {
       price: '₱200',
       rating: 5,
       reviews: 65,
-      image: '/items/Keyboard.png',
+      image: '/assets/items/Keyboard.png',
       badge: null,
     },
     {
@@ -20,7 +20,7 @@ const BrowseItems = () => {
       originalPrice: '₱1160',
       rating: null,
       reviews: null,
-      image: '/items/gucci_duffle_bag.png',
+      image: '/assets/items/gucci_duffle_bag.png',
       badge: '-35%',
       badgeColor: '#7A1CA9',
     },
@@ -30,7 +30,7 @@ const BrowseItems = () => {
       price: '₱1960',
       rating: null,
       reviews: null,
-      image: '/items/RGB_liquid_CPU.png',
+      image: '/assets/items/RGB_liquid_CPU.png',
       badge: null,
     },
     {
@@ -39,7 +39,7 @@ const BrowseItems = () => {
       price: '₱560',
       rating: 5,
       reviews: 65,
-      image: '/items/havit_hv.png',
+      image: '/assets/items/havit_hv.png',
       badge: 'NEW',
       badgeColor: '#00FF66',
     },
@@ -49,7 +49,7 @@ const BrowseItems = () => {
       price: '₱1160',
       rating: 5,
       reviews: 65,
-      image: '/items/IPS_lcd.png',
+      image: '/assets/items/IPS_lcd.png',
       badge: null,
     },
     {
@@ -58,7 +58,7 @@ const BrowseItems = () => {
       price: '₱700',
       rating: 5,
       reviews: 65,
-      image: '/items/laptop.png',
+      image: '/assets/items/laptop.png',
       badge: null,
     },
   ];

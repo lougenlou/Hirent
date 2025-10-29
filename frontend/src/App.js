@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import OwnerInformation from "./pages/owners/Owner_Information";
@@ -14,13 +14,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Regular routes */}
-        <Route path="/" element={<Signup />} />
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/owner-information" element={<OwnerInformation />} />
         <Route path="/owner-submission" element={<OwnerSubmission />} />
 
-        {/* ✅ NESTED ROUTES FOR ONBOARDING */}
         <Route element={<OnboardingLayout />}>
           <Route path="/onboarding1" element={<Onboarding1 />} />
           <Route path="/onboarding2" element={<Onboarding2 />} />

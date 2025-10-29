@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [useForward, setUseForward] = useState(true);
 
   return (
     <div className="flex flex-col min-h-screen">

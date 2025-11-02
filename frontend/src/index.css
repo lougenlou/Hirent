@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+=======
+>>>>>>> origin
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+<<<<<<< HEAD
 * {
   margin: 0;
   padding: 0;
@@ -11,6 +15,11 @@
 }
 
 body {
+=======
+
+body {
+  margin: 0;
+>>>>>>> origin
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -22,7 +31,16 @@ body {
   padding: 0;
 }
 
+<<<<<<< HEAD
 html {
   overflow-x: hidden;
 }
 
+=======
+a {
+  text-decoration: none !important;
+}
+a:hover {
+  text-decoration: none !important;
+}
+>>>>>>> origin

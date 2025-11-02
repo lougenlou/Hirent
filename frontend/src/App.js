@@ -1,24 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-function App() {
+// Layout components
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
+
+// Landing page components
+import HeroSection from './components/home/HeroSection';
+import FeaturedCategories from './components/home/FeaturedCategories';
+import HowItWorks from './components/home/HowItWorks';
+import WhyChoose from './components/home/WhyChoose';
+import Testimonials from './components/home/Testimonials';
+import BrowseItems from './components/items/BrowseItems';
+
+// Landing Page Component
+function LandingPage() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar />
+      <HeroSection />
+      <FeaturedCategories />
+      <BrowseItems />
+      <HowItWorks />
+      <WhyChoose />
+      <Testimonials />
+      <Footer />
     </div>
+  );
+}
+
+// Main App Component
+function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+      </Routes>
+    </Router>
   );
 }
 

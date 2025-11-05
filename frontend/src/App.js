@@ -24,7 +24,6 @@ import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import AddItem from "./pages/owner/AddItem";
 import OwnerProfile from "./pages/owner/OwnerProfile";
 
-import OwnerInformation from "./pages/owners/Owner_Information";
 import OwnerSubmission from "./pages/owners/Owner_Submission";
 import Onboarding1 from "./pages/onboarding/Onboarding1";
 import Onboarding2 from "./pages/onboarding/Onboarding2";

@@ -24,6 +24,12 @@ import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import AddItem from "./pages/owner/AddItem";
 import OwnerProfile from "./pages/owner/OwnerProfile";
 
+import OwnerInformation from "./pages/owners/Owner_Information";
+import OwnerSubmission from "./pages/owners/Owner_Submission";
+
+// Layout components
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
 // Landing Page Component
 function LandingPage() {
   return (

@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "leaflet/dist/leaflet.css";
 
 // Public Components
 import Navbar from "./components/layout/Navbar";
@@ -29,11 +30,7 @@ import Onboarding2 from "./pages/onboarding/Onboarding2";
 import Onboarding3 from "./pages/onboarding/Onboarding3";
 import Onboarding4 from "./pages/onboarding/Onboarding4";
 import OnboardingLayout from "./layouts/OnboardingLayout";
-import "leaflet/dist/leaflet.css";
 
-// Layout components
-import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
 // Landing Page Component
 function LandingPage() {
   return (

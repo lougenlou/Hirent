@@ -1,8 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { getHomePageData } = require('./api/homepage/homepage.controller');
+const controller = require("./homepage.controller");
 
-// @desc    Get homepage data (featured items, categories, why choose, etc.)
-router.get('/', getHomePageData);
+router.get("/categories/featured", controller.getFeaturedCategories);
+router.get("/categories/:slug/items", controller.getItemsByCategory);
+router.get("/items/featured", controller.getFeaturedItems);
+router.get("/search", controller.searchItems);
 
 module.exports = router;

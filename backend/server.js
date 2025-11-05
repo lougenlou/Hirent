@@ -20,6 +20,9 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/homepage', require('./api/homepage/homepage.routes'));
 
+const homepageRoutes = require("./api/homepage/homepage.route");
+app.use("/api/homepage", homepageRoutes);
+
 app.get('/', (req, res) => {
   res.send('🚀 API is running...');
 });

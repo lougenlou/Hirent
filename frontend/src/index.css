@@ -1,0 +1,61 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+=======
+>>>>>>> origin
+>>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+<<<<<<< HEAD
+body {
+  margin: 0;
+=======
+<<<<<<< HEAD
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+=======
+
+body {
+  margin: 0;
+>>>>>>> origin
+>>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* Hide horizontal scrollbar globally */
+body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+html {
+  overflow-x: hidden;
+}
+
+=======
+>>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
+a {
+  text-decoration: none !important;
+}
+a:hover {
+  text-decoration: none !important;
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> origin
+>>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411

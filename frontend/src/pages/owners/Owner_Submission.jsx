@@ -2,7 +2,6 @@ import React from "react";
 import "../../assets/Auth.css";
 import logo from "../../assets/hirent-logo.png";
 import Footer from "../../components/Footer";
-import bgImage from "../../assets/bg-signup.jpg";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import Stepper from "../../components/Stepper";
 
@@ -14,16 +13,7 @@ const Owner_Submission = () => {
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
-            <div
-                className="flex flex-col min-h-[800px] items-center justify-center relative"
-                style={{
-                    backgroundImage: `url(${bgImage})`,
-                    backgroundPosition: "center",
-                    backgroundSize: "cover",
-                    backgroundRepeat: "no-repeat",
-                    backgroundColor: "white",
-                }}
-            >
+            <div className="min-h-screen flex flex-col w-full items-center justify-center relative gradient-anim">
                 <div className="absolute top-6 left-6">
                     <img src={logo} alt="Hirent Logo" className="w-24 h-auto mb-3" />
                 </div>

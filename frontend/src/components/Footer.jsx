@@ -4,24 +4,15 @@ import hirentLogo from "../assets/hirent-logo.png";
 
 const Footer = () => {
     return (
-<<<<<<< HEAD
         <footer className="bg-[#7A1CA9] text-white py-10 px-5 w-full text-sm">
   <div className="max-w-6xl mx-auto flex flex-wrap justify-between gap-10">
 
                 {/* subscription */}
-=======
-        <footer className="bg-[#7A1CA9] text-white py-10 px-8 w-full text-sm">
-            <div className="max-w-6xl mx-auto flex flex-wrap justify-between gap-10">
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
                 <div>
                     <img
                         src={hirentLogo}
                         alt="Hirent Logo"
-<<<<<<< HEAD
                         className="w-24 h-auto mb-4"
-=======
-                        className="w-24 h-auto mb-3"
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
                     />
 
                     <p className="text-xs text-gray-300 mb-3">Subscribe</p>
@@ -40,22 +31,15 @@ const Footer = () => {
                         </button>
                     </div>
                 </div>
-<<<<<<< HEAD
 
                 {/* support */}
-=======
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
                 <div className="space-y-4">
                     <h3 className="font-bold text-base mb-5">Support</h3>
 
                     <p className="text-xs text-gray-300 flex items-center gap-2">
                         <i className="fas fa-map-marker-alt w-3"></i>
-<<<<<<< HEAD
                         Naga City, Camarines Sur,<br />
                         Philippines 4400
-=======
-                        Naga City, Camarines Sur, Philippines 4400
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
                     </p>
 
                     <p className="text-xs text-gray-300 flex items-center gap-2">
@@ -69,10 +53,7 @@ const Footer = () => {
                     </p>
                 </div>
 
-<<<<<<< HEAD
                 {/* account */}
-=======
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
                 <div>
                     <h3 className="font-bold text-base mb-5">Account</h3>
                     <ul className="text-xs text-gray-300 space-y-4">
@@ -82,15 +63,9 @@ const Footer = () => {
                         <li><a href="#" className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200">Wishlist</a></li>
                         <li><a href="#" className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200">Shop</a></li>
                     </ul>
-<<<<<<< HEAD
                 </div>
 
                 {/* quick link */}
-=======
-
-                </div>
-
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
                 <div>
                     <h3 className="font-bold text-base mb-5">Quick Link</h3>
                     <ul className="text-xs text-gray-300 space-y-4">
@@ -101,10 +76,7 @@ const Footer = () => {
                     </ul>
                 </div>
 
-<<<<<<< HEAD
                 {/* download app & social media */}
-=======
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
                 <div>
                     <h3 className="font-bold text-base mb-5">Download App</h3>
                     <p className="text-xs text-gray-300 mb-3">
@@ -143,10 +115,7 @@ const Footer = () => {
                 </div>
             </div>
 
-<<<<<<< HEAD
             {/* copyright */}
-=======
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
             <div className="text-center text-xs text-gray-400 mt-10 border-t border-gray-400 pt-6">
                 © Copyright Hirent 2025. All right reserved.
             </div>
@@ -154,8 +123,4 @@ const Footer = () => {
     );
 };
 
-<<<<<<< HEAD
 export default Footer;
-=======
-export default Footer;
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411

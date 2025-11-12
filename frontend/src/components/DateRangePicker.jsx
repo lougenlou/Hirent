@@ -4,17 +4,34 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
-export default function BasicDateRangePicker() {
-    const [fromDate, setFromDate] = React.useState(dayjs());
-    const [toDate, setToDate] = React.useState(dayjs());
+export default function BasicDateRangePicker({
+    fromDate,
+    toDate,
+    setFromDate,
+    setToDate,
+    disabled = false,
+    resetTrigger,
+}) {
+    const [fromPicked, setFromPicked] = React.useState(false);
+    const [toPicked, setToPicked] = React.useState(false);
+
+    // When resetTrigger changes, reset pick flags
+    React.useEffect(() => {
+        setFromPicked(false);
+        setToPicked(false);
+    }, [resetTrigger]);
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <div className="flex items-center space-x-2">
                 <DatePicker
                     label="From"
+                    disabled={disabled}
                     value={fromDate}
-                    onChange={(newValue) => setFromDate(newValue)}
+                    onChange={(newValue) => {
+                        setFromDate(newValue);
+                        setFromPicked(true);
+                    }}
                     slotProps={{
                         textField: {
                             size: "small",
@@ -22,12 +39,16 @@ export default function BasicDateRangePicker() {
                                 borderRadius: "8px",
                                 width: "100%",
                                 "& .MuiInputBase-input": {
-                                    color: "rgba(0, 0, 0, 0.4)",
+                                    color: fromPicked
+                                        ? "rgba(0, 0, 0, 1)"
+                                        : "rgba(0, 0, 0, 0.4)",
                                     fontSize: "13px",
                                     fontFamily: "Inter, sans-serif",
                                 },
                                 "& .MuiInputLabel-root": {
-                                    color: "rgba(0, 0, 0, 0.7)",
+                                    color: disabled
+                                        ? "rgba(0, 0, 0, 0.3)"
+                                        : "rgba(0, 0, 0, 0.7)",
                                     fontWeight: 400,
                                     fontSize: "18px",
                                 },
@@ -45,14 +66,17 @@ export default function BasicDateRangePicker() {
                                     fontSize: "25px",
                                 },
                             },
-
                         },
                     }}
                 />
                 <DatePicker
                     label="To"
+                    disabled={disabled}
                     value={toDate}
-                    onChange={(newValue) => setToDate(newValue)}
+                    onChange={(newValue) => {
+                        setToDate(newValue);
+                        setToPicked(true);
+                    }}
                     slotProps={{
                         textField: {
                             size: "small",
@@ -60,24 +84,28 @@ export default function BasicDateRangePicker() {
                                 borderRadius: "8px",
                                 width: "100%",
                                 "& .MuiInputBase-input": {
-                                    color: "rgba(0, 0, 0, 0.4)", // grayish-black date text
+                                    color: toPicked
+                                        ? "rgba(0, 0, 0, 1)"
+                                        : "rgba(0, 0, 0, 0.4)",
                                     fontSize: "13px",
                                     fontFamily: "Inter, sans-serif",
                                 },
                                 "& .MuiInputLabel-root": {
-                                    color: "rgba(0, 0, 0, 0.7)",
-                                    fontWeight: 400, // not bold
+                                    color: disabled
+                                        ? "rgba(0, 0, 0, 0.3)"
+                                        : "rgba(0, 0, 0, 0.7)",
+                                    fontWeight: 400,
                                     fontSize: "18px",
                                 },
                                 "& .MuiOutlinedInput-root.Mui-focused fieldset": {
-                                    borderColor: "#7A1CA9", // keep focus border purple
+                                    borderColor: "#7A1CA9",
                                 },
                                 "& .MuiOutlinedInput-root:hover fieldset": {
-                                    borderColor: "#7A1CA9", // purple border on hover
+                                    borderColor: "#7A1CA9",
                                 },
                                 "& .MuiSvgIcon-root": {
-                                    color: "#7A1CA9", // purple icon
-                                    backgroundColor: "rgba(122, 28, 169, 0.1)", // light purple background
+                                    color: "#7A1CA9",
+                                    backgroundColor: "rgba(122, 28, 169, 0.1)",
                                     borderRadius: "8px",
                                     padding: "3px",
                                     fontSize: "25px",

@@ -1,19 +1,154 @@
-import React from "react";
-import { mockListings } from "../../data/mockData";
-import CartIcon from "../../assets/icons/Cart1.svg";
+import React, { useEffect, useState } from "react";
+import { Heart, MapPin, Star, ShoppingCart } from "lucide-react";
 import SortDropdown from "../../components/SortDropdown";
 import FilterSidebar from "../../components/FilterSidebar";
-import MainNav from "../../components/MainNav";
-import Footer from "../../components/Footer";
+import Navbar from "../../components/MainNav";
 import banner from "../../assets/banner.png";
+import Footer from "../../components/Footer";
+import dayjs from "dayjs";
+import mockListings from "../../data/mockData";
 
 const BrowseRentals = () => {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [listings, setListings] = useState([]);
+    const [filteredListings, setFilteredListings] = useState([]);
+    const [filters, setFilters] = useState({
+        category: "",
+        location: "",
+        priceRange: [100, 5000],
+        fromDate: null,
+        toDate: null,
+    });
+    const [sortOption, setSortOption] = useState("Popular");
+    const [loading, setLoading] = useState(true);
+    const [wishlist, setWishlist] = useState([]);
+
+    // ✅ Toggle wishlist
+    const toggleWishlist = (id) => {
+        setWishlist((prev) =>
+            prev.includes(id)
+                ? prev.filter((itemId) => itemId !== id)
+                : [...prev, id]
+        );
+    };
+    // ✅ Fetch rental listings (temporary local data)
+    useEffect(() => {
+        setLoading(true);
+        try {
+            setListings(mockListings);
+            setFilteredListings(mockListings);
+        } catch (error) {
+            console.error("Error fetching listings:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+
+    // ✅ Filtering + Sorting
+    useEffect(() => {
+        let filtered = [...listings];
+
+        // Search filter
+        if (searchQuery.trim()) {
+            filtered = filtered.filter(
+                (item) =>
+                    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.tags?.some((tag) =>
+                        tag.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+            );
+        }
+
+        // Category filter
+        if (filters.category) {
+            filtered = filtered.filter(
+                (item) =>
+                    item.category.toLowerCase().trim() ===
+                    filters.category.toLowerCase().trim()
+            );
+        }
+
+        // Location filter
+        if (filters.location) {
+            filtered = filtered.filter((item) =>
+                item.location.toLowerCase().includes(filters.location.toLowerCase())
+            );
+        }
+
+        // Price range filter
+        if (filters.priceRange && Array.isArray(filters.priceRange)) {
+            const [min, max] = filters.priceRange;
+            filtered = filtered.filter((item) => {
+                const numericPrice = parseFloat(
+                    String(item.price).replace(/[^0-9.]/g, "")
+                );
+                return numericPrice >= min && numericPrice <= max;
+            });
+        }
+
+        // Availability filter (ignore default dayjs)
+        if (
+            filters.fromDate &&
+            filters.toDate &&
+            (!dayjs(filters.fromDate).isSame(dayjs(), "day") ||
+                !dayjs(filters.toDate).isSame(dayjs(), "day"))
+        ) {
+            filtered = filtered.filter((item) => {
+                const availableFrom = dayjs(item.availableFrom);
+                const availableTo = dayjs(item.availableTo);
+                const filterStart = dayjs(filters.fromDate).startOf("day");
+                const filterEnd = dayjs(filters.toDate).endOf("day");
+
+                const overlaps =
+                    (availableFrom.isSame(filterStart, "day") &&
+                        availableTo.isSame(filterEnd, "day")) ||
+                    (availableFrom.isBefore(filterEnd, "day") &&
+                        availableTo.isAfter(filterStart, "day")) ||
+                    (availableFrom.isSame(filterStart, "day") &&
+                        availableTo.isAfter(filterStart, "day")) ||
+                    (availableFrom.isBefore(filterEnd, "day") &&
+                        availableTo.isSame(filterEnd, "day"));
+
+                return overlaps;
+            });
+        }
+
+        // ✅ Sorting logic
+        if (sortOption === "Lowest Price") {
+            filtered.sort(
+                (a, b) =>
+                    parseFloat(a.price.replace(/[^0-9.]/g, "")) -
+                    parseFloat(b.price.replace(/[^0-9.]/g, ""))
+            );
+        } else if (sortOption === "Highest Price") {
+            filtered.sort(
+                (a, b) =>
+                    parseFloat(b.price.replace(/[^0-9.]/g, "")) -
+                    parseFloat(a.price.replace(/[^0-9.]/g, ""))
+            );
+        } else if (sortOption === "Newest") {
+            filtered.sort(
+                (a, b) => new Date(b.availableFrom) - new Date(a.availableFrom)
+            );
+        } else if (sortOption === "Popular") {
+            filtered.sort((a, b) => b.rating - a.rating);
+        }
+
+        setFilteredListings(filtered);
+    }, [filters, listings, searchQuery, sortOption]);
+
+    // ✅ Apply filters from sidebar
+    const handleApplyFilters = (filterData) => {
+        setFilters(filterData);
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-white">
-            {/* Navigation Bar */}
-            <MainNav />
+            {/* Navbar */}
+            <Navbar onSearch={(query) => setSearchQuery(query)} />
 
-            {/* Banner Section */}
+            {/* Banner */}
             <div className="w-full">
                 <img
                     src={banner}
@@ -22,183 +157,185 @@ const BrowseRentals = () => {
                 />
             </div>
 
-            {/* Main Content */}
+            {/* Content */}
             <div className="flex flex-1 overflow-hidden px-6 py-6 gap-6 bg-white">
-                {/* Filter Sidebar with spacing */}
-                <div className="shrink-0">
-                    <FilterSidebar />
-                </div>
+                {/* Filter Sidebar */}
+                <FilterSidebar onApplyFilters={handleApplyFilters} />
 
-                {/* Right Scrollable Section */}
+                {/* Listings Section */}
                 <main className="flex-1 overflow-y-auto p-4 md:p-5 lg:p-6">
-
-                    {/* Header */}
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-medium text-gray-800 flex items-center gap-1">
                             <span className="inline-block w-3 h-6 bg-[#7A1CA9] rounded mr-2"></span>
-                            Gadgets <span className="text-purple-600 font-normal ml-1">(64)</span>
+                            {filters.category || "All Rentals"}{" "}
+                            <span className="text-[#9129c5] font-normal ml-1">
+                                ({filteredListings.length})
+                            </span>
                         </h2>
 
-                        <SortDropdown />
-
+                        {/* ✅ Sort Dropdown now works */}
+                        <SortDropdown onSortChange={setSortOption} />
                     </div>
 
-                    {/* Listings Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-4">
-                        {mockListings.map((item) => (
-                            <div
-                                key={item.id}
-                                className="rounded-2xl shadow-sm hover:shadow-lg transition-all bg-white p-3"
-                            >
-                                <div className="relative bg-gray-100 aspect-square rounded-2xl flex flex-col items-center justify-center overflow-hidden">
-                                    <button
-                                        style={{ position: "absolute", top: 10, right: 10, zIndex: 50 }}
-                                        className="bg-white rounded-full shadow p-1 hover:bg-gray-200 transition"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={1.5}
-                                            stroke="currentColor"
-                                            className="w-5 h-5 text-gray-600"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                                            />
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            />
-                                        </svg>
-                                    </button>
+                    {/* Loading or No Results */}
+                    {loading ? (
+                        <div className="text-center text-gray-500 py-20">
+                            Loading listings...
+                        </div>
+                    ) : filteredListings.length === 0 ? (
+                        <div className="text-center text-gray-500 py-20">
+                            No items found.
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-4">
+                            {filteredListings.map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="rounded-2xl shadow-sm hover:shadow-lg transition-all bg-white p-3"
+                                >
+                                    <div className="relative bg-gray-100 aspect-square rounded-2xl flex flex-col items-center justify-center overflow-hidden">
+                                        {/* Top Right Icons */}
+                                        <div className="absolute top-3 right-3 flex gap-1 z-50">
+                                            <button
+                                                onClick={() => toggleWishlist(item.id)}
+                                                className="bg-white rounded-full shadow p-1 hover:bg-gray-200 transition"
+                                            >
+                                                <Heart
+                                                    size={18}
+                                                    strokeWidth={1.5}
+                                                    className={`transition ${wishlist.includes(item.id)
+                                                        ? "fill-[#f7115e] stroke-[#f7115e]"
+                                                        : "stroke-[#af50df]"
+                                                        }`}
+                                                />
+                                            </button>
 
-                                    {/* Product Image */}
-                                    <div className="flex-1 flex items-center justify-center px-1 pt-1 pb-0">
-                                        <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className="w-4/5 h-4/5 object-contain"
-                                        />
+                                            <button className="bg-white rounded-full shadow p-1 hover:bg-gray-200 transition">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    strokeWidth={1.5}
+                                                    stroke="currentColor"
+                                                    className="w-5 h-5 text-gray-600"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                                                    />
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        {/* Product Image */}
+                                        <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                                            <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                className="absolute w-[95%] h-[95%] object-contain transition-transform duration-300 hover:scale-110"
+                                            />
+                                        </div>
+
+                                        {/* Add to Cart */}
+                                        <button className="bg-[#7A1CA9] hover:bg-[#681690] text-white text-[13px] py-2 w-full rounded-b-2xl transition flex justify-center items-center space-x-2">
+                                            <ShoppingCart size={16} className="text-white" strokeWidth={1.5} />
+                                            <span>Add To Cart</span>
+                                        </button>
                                     </div>
 
-                                    {/* Add to Cart */}
-                                    <button className="bg-[#7A1CA9] hover:bg-[#681690] text-white text-[13px] py-3 w-full rounded-b-2xl transition flex justify-center items-center space-x-2">
+                                    {/* Product Info */}
+                                    <div className="text-left mt-3">
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-gray-800 font-semibold text-sm mt-2 mb-1">
+                                                {item.name}
+                                            </p>
 
-                                        <img src={CartIcon} alt="Cart Icon" className="w-4 h-4" />
-                                        <span>Add To Cart</span>
-                                    </button>
-                                </div>
+                                            {/* Dynamic Rating */}
+                                            <div className="flex items-center text-yellow-500 text-xs">
+                                                {Array.from({ length: 5 }).map((_, index) => {
+                                                    const starValue = index + 1;
+                                                    const isFull = item.rating >= starValue;
+                                                    const isHalf =
+                                                        !isFull && item.rating >= starValue - 0.5;
+                                                    const uniqueId = `half-${item.id}-${index}`;
 
+                                                    if (isFull) {
+                                                        return (
+                                                            <Star
+                                                                key={index}
+                                                                size={14}
+                                                                fill="#facc15"
+                                                                stroke="#facc15"
+                                                                className="mr-[2px]"
+                                                            />
+                                                        );
+                                                    } else if (isHalf) {
+                                                        return (
+                                                            <svg
+                                                                key={index}
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24"
+                                                                width="14"
+                                                                height="14"
+                                                                className="mr-[2px]"
+                                                            >
+                                                                <defs>
+                                                                    <linearGradient id={uniqueId}>
+                                                                        <stop offset="50%" stopColor="#facc15" />
+                                                                        <stop
+                                                                            offset="50%"
+                                                                            stopColor="transparent"
+                                                                        />
+                                                                    </linearGradient>
+                                                                </defs>
+                                                                <path
+                                                                    fill={`url(#${uniqueId})`}
+                                                                    stroke="#facc15"
+                                                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 
+                                  9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                                                />
+                                                            </svg>
+                                                        );
+                                                    } else {
+                                                        return (
+                                                            <Star
+                                                                key={index}
+                                                                size={14}
+                                                                fill="none"
+                                                                stroke="#facc15"
+                                                                className="mr-[2px]"
+                                                            />
+                                                        );
+                                                    }
+                                                })}
+                                                <span className="text-gray-600 font-medium ml-1">
+                                                    {item.rating}
+                                                </span>
+                                            </div>
+                                        </div>
 
-                                {/* Product Info */}
-                                <div className="text-left mt-3">
-                                    <p className="text-gray-800 font-semibold text-sm mt-2 mb-1">{item.name}</p>
-                                    <p className="text-[#7A1CA9] font-bold text-sm mb-1">
-                                        {item.price}
-                                        <span className="text-[#C59BD9] line-through text-sm font-normal ml-2">
-                                            {item.oldPrice}
-                                        </span>
-                                    </p>
+                                        <p className="text-[#7A1CA9] font-bold text-sm mb-1">
+                                            {item.price}
+                                        </p>
 
-
-                                    {/* Rating */}
-                                    <div className="flex items-center space-x-1 text-yellow-500 text-sm">
-                                        <span>★★★★★</span>
-                                        <span className="text-gray-500 text-xs">(65)</span>
+                                        <div className="flex items-center text-gray-500 text-xs gap-1">
+                                            <MapPin size={13} className="text-gray-500" />
+                                            <span>{item.location}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                        ))}
-                    </div>
-
-                    {/* More like this */}
-                    <div className="flex justify-between items-center mb-6 mt-10">
-                        <h2 className="text-xl font-medium text-gray-800 flex items-center gap-1">
-                            <span className="inline-block w-3 h-6 bg-[#7A1CA9] rounded mr-2"></span>
-                            More like this <span className="text-purple-600 font-normal ml-1">(154)</span>
-                        </h2>
-                    </div>
-
-                    {/* Listings Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-4">
-                        {mockListings.map((item) => (
-                            <div
-                                key={item.id}
-                                className="rounded-2xl shadow-sm hover:shadow-lg transition-all bg-white p-3"
-                            >
-                                <div className="relative bg-gray-100 aspect-square rounded-2xl flex flex-col items-center justify-center overflow-hidden">
-                                    <button
-                                        style={{ position: "absolute", top: 10, right: 10, zIndex: 50 }}
-                                        className="bg-white rounded-full shadow p-1 hover:bg-gray-200 transition"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={1.5}
-                                            stroke="currentColor"
-                                            className="w-5 h-5 text-gray-600"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                                            />
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                            />
-                                        </svg>
-                                    </button>
-
-                                    {/* Product Image */}
-                                    <div className="flex-1 flex items-center justify-center px-1 pt-1 pb-0">
-                                        <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className="w-4/5 h-4/5 object-contain"
-                                        />
-                                    </div>
-
-                                    {/* Add to Cart */}
-                                    <button className="bg-[#7A1CA9] hover:bg-[#681690] text-white text-[13px] py-3 w-full rounded-b-2xl transition flex justify-center items-center space-x-2">
-
-                                        <img src={CartIcon} alt="Cart Icon" className="w-4 h-4" />
-                                        <span>Add To Cart</span>
-                                    </button>
-                                </div>
-
-
-                                {/* Product Info */}
-                                <div className="text-left mt-3">
-                                    <p className="text-gray-800 font-semibold text-sm mt-2 mb-1">{item.name}</p>
-                                    <p className="text-[#7A1CA9] font-bold text-sm mb-1">
-                                        {item.price}
-                                        <span className="text-[#C59BD9] line-through text-sm font-normal ml-2">
-                                            {item.oldPrice}
-                                        </span>
-                                    </p>
-
-
-                                    {/* Rating */}
-                                    <div className="flex items-center space-x-1 text-yellow-500 text-sm">
-                                        <span>★★★★★</span>
-                                        <span className="text-gray-500 text-xs">(65)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </main>
             </div>
 
-            {/* Footer */}
             <Footer />
         </div>
     );

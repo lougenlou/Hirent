@@ -3,7 +3,7 @@ import { Heart, MapPin, Star, ShoppingCart, Check } from "lucide-react";
 import SortDropdown from "../../components/SortDropdown";
 import FilterSidebar from "../../components/FilterSidebar";
 import Navbar from "../../components/MainNav";
-import banner from "../../assets/banner.png";
+import BannerCarousel from "../../components/BannerCarousel";
 import Footer from "../../components/Footer";
 import dayjs from "dayjs";
 import mockListings from "../../data/mockData";
@@ -162,13 +162,10 @@ const BrowseRentals = () => {
             <Navbar onSearch={(query) => setSearchQuery(query)} />
 
             {/* Banner */}
-            <div className="w-full">
-                <img
-                    src={banner}
-                    alt="Browse Rentals Banner"
-                    className="w-full h-auto object-cover"
-                />
-            </div>
+            <BannerCarousel />
+
+            <div className="mt-32"></div>  {/* mt-16 = 4rem / 64px */}
+
 
             {/* Content */}
             <div className="flex flex-1 overflow-hidden px-6 py-6 gap-6 bg-white">

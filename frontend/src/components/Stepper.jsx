@@ -1,47 +1,60 @@
-import * as React from "react";
-import MuiStepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import Box from "@mui/material/Box";
+import React, { useEffect, useState } from "react";
 
-const steps = ["Owner Information", "Owner Submission"];
+const Stepper = ({ currentStep }) => {
+  const [animateFirst, setAnimateFirst] = useState(false);
 
-export default function Stepper({ activeStep }) {
+  useEffect(() => {
+    setTimeout(() => setAnimateFirst(true), 150);
+  }, []);
+
   return (
-    <Box sx={{ width: "100%" }}>
-      <MuiStepper
-        activeStep={activeStep}
-        alternativeLabel
-        sx={{
-          "& .MuiStepLabel-label": {
-            fontSize: "0.9rem",
-            opacity: 0.5,
-            color: "gray",
-            transition: "color 0.4s, opacity 0.4s",
-          },
-          "& .MuiStepLabel-label.Mui-active, & .MuiStepLabel-label.Mui-completed": {
-            color: "#7A1CA9",
-            opacity: 1,
-          },
-          "& .MuiStepIcon-root": {
-            transition: "transform 0.4s, color 0.4s",
-          },
-          "& .MuiStepIcon-root.Mui-active": {
-            color: "#7A1CA9",
-            transform: "scale(1.3)",
-          },
-          "& .MuiStepIcon-root.Mui-completed": {
-            color: "#7A1CA9",
-            transform: "scale(1.1)",
-          },
-        }}
-      >
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </MuiStepper>
-    </Box>
+    <div className="w-full flex flex-col items-center gap-3">
+      <div className="flex w-full max-w-[800px] gap-0">
+
+        {/* Segment 1 */}
+        <div className="w-1/3 h-2 bg-gray-200 rounded-l-full overflow-hidden">
+          <div
+            className="
+              h-full bg-[#7A1CA9]
+              transition-all duration-500 ease-in-out
+              rounded-l-full
+            "
+            style={{
+              width: animateFirst ? "100%" : "0%",
+            }}
+          ></div>
+        </div>
+
+        {/* Segment 2 */}
+        <div className="w-1/3 h-2 bg-gray-200 overflow-hidden">
+          <div
+            className="
+              h-full bg-[#7A1CA9]
+              transition-all duration-500 ease-in-out
+            "
+            style={{
+              width: currentStep >= 2 ? "100%" : "0%",
+            }}
+          ></div>
+        </div>
+
+        {/* Segment 3 */}
+        <div className="w-1/3 h-2 bg-gray-200 rounded-r-full overflow-hidden">
+          <div
+            className="
+              h-full bg-[#7A1CA9]
+              transition-all duration-500 ease-in-out
+              rounded-r-full
+            "
+            style={{
+              width: currentStep === 3 ? "100%" : "0%",
+            }}
+          ></div>
+        </div>
+
+      </div>
+    </div>
   );
-}
+};
+
+export default Stepper;

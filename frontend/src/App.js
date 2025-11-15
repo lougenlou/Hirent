@@ -2,13 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { AuthProvider } from "./context/AuthContext";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
-import OwnerInformation from "./pages/auth/Owner_Information";
-import OwnerSubmission from "./pages/auth/Owner_Submission";
-import Onboarding1 from "./pages/onboarding/Onboarding1";
-import Onboarding2 from "./pages/onboarding/Onboarding2";
-import Onboarding3 from "./pages/onboarding/Onboarding3";
-import Onboarding4 from "./pages/onboarding/Onboarding4";
-import OnboardingLayout from "./layouts/OnboardingLayout";
+import OwnerSignup from "./pages/auth/OwnerSignup";
+import OwnerSetup from "./pages/auth/OwnerSetup";
 import BrowseRentals from "./pages/home/BrowseRentals";
 import MainLayout from "./layouts/MainLayout";
 import "leaflet/dist/leaflet.css";
@@ -21,15 +16,8 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/owner-information" element={<OwnerInformation />} />
-          <Route path="/owner-submission" element={<OwnerSubmission />} />
-
-          <Route element={<OnboardingLayout />}>
-            <Route path="/onboarding1" element={<Onboarding1 />} />
-            <Route path="/onboarding2" element={<Onboarding2 />} />
-            <Route path="/onboarding3" element={<Onboarding3 />} />
-            <Route path="/onboarding4" element={<Onboarding4 />} />
-          </Route>
+          <Route path="/ownersignup" element={<OwnerSignup/>} />
+          <Route path="/ownersetup" element={<OwnerSetup />} />
 
           <Route element={<MainLayout />}>
             <Route path="/browse" element={<BrowseRentals />} />

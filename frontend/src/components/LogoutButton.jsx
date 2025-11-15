@@ -5,11 +5,11 @@ const LogoutButton = () => {
 
   const handleLogout = () => {
     // Clear local storage/session
-    localStorage.removeItem("token"); // or whatever key you use
-    localStorage.removeItem("user");  // optional user info
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-    // Redirect to login page
-    navigate("/login");
+    // Reload same page so navbar re-renders as MainNav
+    window.location.reload();
   };
 
   return (

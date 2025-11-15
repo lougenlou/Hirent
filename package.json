@@ -23,7 +23,8 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
-    "mongoose": "^8.19.2"
+    "mongoose": "^8.19.2",
+    "react-icons-kit": "^2.0.0"
   },
   "devDependencies": {
     "sass": "^1.93.2"

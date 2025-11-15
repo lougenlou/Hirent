@@ -51,12 +51,15 @@ const MainNav = () => {
 
             {/* “Be an Owner” */}
             <NavLink
-              to="/seller"
-              className="flex items-center justify-center px-5 h-full transition-colors"
-              style={{ color: "#FFFB83" }}
-            >
-              <span className="underline underline-offset-2 hover:decoration-yellow-400 hover:text-yellow-300 transition-all">Be an Owner</span>
-            </NavLink>
+  to="/ownersignup"
+  className="flex items-center justify-center px-5 h-full transition-colors"
+  style={{ color: "#FFFB83" }}
+>
+  <span className="underline underline-offset-2 hover:decoration-yellow-400 hover:text-yellow-300 transition-all">
+    Be an Owner
+  </span>
+</NavLink>
+
           </div>
 
           {/* Buttons (Login / Register) */}

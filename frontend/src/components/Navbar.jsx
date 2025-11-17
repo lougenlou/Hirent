@@ -4,25 +4,31 @@ import { Search, Heart, ShoppingCart, User } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import hirentLogo from "../assets/hirent-logo.png";
 
+
 const Navbar = ({ onSearch }) => {
   const [inputValue, setInputValue] = useState("");
   const location = useLocation();
   const { isLoggedIn, logout } = useContext(AuthContext);
 
+
   const handleSearch = () => {
     if (onSearch) onSearch(inputValue.trim());
   };
 
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSearch();
   };
+
 
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Browse", path: "/browse" },
     { name: "How It Works", path: "/how-it-works" },
     { name: "About Us", path: "/about" },
+    { name: "Be A Seller", path: "/be-a-seller", highlight: true },
   ];
+
 
   return (
     <>
@@ -32,10 +38,12 @@ const Navbar = ({ onSearch }) => {
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto h-full">
 
+
           {/* Logo */}
           <div className="flex items-center h-full">
-            <img src={hirentLogo} alt="HiRENT" className="h-7" />
+            <img src={hirentLogo} alt="Hirent" className="h-7" />
           </div>
+
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center h-full font-inter text-[13px]">
@@ -45,16 +53,18 @@ const Navbar = ({ onSearch }) => {
                 <NavLink
                   key={link.name}
                   to={link.path}
-                  className={`px-5 flex items-center h-full transition-colors ${isActive
-                    ? "bg-[#59087f] text-white border-b-[4px] border-white"
-                    : "text-white hover:bg-[#680e91]"
-                  }`}
+                  className={`px-5 flex items-center h-full transition-colors ${
+                    isActive
+                      ? "bg-[#59087f] border-b-[4px] border-white"
+                      : "hover:bg-[#680e91]"
+                  } ${link.highlight ? "text-[#FFFB83]" : "text-white"}`}
                 >
                   {link.name}
                 </NavLink>
               );
             })}
           </div>
+
 
           {/* Right Side: Different UI if logged in or not */}
           <div className="hidden lg:flex items-center h-full space-x-4">
@@ -75,6 +85,7 @@ const Navbar = ({ onSearch }) => {
                     onClick={handleSearch}
                   />
                 </div>
+
 
                 {/* Icons */}
                 <div className="flex items-stretch space-x-1 h-full">
@@ -100,11 +111,13 @@ const Navbar = ({ onSearch }) => {
                   })}
                 </div>
 
+
                 {/* Logout Button */}
                 <button
-                  onClick={logout} // just logout, no navigation
+                  onClick={logout}
                   className="flex items-center justify-center text-sm h-full px-3 text-white hover:bg-[#680e91] transition rounded ml-auto"
-                > Logout
+                >
+                  Logout
                 </button>
               </>
             ) : (
@@ -130,5 +143,6 @@ const Navbar = ({ onSearch }) => {
     </>
   );
 };
+
 
 export default Navbar;

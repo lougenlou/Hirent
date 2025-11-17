@@ -8,8 +8,8 @@ const ProductSidebar = () => {
 
   const sidebarItems = [
     { icon: Home, link: '/', label: 'Home' },
-    { icon: ShoppingCart, link: '/my-rentals', label: 'My Rentals' },
-    { icon: Gift, link: '/my-cart', label: 'My Cart' },
+    { icon: ShoppingCart, link: '/cart', label: 'My Cart' }, // Changed from /my-cart to /cart
+    { icon: Gift, link: '/my-rentals', label: 'My Rentals' },
     { icon: Heart, link: '/wishlist', label: 'Wishlist' },
     { icon: User, link: '/profile', label: 'Profile' },
     { icon: Settings, link: '/settings', label: 'Settings' }

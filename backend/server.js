@@ -21,7 +21,8 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/homepage', require('./api/homepage/homepage.routes'));
+app.use('/api/homepage', require('./routes/homepage.routes'));
+app.use('/api/users', require('./routes/userRoutes')); // User routes
 
 const homepageRoutes = require("./api/homepage/homepage.route");
 app.use("/api/homepage", homepageRoutes);

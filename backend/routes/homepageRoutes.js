@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("./homepage.controller");
+const controller = require("../controllers/homepageController");
 
 router.get("/categories/featured", controller.getFeaturedCategories);
 router.get("/categories/:slug/items", controller.getItemsByCategory);

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BookingStatsBar from "../components/bookings/BookingStatsBar";
 import BookingTable from "../components/bookings/BookingTable";
-import RenterDetailsModal from "../components/bookings/RenterDetailsModal";
-import { HiOutlineChevronDown } from "react-icons/hi";
+import ApprovalModal from "../components/bookings/ApprovalModal";
+import RejectModal from "../components/bookings/RejectModal";
+import { HiOutlineSearch } from "react-icons/hi";
 
 const KPI_STATS = [
   {
@@ -29,17 +30,7 @@ const KPI_STATS = [
     valueColor: "text-gray-900",
     subColor: "text-yellow-600",
   },
-  {
-    label: "Earnings This Month",
-    value: "₱5,500.00",
-    sub: "+18% from last month",
-    iconColor: "bg-purple-700",
-    valueColor: "text-green-600",
-    subColor: "text-green-600",
-  },
 ];
-
-const SORT_OPTIONS = ["Booked Date", "Pending", "Approved", "Completed"];
 
 const MOCK_BOOKINGS = [
   {
@@ -50,17 +41,24 @@ const MOCK_BOOKINGS = [
     renter: {
       name: "Maria Santos",
       email: "maria.santos@gmail.com",
-      phone: "+63 998 888 1234",
-      avatar: "/assets/icons/profile1.png",
-      address: "Unit 301, HiRent Tower, QC",
+      phone: "+63 912 345 6789",
+      avatar: "",
+      address: "123 Bonifacio St, Makati City, Metro Manila 1200",
       verified: true,
       joined: "2022-04-01",
+      rating: 4.5,
     },
     price: "₱750/day",
     discount: "with 15% discount",
     bookedDates: "2025-10-20",
     bookedDateEnd: "2025-10-24",
-    status: "Approved",
+    duration: "5 days",
+    paymentMethod: "GCash",
+    subtotal: "₱750/day",
+    shipping: "Free",
+    discountPercent: "15%",
+    total: "₱637.50",
+    status: "Pending",
   },
   {
     id: 2,
@@ -70,16 +68,23 @@ const MOCK_BOOKINGS = [
     renter: {
       name: "Maria Santos",
       email: "maria.santos@gmail.com",
-      phone: "+63 998 888 1234",
-      avatar: "/assets/icons/profile1.png",
-      address: "Unit 301, HiRent Tower, QC",
+      phone: "+63 912 345 6789",
+      avatar: "",
+      address: "123 Bonifacio St, Makati City, Metro Manila 1200",
       verified: true,
       joined: "2022-04-01",
+      rating: 4.5,
     },
     price: "₱250/day",
     discount: "",
     bookedDates: "2025-10-20",
     bookedDateEnd: "2025-10-24",
+    duration: "5 days",
+    paymentMethod: "GCash",
+    subtotal: "₱250/day",
+    shipping: "Free",
+    discountPercent: "",
+    total: "₱250.00",
     status: "Approved",
   },
   {
@@ -90,16 +95,23 @@ const MOCK_BOOKINGS = [
     renter: {
       name: "Maria Santos",
       email: "maria.santos@gmail.com",
-      phone: "+63 998 888 1234",
-      avatar: "/assets/icons/profile1.png",
-      address: "Unit 301, HiRent Tower, QC",
+      phone: "+63 912 345 6789",
+      avatar: "",
+      address: "123 Bonifacio St, Makati City, Metro Manila 1200",
       verified: true,
       joined: "2022-04-01",
+      rating: 4.5,
     },
     price: "₱800/day",
     discount: "with 30% discount",
     bookedDates: "2025-10-20",
     bookedDateEnd: "2025-10-24",
+    duration: "5 days",
+    paymentMethod: "GCash",
+    subtotal: "₱800/day",
+    shipping: "Free",
+    discountPercent: "30%",
+    total: "₱560.00",
     status: "Pending",
   },
   {
@@ -110,17 +122,24 @@ const MOCK_BOOKINGS = [
     renter: {
       name: "Maria Santos",
       email: "maria.santos@gmail.com",
-      phone: "+63 998 888 1234",
-      avatar: "/assets/icons/profile1.png",
-      address: "Unit 301, HiRent Tower, QC",
+      phone: "+63 912 345 6789",
+      avatar: "",
+      address: "123 Bonifacio St, Makati City, Metro Manila 1200",
       verified: true,
       joined: "2022-04-01",
+      rating: 4.5,
     },
     price: "₱250/day",
     discount: "with 25% discount",
     bookedDates: "2025-10-20",
     bookedDateEnd: "2025-10-24",
-    status: "Completed",
+    duration: "5 days",
+    paymentMethod: "GCash",
+    subtotal: "₱250/day",
+    shipping: "Free",
+    discountPercent: "25%",
+    total: "₱187.50",
+    status: "Approved",
   },
   {
     id: 5,
@@ -130,97 +149,146 @@ const MOCK_BOOKINGS = [
     renter: {
       name: "Maria Santos",
       email: "maria.santos@gmail.com",
-      phone: "+63 998 888 1234",
-      avatar: "/assets/icons/profile1.png",
-      address: "Unit 301, HiRent Tower, QC",
+      phone: "+63 912 345 6789",
+      avatar: "",
+      address: "123 Bonifacio St, Makati City, Metro Manila 1200",
       verified: true,
       joined: "2022-04-01",
+      rating: 4.5,
     },
     price: "₱700/day",
     discount: "",
     bookedDates: "2025-10-20",
     bookedDateEnd: "2025-10-24",
+    duration: "5 days",
+    paymentMethod: "GCash",
+    subtotal: "₱700/day",
+    shipping: "Free",
+    discountPercent: "",
+    total: "₱700.00",
     status: "Pending",
   },
 ];
 
 export default function OwnerBookingsDashboard() {
-  const [sortOpen, setSortOpen] = useState(false);
-  const [sortBy, setSortBy] = useState("Booked Date");
   const [bookings, setBookings] = useState([...MOCK_BOOKINGS]);
-  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [expandedRow, setExpandedRow] = useState(null);
 
-  function handleSort(option) {
-    let filtered = [...MOCK_BOOKINGS];
+  const [approvalModalData, setApprovalModalData] = useState(null);
+  const [rejectModalData, setRejectModalData] = useState(null);
 
-    if (option === "Booked Date") {
-      filtered.sort((a, b) => new Date(b.bookedDates) - new Date(a.bookedDates));
-    } else if (option === "Pending") {
-      filtered = filtered.filter((b) => b.status === "Pending");
-    } else if (option === "Approved") {
-      filtered = filtered.filter((b) => b.status === "Approved");
-    } else if (option === "Completed") {
-      filtered = filtered.filter((b) => b.status === "Completed");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (!debouncedSearch.trim()) {
+      setBookings([...MOCK_BOOKINGS]);
+      return;
     }
 
-    setSortBy(option);
+    const q = debouncedSearch.toLowerCase();
+    const filtered = MOCK_BOOKINGS.filter(
+      (b) =>
+        b.item.toLowerCase().includes(q) ||
+        b.renter.name.toLowerCase().includes(q)
+    );
+
     setBookings(filtered);
-    setSortOpen(false);
-  }
+  }, [debouncedSearch]);
 
   return (
-    <div className="w-full px-12 py-10 bg-gray-50 min-h-screen">
+    <div className="w-full px-10 py-10 bg-gray-50 min-h-screen font-inter">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-2">
-          <h2 className="font-semibold text-gray-600 text-base">Bookings</h2>
-          <h1 className="text-2xl font-bold text-gray-900 mb-0">
-            Hello, <span className="text-purple-700">John Doe!</span>
-          </h1>
-          <p className="mb-7 text-gray-500 text-sm">
-            View and manage all bookings from renters
-          </p>
-        </div>
 
-        <BookingStatsBar stats={KPI_STATS} />
+        {/* HEADER + KPIs ALIGNED */}
+        <div className="flex justify-between items-start mb-10">
+          
+          {/* LEFT SIDE: HEADER + SEARCH */}
+          <div className="flex flex-col w-full max-w-md">
+            <h2 className="font-semibold text-gray-600 text-base">Bookings</h2>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              Hello, <span className="text-purple-700">John Doe!</span>
+            </h1>
+            <p className="text-gray-500 text-sm mb-4">
+              View and manage all bookings from renters
+            </p>
 
-        <div className="flex flex-row gap-3 items-center mb-6 mt-1 justify-end">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span className="uppercase text-xs font-semibold">Sort by</span>
+            {/* SEARCH BAR — FIXED ICON ALIGNMENT */}
+            <div className="relative w-full">
+              <HiOutlineSearch
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"
+              />
+              <input
+                type="text"
+                placeholder="Search items or renters..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="
+                  w-full pl-10 pr-4 py-2
+                  border border-purple-400 rounded-xl
+                  bg-white text-sm
+                  focus:outline-none focus:ring-2 focus:ring-purple-500
+                "
+              />
+            </div>
           </div>
-          <div className="relative">
-            <button
-              className="rounded border border-gray-200 bg-white px-6 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition min-w-[180px] justify-between"
-              onClick={() => setSortOpen((v) => !v)}
-            >
-              {sortBy}
-              <HiOutlineChevronDown className="w-5 h-5" />
-            </button>
-            {sortOpen && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border z-10 py-2">
-                {SORT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    className={`flex items-center w-full px-4 py-2 text-sm text-left hover:bg-purple-50 ${
-                      sortBy === opt ? "font-bold text-purple-700" : ""
-                    }`}
-                    onClick={() => handleSort(opt)}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
+
+          {/* RIGHT SIDE: KPI CARDS */}
+          <div className="flex gap-6 ml-10">
+            <BookingStatsBar stats={KPI_STATS} />
           </div>
         </div>
 
-        <BookingTable bookings={bookings} onViewDetails={setSelectedBooking} />
+        {/* TABLE */}
+        <BookingTable
+          bookings={bookings}
+          expandedRow={expandedRow}
+          setExpandedRow={setExpandedRow}
+          onApprove={(b) => setApprovalModalData(b)}
+          onReject={(b) => setRejectModalData(b)}
+        />
 
-        {selectedBooking && (
-          <RenterDetailsModal
-            booking={selectedBooking}
-            onClose={() => setSelectedBooking(null)}
+        {/* APPROVAL MODAL */}
+        {approvalModalData && (
+          <ApprovalModal
+            booking={approvalModalData}
+            onClose={() => setApprovalModalData(null)}
+            onConfirm={() => {
+              setBookings(
+                bookings.map((b) =>
+                  b.id === approvalModalData.id
+                    ? { ...b, status: "Approved" }
+                    : b
+                )
+              );
+              setApprovalModalData(null);
+            }}
           />
         )}
+
+        {/* REJECTION MODAL */}
+        {rejectModalData && (
+          <RejectModal
+            booking={rejectModalData}
+            onClose={() => setRejectModalData(null)}
+            onConfirm={() => {
+              setBookings(
+                bookings.map((b) =>
+                  b.id === rejectModalData.id
+                    ? { ...b, status: "Rejected" }
+                    : b
+                )
+              );
+              setRejectModalData(null);
+            }}
+          />
+        )}
+
       </div>
     </div>
   );

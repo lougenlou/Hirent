@@ -1,28 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* Import Inter once */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+/* Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
+/* Global reset (Tailwind already handles most) */
+html, body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-body {
+  overflow-x: hidden;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-/* Hide horizontal scrollbar globally */
-body {
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
 
-html {
-  overflow-x: hidden;
+/* Ensure box-sizing is consistent */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
-

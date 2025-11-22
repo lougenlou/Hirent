@@ -239,14 +239,20 @@ const MyRentalsPage = () => {
                                                 {item.bookedFrom && item.bookedTo && (
                                                     <div className="flex items-center gap-1 text-gray-600">
                                                         <ClockFading className="w-4 h-4 mr-1 opacity-65" />
-                                                        {Math.ceil(
-                                                            (new Date(item.bookedTo) - new Date(item.bookedFrom)) / (1000 * 60 * 60 * 24)
-                                                        )}{" "}
-                                                        day{Math.ceil(
-                                                            (new Date(item.bookedTo) - new Date(item.bookedFrom)) / (1000 * 60 * 60 * 24)
-                                                        ) > 1 ? "s" : ""}
+                                                        {(() => {
+                                                            let daysCount = item.days || 1;
+                                                            if (item.bookedFrom && item.bookedTo) {
+                                                                const from = new Date(item.bookedFrom);
+                                                                const to = new Date(item.bookedTo);
+                                                                const msPerDay = 1000 * 60 * 60 * 24;
+                                                                const diff = Math.floor((to - from) / msPerDay) + 1;
+                                                                daysCount = diff > 0 ? diff : daysCount;
+                                                            }
+                                                            return `${daysCount} day${daysCount > 1 ? "s" : ""}`;
+                                                        })()}
                                                     </div>
                                                 )}
+
                                             </div>
 
                                             {/* Location (from listing) */}
@@ -298,9 +304,11 @@ const MyRentalsPage = () => {
                                                                         ? item.couponDiscount
                                                                         : listing?.couponDiscount || 0;
 
+                                                                const securityDeposit = item.securityDeposit || 0;
                                                                 const subtotal = pricePerDay * daysCount;
                                                                 const discountAmount = (subtotal * discountPercent) / 100;
-                                                                const total = subtotal - discountAmount + shippingFee;
+                                                                const total = subtotal - discountAmount + shippingFee + securityDeposit;
+
 
                                                                 return `₱${total.toFixed(2)}`;
                                                             })()}

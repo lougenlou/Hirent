@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CalendarCheck, CalendarClock, MapPin, CreditCard, Package, Truck, CheckCircle2, Clock, Tag } from "lucide-react";
+import { CalendarCheck, CalendarClock, MapPin, CreditCard, Package, Truck, DollarSign, CheckCircle2, Clock, Tag, Percent, ShieldAlert } from "lucide-react";
 import TruckIcon from "../../assets/delivery.png"; // adjust path if needed
 import DeliveryTrackingModal from "./DeliveryTrackingModal";
 import CancelConfirmationModal from "./CancelModal";
@@ -217,16 +217,21 @@ export function ViewDetailsModal({ isOpen, onClose, itemId, rentalData }) {
                                             ? rental.couponDiscount
                                             : listing?.couponDiscount || 0;
 
+                                    const securityDeposit = rental.securityDeposit || 0; // default to 0 if undefined
                                     const subtotal = pricePerDay * daysCount;
                                     const discountAmount = (subtotal * discountPercent) / 100;
-                                    const total = subtotal - discountAmount + shippingFee;
+                                    const total = subtotal - discountAmount + shippingFee + securityDeposit;
+
 
                                     return (
                                         <>
                                             {/* Subtotal */}
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-gray-500">
-                                                    Subtotal ({daysCount} days × ₱{pricePerDay})
+                                                    <div className="flex items-center gap-2">
+                                                        <DollarSign className="w-4 h-4 text-gray-500" />
+                                                        Subtotal ({daysCount} days × ₱{pricePerDay})
+                                                    </div>
                                                 </span>
                                                 <span className="text-gray-900">
                                                     ₱{subtotal.toFixed(2)}
@@ -236,37 +241,54 @@ export function ViewDetailsModal({ isOpen, onClose, itemId, rentalData }) {
                                             {/* Discount (SHOW BADGE ONLY IF COUPON EXISTS) */}
                                             <div className="flex justify-between items-center text-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-green-600">
-                                                        Discount ({discountPercent}%)
-                                                    </span>
+                                                    {/* Icon + Discount Label */}
+                                                    <div className="flex items-center gap-2 text-green-500">
+                                                        <Percent className="w-4 h-4 text-green-500" />
+                                                        <span>Discount ({discountPercent}%)</span>
+                                                    </div>
 
+                                                    {/* Coupon Badge */}
                                                     {discountPercent > 0 && (
                                                         <span className="flex items-center gap-1 px-1.5 py-0.5 text-[11px] rounded-lg bg-purple-100 text-purple-700">
                                                             <Tag className="w-3 h-3 text-[#7A1CA9]" />
                                                             Coupon Applied
                                                         </span>
                                                     )}
-
                                                 </div>
 
-                                                <span className={discountAmount > 0 ? "text-green-600" : "text-gray-900"}>
+                                                {/* Discount Amount */}
+                                                <span className={discountPercent > 0 ? "text-green-600" : "text-gray-900"}>
                                                     -₱{discountAmount.toFixed(2)}
                                                 </span>
                                             </div>
 
 
-                                            {/* Shipping (ALWAYS SHOW) */}
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-gray-500">Shipping Fee</span>
+
+                                            {/* Shipping*/}
+                                            <div className="flex justify-between text-sm items-center">
+                                                <div className="flex items-center gap-2">
+                                                    <Truck className="w-4 h-4 text-gray-500" />
+                                                    <span className="text-gray-500">Shipping Fee</span>
+                                                </div>
 
                                                 {shippingFee > 0 ? (
-                                                    <span className="text-gray-900">
-                                                        +₱{shippingFee.toFixed(2)}
-                                                    </span>
+                                                    <span className="text-gray-900">+₱{shippingFee.toFixed(2)}</span>
                                                 ) : (
                                                     <span className="text-gray-900">Free</span>
                                                 )}
                                             </div>
+
+                                            {/* Security Deposit */}
+                                            {securityDeposit > 0 && (
+                                                <div className="flex justify-between text-sm items-center">
+                                                    <div className="flex items-center gap-2">
+                                                        <ShieldAlert className="w-4 h-4 text-gray-500" />
+                                                        <span className="text-gray-500">Security Deposit</span>
+                                                    </div>
+                                                    <span className="text-yellow-600">₱{securityDeposit.toFixed(2)}</span>
+                                                </div>
+                                            )}
+
 
                                             <hr className="border-t border-gray-200" />
 

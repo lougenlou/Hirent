@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../../components/layouts/Sidebar";
 import Footer from "../../../components/layouts/Footer";
 import emptyCart from "../../../assets/empty-cart.png";
-import { User, Calendar, Truck, CircleCheckBig, Clock, Package, MessageCircle, Pencil, CalendarPlus } from "lucide-react";
+import { User, Calendar, Truck, CircleCheckBig, Clock, Package, MessageCircle, Pencil, CalendarPlus, ShieldAlert } from "lucide-react";
 import sampleUserCart from "../../../data/sampleUserCart";
 import CancelConfirmationModal from "../../../components/modals/CancelModal";
 import mockListings from "../../../data/mockData";
@@ -199,6 +199,14 @@ const CartPage = () => {
     // Final total including discount
     const approvedGrandTotal = approvedTotals.subtotal + approvedTotals.shipping - approvedTotals.discount;
 
+    // ✅ Add these here so they are available in JSX
+    const approvedSecurityDepositTotal = approvedItems.reduce(
+        (acc, item) => acc + (item.securityDeposit || 0),
+        0
+    );
+
+    const approvedGrandTotalWithDeposit = approvedGrandTotal + approvedSecurityDepositTotal;
+
 
     return (
         <div className="flex flex-col min-h-screen bg-[#fbfbfb]">
@@ -343,7 +351,7 @@ const CartPage = () => {
 
 
                                                             {item.status !== "not-booked" && item.bookedFrom && item.bookedTo ? (
-                                                                <div className="flex items-center gap-4 mt-2 text-gray-600 text-[13px]">
+                                                                <div className="flex items-center gap-6 mt-2 text-gray-600 text-[13px]">
                                                                     <div className="flex items-center gap-1">
                                                                         <Calendar className="w-4 h-4" />
                                                                         <span>{item.bookedFrom} - {item.bookedTo}</span>
@@ -352,8 +360,14 @@ const CartPage = () => {
                                                                         <Truck className="w-4 h-4" />
                                                                         <span>{item.shipping > 0 ? `Delivery (₱${Math.round(item.shipping)})` : "Delivery (Free)"}</span>
                                                                     </div>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <ShieldAlert className="w-4 h-4" />
+                                                                        <span>Security Deposit (₱{item.securityDeposit ?? 0})</span>
+                                                                    </div>
                                                                 </div>
                                                             ) : null}
+
+
                                                         </div>
 
                                                         <div className="mt-0">
@@ -363,13 +377,18 @@ const CartPage = () => {
 
                                                                 {(item.status === "approved" || item.status === "pending") && (() => {
                                                                     const itemTotals = calculateItemTotal(item);
+                                                                    const totalWithDeposit = itemTotals.total + (item.securityDeposit || 0);
+
                                                                     return (
                                                                         <div className="flex justify-between mt-2 mr-28 text-[14px]">
                                                                             <span className="mr-6">Subtotal: ₱{itemTotals.subtotal.toFixed(2)}</span>
-                                                                            <span className="text-[15px] font-semibold">Total: ₱{itemTotals.total.toFixed(2)}</span>
+                                                                            <span className="text-[15px] font-semibold">
+                                                                                Total: ₱{totalWithDeposit.toFixed(2)}
+                                                                            </span>
                                                                         </div>
                                                                     );
                                                                 })()}
+
 
 
                                                                 {item.status === "approved" ? (
@@ -466,10 +485,15 @@ const CartPage = () => {
                                                             <span>-₱{approvedTotals.discount.toFixed(2)}</span>
                                                         </div>
                                                     )}
+                                                    <div className="flex justify-between">
+                                                        <span>Security Deposit</span>
+                                                        <span>₱{approvedSecurityDepositTotal.toFixed(2)}</span>
+                                                    </div>
                                                     <div className="flex justify-between font-bold text-lg">
                                                         <span>Total</span>
-                                                        <span className="text-gray-900">₱{approvedGrandTotal.toFixed(2)}</span>
+                                                        <span className="text-gray-900">₱{approvedGrandTotalWithDeposit.toFixed(2)}</span>
                                                     </div>
+
                                                 </div>
 
 

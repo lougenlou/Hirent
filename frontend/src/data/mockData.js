@@ -16,7 +16,7 @@ export // src/data/mockData.js
       id: 1,
       name: "MacBook Pro",
       image: "items/macbook.png",
-      price: "₱750/day",
+      price: "₱450/day",
       category: "Gadgets",
       location: "Quezon City, Metro Manila",
       owner: "Juan Dela Cruz",
@@ -31,12 +31,13 @@ export // src/data/mockData.js
       userEnteredCoupon: "",
       couponMessage: "",
       tags: ["laptop", "macbook", "apple", "computer", "notebook", "tech"],
+      securityDeposit: 800
     },
     {
       id: 2,
       name: "Nikon DSLR",
       image: "items/camera.png",
-      price: "₱800/day",
+      price: "₱550/day",
       category: "Cameras",
       location: "Naga City, Camarines Sur",
       owner: "Maria Santos",
@@ -51,12 +52,13 @@ export // src/data/mockData.js
       userEnteredCoupon: "",
       couponMessage: "",
       tags: ["camera", "dslr", "nikon", "photography", "lens"],
+      securityDeposit: 1000
     },
     {
       id: 3,
       name: "Electric Bike",
       image: "items/bike.png",
-      price: "₱900/day",
+      price: "₱700/day",
       category: "Vehicles",
       location: "Davao City, Davao del Sur",
       owner: "Carlos Ramos",
@@ -71,12 +73,13 @@ export // src/data/mockData.js
       userEnteredCoupon: "",
       couponMessage: "",
       tags: ["bike", "ebike", "electric", "vehicle", "transport"],
+      securityDeposit: 1200
     },
     {
       id: 4,
       name: "Drill Set",
       image: "items/drill.png",
-      price: "₱250/day",
+      price: "₱120/day",
       category: "Tools",
       location: "Baguio City, Benguet",
       owner: "Ana Lopez",
@@ -91,12 +94,13 @@ export // src/data/mockData.js
       userEnteredCoupon: "",
       couponMessage: "",
       tags: ["drill", "tool", "power tool", "hardware"],
+      securityDeposit: 300
     },
     {
       id: 5,
       name: "DJI Mini Drone",
       image: "items/drone.png",
-      price: "₱850/day",
+      price: "₱500/day",
       category: "Gadgets",
       location: "Iriga City, Camarines Sur",
       owner: "Lara Mendoza",
@@ -111,12 +115,13 @@ export // src/data/mockData.js
       userEnteredCoupon: "",
       couponMessage: "",
       tags: ["drone", "aerial", "camera", "flying", "dji"],
+      securityDeposit: 1000
     },
     {
       id: 6,
       name: "Yamaha Keyboard",
       image: "items/keyboard.png",
-      price: "₱500/day",
+      price: "₱200/day",
       category: "Musical Instruments",
       location: "Cagayan de Oro City, Misamis Oriental",
       owner: "Mark Garcia",
@@ -131,12 +136,13 @@ export // src/data/mockData.js
       userEnteredCoupon: "",
       couponMessage: "",
       tags: ["keyboard", "piano", "yamaha", "music", "instrument"],
+      securityDeposit: 650
     },
     {
       id: 7,
       name: "Projector Set",
       image: "items/projector.png",
-      price: "₱600/day",
+      price: "₱300/day",
       category: "Electronics",
       location: "Tacloban City, Leyte",
       owner: "Ella Cruz",
@@ -151,12 +157,13 @@ export // src/data/mockData.js
       userEnteredCoupon: "",
       couponMessage: "",
       tags: ["projector", "screen", "presentation", "display"],
+      securityDeposit: 800
     },
     {
       id: 8,
       name: "Camping Tent",
       image: "items/tent.png",
-      price: "₱250/day",
+      price: "₱100/day",
       category: "Outdoors",
       location: "Tagaytay City, Cavite",
       owner: "Rico Santos",
@@ -171,8 +178,8 @@ export // src/data/mockData.js
       userEnteredCoupon: "",
       couponMessage: "",
       tags: ["camping", "tent", "outdoor", "gear", "hiking"],
+      securityDeposit: 450
     },
   ];
 
 export default mockListings;
-

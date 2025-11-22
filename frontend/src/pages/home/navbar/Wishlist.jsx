@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { MapPin, Calendar, ShoppingCart } from "lucide-react";
-import Footer from "../../components/Footer";
-import Sidebar from "../../components/Sidebar";
-import emptyWishlist from "../../assets/empty-wishlist.png";
-import emptyItems from "../../assets/empty-listings.png";
-import mockListings from "../../data/mockData";
-import { getFakeUser, generateFakeToken } from "../../utils/fakeAuth";
+import Footer from "../../../components/layouts/Footer";
+import Sidebar from "../../../components/layouts/Sidebar";
+import emptyWishlist from "../../../assets/empty-wishlist.png";
+import emptyItems from "../../../assets/empty-listings.png";
+import mockListings from "../../../data/mockData";
+import { getFakeUser, generateFakeToken } from "../../../utils/fakeAuth";
 import { Base64 } from "js-base64";
 
 const WishlistPage = () => {

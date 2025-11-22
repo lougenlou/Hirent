@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../components/Sidebar";
-import Footer from "../../components/Footer";
-import emptyCart from "../../assets/empty-cart.png";
+import Sidebar from "../../../components/layouts/Sidebar";
+import Footer from "../../../components/layouts/Footer";
+import emptyCart from "../../../assets/empty-cart.png";
 import { User, Calendar, Truck, CircleCheckBig, Clock, Package, MessageCircle, Pencil, CalendarPlus } from "lucide-react";
-import sampleUserCart from "../../data/sampleUserCart";
-import CancelConfirmationModal from "../../components/CancelModal";
-import mockListings from "../../data/mockData";
-
-import { getFakeUser, generateFakeToken } from "../../utils/fakeAuth";
+import sampleUserCart from "../../../data/sampleUserCart";
+import CancelConfirmationModal from "../../../components/modals/CancelModal";
+import mockListings from "../../../data/mockData";
+import { getFakeUser, generateFakeToken } from "../../../utils/fakeAuth";
 
 const CartPage = () => {
     const navigate = useNavigate();

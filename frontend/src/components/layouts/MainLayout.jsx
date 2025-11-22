@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import Navbar from "../components/Navbar";
-import MainNav from "../components/MainNav";
+import Navbar from "./Navbar";
+import MainNav from "./MainNav";
 import { Outlet } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 
 const MainLayout = () => {
   const { isLoggedIn } = useContext(AuthContext);

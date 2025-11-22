@@ -1,10 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Search, Heart, ShoppingCart, User } from "lucide-react";
-import { AuthContext } from "../context/AuthContext";
-import hirentLogo from "../assets/hirent-logo.png";
-import LogoutButton from "../components/LogoutButton";
-import { getFakeUser } from "../utils/fakeAuth";
+import { AuthContext } from "../../context/AuthContext";
+import hirentLogo from "../../assets/hirent-logo.png";
+import { getFakeUser } from "../../utils/fakeAuth";
 
 const Navbar = ({ onSearch }) => {
   const [inputValue, setInputValue] = useState("");
@@ -46,8 +45,8 @@ const Navbar = ({ onSearch }) => {
         <div className="flex items-center justify-between max-w-7xl mx-auto h-full">
 
           {/* Logo */}
-          <div className="flex items-center h-full">
-            <img src={hirentLogo} alt="HiRENT" className="h-7" />
+          <div className="flex items-center h-full mr-28">
+            <img src={hirentLogo} alt="HiRENT" className="h-6" />
           </div>
 
           {/* Navigation Links */}
@@ -69,11 +68,11 @@ const Navbar = ({ onSearch }) => {
             })}
           </div>
 
-          <div className="hidden lg:flex items-center h-full space-x-4">
+          <div className="hidden lg:flex items-center h-full space-x-2 ml-14">
             {isLoggedIn ? (
               <>
                 {/* Search Bar */}
-                <div className="flex items-center bg-white rounded-full px-4 py-1.5 text-gray-700 w-72">
+                <div className="flex items-center bg-white rounded-full px-4 py-1.5 text-gray-700 w-64">
                   <input
                     type="text"
                     placeholder="What are you looking for?"
@@ -92,7 +91,7 @@ const Navbar = ({ onSearch }) => {
                 </div>
 
                 {/* Icons */}
-                <div className="flex items-stretch space-x-1 h-full">
+                <div className="flex h-full">
                   {[
                     { icon: <Heart className="w-5 h-5" />, path: "/wishlist" },
                     {
@@ -116,8 +115,8 @@ const Navbar = ({ onSearch }) => {
                         key={path}
                         to={path}
                         className={`flex items-center justify-center h-full w-[40px] transition-colors ${isActive
-                            ? "bg-[#59087f] text-white border-b-[4px] border-white"
-                            : "text-white hover:bg-[#680e91]"
+                          ? "bg-[#59087f] text-white border-b-[4px] border-white"
+                          : "text-white hover:bg-[#680e91]"
                           }`}
                         style={{ margin: 0, paddingTop: 0, paddingBottom: 0 }}
                       >
@@ -127,8 +126,7 @@ const Navbar = ({ onSearch }) => {
                   })}
                 </div>
 
-                {/* Logout Button */}
-                <LogoutButton />
+
               </>
             ) : (
               // main nav for guests (login/signup)
@@ -147,6 +145,19 @@ const Navbar = ({ onSearch }) => {
                 </NavLink>
               </>
             )}
+          </div>
+
+          {/* Greeting + Logout */}
+          <div className="flex items-center text-white text-[13px] space-x-2">
+            <span>Hi, {getFakeUser()?.name || "User"}!</span>
+            <span className="text-white">|</span>
+            <NavLink
+              to="/login"
+              onClick={logout}
+              className="text-white hover:underline hover:opacity-90 transition"
+            >
+              Logout
+            </NavLink>
           </div>
         </div>
       </nav>

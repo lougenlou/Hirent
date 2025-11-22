@@ -32,7 +32,7 @@ const PriceRangeSlider = ({ onPriceChange }) => {
           },
         }}
       />
-      <div className="flex justify-between text-sm text-gray-600">
+      <div className="flex justify-between text-[13px] text-gray-600">
         <span>₱{value[0]}</span>
         <span>₱{value[1]}</span>
       </div>

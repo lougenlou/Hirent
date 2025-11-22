@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { CalendarCheck, CalendarClock, MapPin, CreditCard, Package, Truck, CheckCircle2, Clock, Tag } from "lucide-react";
-import TruckIcon from "../assets/delivery.png"; // adjust path if needed
+import TruckIcon from "../../assets/delivery.png"; // adjust path if needed
 import DeliveryTrackingModal from "./DeliveryTrackingModal";
 import CancelConfirmationModal from "./CancelModal";
-import mockListings from "../data/mockData";
+import mockListings from "../../data/mockData";
 
 const deliverySteps = [
     { key: "pending", label: "Order Confirmed", icon: CheckCircle2 },

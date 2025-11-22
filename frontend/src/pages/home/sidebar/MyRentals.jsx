@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../../../components/Sidebar";
-import Footer from "../../../components/Footer";
+import Sidebar from "../../../components/layouts/Sidebar";
+import Footer from "../../../components/layouts/Footer";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Eye, MessageCircle, CircleOff, CircleCheckBig, ClockFading } from "lucide-react";
 import mockListings from "../../../data/mockData";
 import sampleUserCart from "../../../data/sampleUserCart";
-import CancelConfirmationModal from "../../../components/CancelModal";
-import { ViewDetailsModal } from "../../../components/ViewDetailsModal";
+import CancelConfirmationModal from "../../../components/modals/CancelModal";
+import { ViewDetailsModal } from "../../../components/modals/ViewDetailsModal";
 import { getFakeUser, generateFakeToken } from "../../../utils/fakeAuth";
 
 const MyRentalsPage = () => {

@@ -4,10 +4,10 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import OwnerSignup from "./pages/auth/OwnerSignup";
 import OwnerSetup from "./pages/auth/OwnerSetup";
-import BrowseRentals from "./pages/home/BrowseRentals";
-import Cart from "./pages/home/Cart";
-import Wishlist from "./pages/home/Wishlist";
-import MainLayout from "./layouts/MainLayout";
+import BrowseRentals from "./pages/home/navbar/BrowseRentals";
+import Cart from "./pages/home/navbar/Cart";
+import Wishlist from "./pages/home/navbar/Wishlist";
+import MainLayout from "./components/layouts/MainLayout";
 import "leaflet/dist/leaflet.css";
 // index.js or App.js
 import { generateFakeToken } from "./utils/fakeAuth";
@@ -36,7 +36,6 @@ function App() {
             <Route path="/how-it-works" element={<div></div>} />
             <Route path="/wishlist" element={<Wishlist/>} />
             <Route path="/cart" element={<Cart/>} />
-            <Route path="/profile" element={<div></div>} />
           </Route>
         </Routes>
       </Router>

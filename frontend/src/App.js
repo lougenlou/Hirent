@@ -5,20 +5,20 @@ import Login from "./pages/auth/Login";
 import OwnerSignup from "./pages/auth/OwnerSignup";
 import OwnerSetup from "./pages/auth/OwnerSetup";
 import BrowseRentals from "./pages/home/navbar/BrowseRentals";
+import ProductDetails from './pages/ProductDetails';
 import Cart from "./pages/home/navbar/Cart";
 import Wishlist from "./pages/home/navbar/Wishlist";
 import MyRentals from "./pages/home/sidebar/MyRentals";
 import MainLayout from "./components/layouts/MainLayout";
 import "leaflet/dist/leaflet.css";
-// index.js or App.js
 import { generateFakeToken } from "./utils/fakeAuth";
+import './App.css';
 
 if (!localStorage.getItem("fakeToken")) {
   const token = generateFakeToken();
   localStorage.setItem("fakeToken", token);
   console.log("Fake token generated for dev:", token);
 }
-
 
 function App() {
   return (
@@ -32,6 +32,7 @@ function App() {
           <Route path="/ownersetup" element={<OwnerSetup />} />
 
           <Route element={<MainLayout />}>
+            <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/browse" element={<BrowseRentals />} />
             <Route path="/about" element={<div></div>} />
             <Route path="/how-it-works" element={<div></div>} />

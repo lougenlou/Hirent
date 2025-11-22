@@ -42,7 +42,7 @@ export default function BasicDateRangePicker({
                                     color: fromPicked
                                         ? "rgba(0, 0, 0, 1)"
                                         : "rgba(0, 0, 0, 0.4)",
-                                    fontSize: "13px",
+                                    fontSize: "12px",
                                     fontFamily: "Inter, sans-serif",
                                 },
                                 "& .MuiInputLabel-root": {
@@ -50,7 +50,7 @@ export default function BasicDateRangePicker({
                                         ? "rgba(0, 0, 0, 0.3)"
                                         : "rgba(0, 0, 0, 0.7)",
                                     fontWeight: 400,
-                                    fontSize: "18px",
+                                    fontSize: "16px",
                                 },
                                 "& .MuiOutlinedInput-root.Mui-focused fieldset": {
                                     borderColor: "#7A1CA9",
@@ -87,7 +87,7 @@ export default function BasicDateRangePicker({
                                     color: toPicked
                                         ? "rgba(0, 0, 0, 1)"
                                         : "rgba(0, 0, 0, 0.4)",
-                                    fontSize: "13px",
+                                    fontSize: "12px",
                                     fontFamily: "Inter, sans-serif",
                                 },
                                 "& .MuiInputLabel-root": {
@@ -95,7 +95,7 @@ export default function BasicDateRangePicker({
                                         ? "rgba(0, 0, 0, 0.3)"
                                         : "rgba(0, 0, 0, 0.7)",
                                     fontWeight: 400,
-                                    fontSize: "18px",
+                                    fontSize: "16px",
                                 },
                                 "& .MuiOutlinedInput-root.Mui-focused fieldset": {
                                     borderColor: "#7A1CA9",

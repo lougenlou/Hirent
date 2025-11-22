@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
-import BasicDateRangePicker from "./DateRangePicker";
-import PriceRangeSlider from "./PriceRange";
+import BasicDateRangePicker from "../pickers/DateRangePicker";
+import PriceRangeSlider from "../pickers/PriceRange";
 import dayjs from "dayjs";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -159,15 +159,15 @@ const FilterSidebar = ({ onApplyFilters }) => {
     };
     return (
         <>
-            <aside className="w-80 bg-white shadow-md border border-gray-200 rounded-2xl h-[830px] flex flex-col">
-                <div className="flex-1 overflow-y-auto px-6 pt-4 space-y-3 pb-0">
+            <aside className="w-80 bg-white shadow-md border border-gray-200 rounded-2xl h-[815px] flex flex-col">
+                <div className="flex-1 overflow-y-auto px-6 pt-6 space-y-3 pb-0">
 
                     {/* Header */}
                     <div className="flex justify-between items-center mb-5">
-                        <h2 className="text-lg font-semibold text-gray-800">Filter</h2>
+                        <h2 className="text-[16px] font-semibold text-gray-800">Filter</h2>
                         <button
                             onClick={handleClearAll}
-                            className="text-[#7A1CA9] text-[13px] font-medium hover:text-purple-400 transition mt-1"
+                            className="text-[#7A1CA9] text-[12px] font-medium hover:text-purple-400 transition mt-1"
                         >
                             Clear All
                         </button>
@@ -175,7 +175,7 @@ const FilterSidebar = ({ onApplyFilters }) => {
 
                     {/* Category */}
                     <div>
-                        <p className="font-light text-[14px] text-gray-700 mb-2">Category</p>
+                        <p className="font-light text-[13px] text-gray-700 mb-2">Category</p>
                         <div
                             ref={scrollRef}
                             onMouseDown={handleMouseDown}
@@ -188,7 +188,7 @@ const FilterSidebar = ({ onApplyFilters }) => {
                                 <button
                                     key={cat}
                                     onClick={() => setSelectedCategory(cat)}
-                                    className={`px-5 py-1.5 text-[13px] rounded-full whitespace-nowrap border transition ${selectedCategory === cat
+                                    className={`px-5 py-1.5 text-[12px] rounded-full whitespace-nowrap border transition ${selectedCategory === cat
                                         ? "bg-[#7A1CA9] text-white border-[#7A1CA9]"
                                         : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
                                         }`}
@@ -202,16 +202,16 @@ const FilterSidebar = ({ onApplyFilters }) => {
                     {/* Location */}
                     <div>
                         <div className="flex justify-between items-center mb-2">
-                            <p className="font-light text-[14px] text-gray-700">Location</p>
+                            <p className="font-light text-[13px] text-gray-700">Location</p>
                             <button
                                 onClick={() => setLocation(null)}
-                                className="text-[#9129c5] text-[13px] hover:text-purple-400 transition"
+                                className="text-[#9129c5] text-[12px] hover:text-purple-400 transition"
                             >
                                 Reset
                             </button>
                         </div>
                         <div
-                            className={`w-full border border-gray-400 rounded-lg px-3 py-2 mb-5 text-[14px] cursor-pointer hover:bg-purple-50 transition ${location ? "text-gray-700" : "text-gray-400 opacity-70"
+                            className={`w-full border border-gray-300 rounded-lg px-3 py-2 mb-5 text-[13px] cursor-pointer hover:bg-purple-50 transition ${location ? "text-gray-700" : "text-gray-400 opacity-70"
                                 }`}
                             onClick={() => setMapOpen(true)}
                         >
@@ -223,7 +223,7 @@ const FilterSidebar = ({ onApplyFilters }) => {
                     {/* Date Range */}
                     <div>
                         <div className="flex justify-between items-center mb-2">
-                            <p className="font-light text-[14px] text-gray-700 mb-3">
+                            <p className="font-light text-[13px] text-gray-700 mb-3">
                                 Availability Dates
                             </p>
                             <button
@@ -233,7 +233,7 @@ const FilterSidebar = ({ onApplyFilters }) => {
                                     setToDate(dayjs());
                                     setResetTrigger((prev) => prev + 1);
                                 }}
-                                className="text-[#9129c5] text-[13px] mb-3 hover:text-purple-400 transition"
+                                className="text-[#9129c5] text-[12px] mb-3 hover:text-purple-400 transition"
                             >
                                 Reset
                             </button>
@@ -259,7 +259,7 @@ const FilterSidebar = ({ onApplyFilters }) => {
                                 <button
                                     key={range}
                                     onClick={() => handleDateRange(range)}
-                                    className={`flex-1 text-xs px-4 py-2 rounded-lg border transition whitespace-nowrap ${selectedRange === range
+                                    className={`flex-1 text-[12px] px-4 py-2 rounded-lg border transition whitespace-nowrap ${selectedRange === range
                                         ? "bg-[#7A1CA9] text-white border-[#7A1CA9]"
                                         : "bg-white text-gray-700 border-gray-300 hover:bg-gray-200"
                                         }`}
@@ -273,10 +273,10 @@ const FilterSidebar = ({ onApplyFilters }) => {
                     {/* Price Range */}
                     <div className="pb-3">
                         <div className="flex justify-between items-center mb-2">
-                            <p className="font-light text-[14px] text-gray-700">Price Range (per day)</p>
+                            <p className="font-light text-[13px] text-gray-700">Price Range (per day)</p>
                             <button
                                 onClick={() => setPriceRangeKey((prev) => prev + 1)}
-                                className="text-[#9129c5] text-[13px] hover:text-purple-400 transition"
+                                className="text-[#9129c5] text-[12px] hover:text-purple-400 transition"
                             >
                                 Reset
                             </button>
@@ -292,10 +292,10 @@ const FilterSidebar = ({ onApplyFilters }) => {
                     {/* Rating Filter */}
                     <div className="pb-3">
                         <div className="flex justify-between items-center mb-3">
-                            <p className="font-light text-[14px] text-gray-700">Rating</p>
+                            <p className="font-light text-[13px] text-gray-700">Rating</p>
                             <button
                                 onClick={() => setRating(null)}
-                                className="text-[#9129c5] text-[13px] hover:text-purple-400 transition"
+                                className="text-[#9129c5] text-[12px] hover:text-purple-400 transition"
                             >
                                 Reset
                             </button>
@@ -306,21 +306,21 @@ const FilterSidebar = ({ onApplyFilters }) => {
                                 <button
                                     key={r}
                                     onClick={() => setRating(r)}
-                                    className={`flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-100 transition text-sm cursor-pointer ${rating === r ? "border-[#7A1CA9] bg-purple-50" : "border-gray-300"
+                                    className={`flex items-center justify-between gap-2 p-2 border rounded-lg hover:bg-gray-100 transition text-sm cursor-pointer ${rating === r ? "border-[#7A1CA9] bg-purple-50" : "border-gray-300"
                                         }`}
                                 >
                                     <div className="flex">
                                         {Array.from({ length: 5 }).map((_, index) => (
                                             <span
                                                 key={index}
-                                                className={`text-[16px] ${index < r ? "text-yellow-400" : "text-gray-300"
+                                                className={`text-[15px] ${index < r ? "text-yellow-400" : "text-gray-300"
                                                     }`}
                                             >
                                                 ★
                                             </span>
                                         ))}
                                     </div>
-                                    <span className="text-[13px] text-gray-600">
+                                    <span className="text-[12px] text-gray-600">
                                         {r === 5 ? "5.0 only" : `${r}.0 – ${r}.9`}
                                     </span>
 
@@ -332,7 +332,7 @@ const FilterSidebar = ({ onApplyFilters }) => {
                 </div>
 
                 {/* Apply Button */}
-                <div className="px-6 pb-5 mb-3">
+                <div className="px-6 pb-6">
                     <button
                         onClick={handleApply}
                         className="w-full bg-[#7A1CA9] hover:bg-[#681690] text-white rounded-lg py-2 text-[13px] font-normal transition"

@@ -1,9 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Search, Heart, ShoppingCart, User } from "lucide-react";
-import { AuthContext } from "../context/AuthContext";
-import hirentLogo from "../assets/hirent-logo.png";
-import LogoutButton from "../components/LogoutButton"; // adjust the path
+import { AuthContext } from "../../context/AuthContext";
+import hirentLogo from "../../assets/hirent-logo.png";
+import { getFakeUser } from "../../utils/fakeAuth";
 
 const Navbar = ({ onSearch }) => {
   const [inputValue, setInputValue] = useState("");
@@ -25,6 +25,17 @@ const Navbar = ({ onSearch }) => {
     { name: "About Us", path: "/about" },
   ];
 
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const user = getFakeUser();
+    if (user && user.cart) {
+      setCartCount(user.cart.length);
+    } else {
+      setCartCount(0);
+    }
+  }, []);
+
   return (
     <>
       <nav
@@ -34,8 +45,8 @@ const Navbar = ({ onSearch }) => {
         <div className="flex items-center justify-between max-w-7xl mx-auto h-full">
 
           {/* Logo */}
-          <div className="flex items-center h-full">
-            <img src={hirentLogo} alt="HiRENT" className="h-7" />
+          <div className="flex items-center h-full mr-28">
+            <img src={hirentLogo} alt="HiRENT" className="h-6" />
           </div>
 
           {/* Navigation Links */}
@@ -57,20 +68,20 @@ const Navbar = ({ onSearch }) => {
             })}
           </div>
 
-          <div className="hidden lg:flex items-center h-full space-x-4">
+          <div className="hidden lg:flex items-center h-full space-x-2 ml-14">
             {isLoggedIn ? (
               <>
                 {/* Search Bar */}
-                <div className="flex items-center bg-white rounded-full px-4 py-1.5 text-gray-700 w-72">
+                <div className="flex items-center bg-white rounded-full px-4 py-1.5 text-gray-700 w-64">
                   <input
                     type="text"
                     placeholder="What are you looking for?"
                     value={inputValue}
                     onChange={(e) => {
                       setInputValue(e.target.value);
-                      if (onSearch) onSearch(e.target.value); 
+                      if (onSearch) onSearch(e.target.value);
                     }}
-                    onKeyDown={handleKeyDown} 
+                    onKeyDown={handleKeyDown}
                     className="flex-1 outline-none text-[13px] bg-transparent placeholder-gray-400"
                   />
                   <Search
@@ -80,10 +91,22 @@ const Navbar = ({ onSearch }) => {
                 </div>
 
                 {/* Icons */}
-                <div className="flex items-stretch space-x-1 h-full">
+                <div className="flex h-full">
                   {[
                     { icon: <Heart className="w-5 h-5" />, path: "/wishlist" },
-                    { icon: <ShoppingCart className="w-5 h-5" />, path: "/cart" },
+                    {
+                      icon: (
+                        <div className="relative">
+                          <ShoppingCart className="w-5 h-5" />
+                          {cartCount > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                              {cartCount}
+                            </span>
+                          )}
+                        </div>
+                      ),
+                      path: "/cart",
+                    },
                     { icon: <User className="w-5 h-5" />, path: "/profile" },
                   ].map(({ icon, path }) => {
                     const isActive = location.pathname === path;
@@ -103,8 +126,7 @@ const Navbar = ({ onSearch }) => {
                   })}
                 </div>
 
-                {/* Logout Button */}
-                <LogoutButton />
+
               </>
             ) : (
               // main nav for guests (login/signup)
@@ -123,6 +145,19 @@ const Navbar = ({ onSearch }) => {
                 </NavLink>
               </>
             )}
+          </div>
+
+          {/* Greeting + Logout */}
+          <div className="flex items-center text-white text-[13px] space-x-2">
+            <span>Hi, {getFakeUser()?.name || "User"}!</span>
+            <span className="text-white">|</span>
+            <NavLink
+              to="/login"
+              onClick={logout}
+              className="text-white hover:underline hover:opacity-90 transition"
+            >
+              Logout
+            </NavLink>
           </div>
         </div>
       </nav>

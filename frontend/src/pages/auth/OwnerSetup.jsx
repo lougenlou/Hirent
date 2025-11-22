@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../assets/Auth.css";
 import logo from "../../assets/logo.png";
 import bg from "../../assets/auth-owner-bg.jpg";
-import Footer from "../../components/Footer";
+import Footer from "../../components/layouts/Footer";
 import Stepper from "../../components/Stepper";
 import { useNavigate } from "react-router-dom";
 import { regions, provinces, cities, barangays } from "select-philippines-address";

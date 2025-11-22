@@ -1,6 +1,6 @@
 import React from "react";
-import qrCode from "../assets/qr-code.png";
-import hirentLogo from "../assets/hirent-logo.png";
+import qrCode from "../../assets/qr-code.png";
+import hirentLogo from "../../assets/hirent-logo.png";
 
 const Footer = () => {
     return (

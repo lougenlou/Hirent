@@ -3,7 +3,7 @@ import "../../assets/Auth.css";
 import logo from "../../assets/logo.png";
 import hirentLogo from "../../assets/hirent-logo-purple.png";
 import bg from "../../assets/auth-owner-bg.jpg";
-import Footer from "../../components/Footer";
+import Footer from "../../components/layouts/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FiEye, FiEyeOff } from "react-icons/fi";

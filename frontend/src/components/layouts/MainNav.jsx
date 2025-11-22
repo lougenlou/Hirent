@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import hirentLogo from "../assets/hirent-logo.png";
+import hirentLogo from "../../assets/hirent-logo.png";
 
 const MainNav = () => {
   const location = useLocation();

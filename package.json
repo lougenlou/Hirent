@@ -1,14 +1,6 @@
 {
-  "name": "hirent",
+  "name": "hirent-frontend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
@@ -26,6 +18,8 @@
     "mongoose": "^8.19.2"
   },
   "devDependencies": {
-    "sass": "^1.93.2"
-  }
+    "sass": "^1.93.2",
+    "firebase-admin": "^13.6.0",
+    "google-auth-library": "^10.5.0"
+}
 }

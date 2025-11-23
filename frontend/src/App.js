@@ -1,23 +1,74 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "leaflet/dist/leaflet.css";
+
+// Public Components
+import Navbar from "./components/MainNav";
+import Footer from "./components/Footer";
+import HeroSection from "./components/home/HeroSection";
+import FeaturedCategories from "./components/home/FeaturedCategories";
+import BrowseItems from "./components/items/BrowseItems";
+import HowItWorks from "./components/home/HowItWorks";
+import WhyChoose from "./components/home/WhyChoose";
+import Testimonials from "./components/home/Testimonials";
+
+// Auth Pages
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
+<<<<<<< HEAD
 import OwnerInformation from "./pages/auth/Owner_Information";
 import OwnerSubmission from "./pages/auth/Owner_Submission";
+=======
+
+// Owner Registration Pages
+import OwnerInformation from "./pages/auth/Owner_Information";
+import OwnerSubmission from "./pages/auth/Owner_Submission";
+
+// Owner Dashboard Pages
+import OwnerDashboard from "./pages/owner/OwnerDashboard";
+import AddItem from "./pages/owner/AddItem";
+import OwnerProfile from "./pages/owner/OwnerProfile";
+
+>>>>>>> main
 import Onboarding1 from "./pages/onboarding/Onboarding1";
 import Onboarding2 from "./pages/onboarding/Onboarding2";
 import Onboarding3 from "./pages/onboarding/Onboarding3";
 import Onboarding4 from "./pages/onboarding/Onboarding4";
 import OnboardingLayout from "./layouts/OnboardingLayout";
+<<<<<<< HEAD
 import BrowseRentals from "./pages/home/BrowseRentals";
 import "leaflet/dist/leaflet.css";
+=======
+>>>>>>> main
 
+// Landing Page Component
+function LandingPage() {
+  return (
+    <div className="App">
+      <Navbar />
+      <HeroSection />
+      <FeaturedCategories />
+      <BrowseItems />
+      <HowItWorks />
+      <WhyChoose />
+      <Testimonials />
+      <Footer />
+    </div>
+  );
+}
+
+// Main App Component
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+
+        {/* Owner Registration */}
         <Route path="/owner-information" element={<OwnerInformation />} />
         <Route path="/owner-submission" element={<OwnerSubmission />} />
 
@@ -27,7 +78,15 @@ function App() {
           <Route path="/onboarding3" element={<Onboarding3 />} />
           <Route path="/onboarding4" element={<Onboarding4 />} />
         </Route>
+<<<<<<< HEAD
         <Route path="/browse" element={<BrowseRentals />} />
+=======
+        {/* Owner Dashboard */}
+        <Route path="/owner" element={<OwnerDashboard />} />
+        <Route path="/owner/add-item" element={<AddItem />} />
+        <Route path="/owner/profile" element={<OwnerProfile />} />
+
+>>>>>>> main
       </Routes>
     </Router>
   );

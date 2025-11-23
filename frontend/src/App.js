@@ -1,5 +1,7 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProductDetails from './pages/ProductDetails';
+import './App.css';
 import "leaflet/dist/leaflet.css";
 
 // Public Components
@@ -52,6 +54,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Product Details Route */}
+        <Route path="/product/:id" element={<ProductDetails />} />
+        
 
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />

@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-import gucci_duffle_bag from "../assets/items/gucci_duffle_bag.png";
+import gucci_dufflebag from "../assets/items/gucci_duffle_bag.png";
 import havit_hv from "../assets/items/havit_hv.png";
 import IPS_lcd from "../assets/items/IPS_lcd.png";
 import Keyboard from "../assets/items/Keyboard.png";
 import laptop from "../assets/items/laptop.png";
 import RGB_liquid_CPU from "../assets/items/RGB_liquid_CPU.png";
 
-=======
->>>>>>> main
 export const mockDashboardStats = {
   totalListings: 15,
   listingsChange: "+2 this month",
@@ -16,48 +13,29 @@ export const mockDashboardStats = {
   pendingBookings: 7,
   pendingBookingsSubtext: "Awaiting approval",
   earnings: "₱ 5,500.00",
-<<<<<<< HEAD
   earningsChange: "+18% from last month",
-=======
-  earningsChange: "+18% from last month"
->>>>>>> main
 };
 
 export const mockListings = [
   {
     id: 1,
-    name: "Gucci duffle bag",
+    name: "Gucci Duffle Bag",
     category: "Fashion",
     price: "₱960",
     availability: "Rented",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Active",
-<<<<<<< HEAD
-    image: gucci_duffle_bag,
+    image: gucci_dufflebag
   },
   {
     id: 2,
-    name: "Havic HV G-92 Gamepad",
-    category: "Gadgets",
-    price: "₱560",
-    oldPrice: "₱720",
-    availability: "Available",
-    bookedDates: "Oct 20 - 24, 2025",
-    status: "Active",
-    image: havit_hv,
-=======
-    image: "/assets/items/gucci_duffle_bag.png"
-  },
-  {
-    id: 2,
-    name: "HAVIT HV Gaming",
+    name: "Havit HV Gaming Mouse",
     category: "Gadgets",
     price: "₱560",
     availability: "Available",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Active",
-    image: "/assets/items/havit_hv.png"
->>>>>>> main
+    image: havit_hv
   },
   {
     id: 3,
@@ -67,21 +45,7 @@ export const mockListings = [
     availability: "Rented",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Active",
-<<<<<<< HEAD
-    image: IPS_lcd,
-  },
-  {
-    id: 4,
-    name: "AK-900 Wired Keyboard",
-    category: "Gadgets",
-    price: "₱450",
-    oldPrice: "₱600",
-    availability: "Available",
-    bookedDates: "Oct 20 - 24, 2025",
-    status: "Active",
-    image: Keyboard,
-=======
-    image: "/assets/items/IPS_lcd.png"
+    image: IPS_lcd
   },
   {
     id: 4,
@@ -91,8 +55,7 @@ export const mockListings = [
     availability: "Available",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Active",
-    image: "/assets/items/Keyboard.png"
->>>>>>> main
+    image: Keyboard
   },
   {
     id: 5,
@@ -102,11 +65,7 @@ export const mockListings = [
     availability: "Available",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Pending",
-<<<<<<< HEAD
-    image: laptop,
-=======
-    image: "/assets/items/laptop.png"
->>>>>>> main
+    image: laptop
   },
   {
     id: 6,
@@ -116,11 +75,6 @@ export const mockListings = [
     availability: "Unavailable",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Inactive",
-<<<<<<< HEAD
-    image: RGB_liquid_CPU,
-  },
-=======
-    image: "/assets/items/RGB_liquid_CPU.png"
+    image: RGB_liquid_CPU
   }
->>>>>>> main
 ];

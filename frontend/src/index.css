@@ -1,60 +1,45 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+
+/* Import Inter Font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-=======
->>>>>>> origin
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
+/* Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-<<<<<<< HEAD
 body {
   margin: 0;
-=======
-<<<<<<< HEAD
+/* Global Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-=======
-
+/* Body */
 body {
   margin: 0;
->>>>>>> origin
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
+  padding: 0;
+  overflow-x: hidden;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-/* Hide horizontal scrollbar globally */
-body {
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+
+/* HTML */
 html {
   overflow-x: hidden;
 }
 
-=======
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
+/* Anchor reset from origin */
+
 a {
   text-decoration: none !important;
 }
 a:hover {
   text-decoration: none !important;
-<<<<<<< HEAD
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -64,11 +49,5 @@ a:hover {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-=======
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin
->>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
->>>>>>> main
+

@@ -1,134 +1,109 @@
-import React from 'react';
+import React from "react";
+import qrCode from "../../assets/qr-code.png";
+import hirentLogo from "../../assets/hirent-logo.png";
 
 const Footer = () => {
-  const createFooterSection = (title, links) => {
-    return React.createElement(
-      'div',
-      null,
-      React.createElement('h4', { className: 'font-inter font-semibold mb-4' }, title),
-      React.createElement(
-        'ul',
-        { className: 'space-y-2 text-sm font-inter text-purple-100' },
-        ...links.map((link, index) =>
-          React.createElement(
-            'li',
-            { key: index },
-            React.createElement(
-              'a',
-              { href: '#', className: 'hover:text-white transition' },
-              link
-            )
-          )
-        )
-      )
-    );
-  };
+  return (
+    <footer className="bg-[#7A1CA9] text-white py-10 px-8 w-full text-sm">
+      <div className="max-w-6xl mx-auto flex flex-wrap justify-between gap-10">
+        {/* subscription */}
+        <div>
+          <img src={hirentLogo} alt="Hirent Logo" className="w-24 h-auto mb-4" />
 
-  return React.createElement(
-    'footer',
-    { className: 'bg-gradient-to-br from-purple-600 to-purple-900 text-white py-12 px-6 md:px-16 lg:px-24' },
-    React.createElement(
-      'div',
-      { className: 'max-w-7xl mx-auto' },
-      React.createElement(
-        'div',
-        { className: 'grid grid-cols-1 md:grid-cols-4 gap-8 mb-8' },
-        
-        // Brand Section
-        React.createElement(
-          'div',
-          null,
-          React.createElement('h3', { className: 'text-xl font-inter font-bold mb-4' }, 'HIRENT'),
-          React.createElement('p', { className: 'text-sm font-inter text-purple-100 mb-4' }, 'Subscribe'),
-          React.createElement('p', { className: 'text-sm font-inter text-purple-100 mb-4' }, 'Get 10% off your first order'),
-          React.createElement(
-            'div',
-            { className: 'flex' },
-            React.createElement('input', {
-              type: 'email',
-              placeholder: 'Enter your email',
-              className: 'flex-1 px-4 py-2 rounded-l-md text-gray-900 font-inter focus:outline-none'
-            }),
-            React.createElement(
-              'button',
-              { className: 'px-4 py-2 bg-white text-primary-purple rounded-r-md font-inter font-semibold hover:bg-gray-100 transition' },
-              '→'
-            )
-          )
-        ),
-        
-        // Support Section
-        createFooterSection('Support', [
-          'Help Center',
-          'Our Community',
-          'Insurance Policy',
-          'Upload rented items'
-        ]),
-        
-        // Account Section
-        createFooterSection('Account', [
-          'My Account',
-          'Login / Register',
-          'Cart',
-          'Wishlist',
-          'Shop'
-        ]),
-        
-        // Quick Links & Download Section
-        React.createElement(
-          'div',
-          null,
-          React.createElement('h4', { className: 'font-inter font-semibold mb-4' }, 'Quick Link'),
-          React.createElement(
-            'ul',
-            { className: 'space-y-2 text-sm font-inter text-purple-100 mb-6' },
-            React.createElement('li', null, React.createElement('a', { href: '#', className: 'hover:text-white transition' }, 'Privacy Policy')),
-            React.createElement('li', null, React.createElement('a', { href: '#', className: 'hover:text-white transition' }, 'Terms Of Use')),
-            React.createElement('li', null, React.createElement('a', { href: '#', className: 'hover:text-white transition' }, 'FAQ')),
-            React.createElement('li', null, React.createElement('a', { href: '#', className: 'hover:text-white transition' }, 'Contact'))
-          ),
-          React.createElement('h4', { className: 'font-inter font-semibold mb-4' }, 'Download App'),
-          React.createElement(
-            'div',
-            { className: 'flex gap-2 mb-4' },
-            React.createElement(
-              'div',
-              { className: 'w-20 h-20 bg-white rounded p-1' },
-              React.createElement('div', { className: 'w-full h-full bg-gray-800 rounded flex items-center justify-center text-white text-xs font-bold' }, 'QR')
-            ),
-            React.createElement(
-              'div',
-              { className: 'flex flex-col gap-2' },
-              React.createElement('div', { className: 'h-9 bg-black rounded px-3 flex items-center gap-2 text-white text-xs' },
-                React.createElement('span', null, '▶'),
-                React.createElement('div', null,
-                  React.createElement('div', { className: 'text-[8px]' }, 'GET IT ON'),
-                  React.createElement('div', { className: 'font-semibold text-xs' }, 'Google Play')
-                )
-              ),
-              React.createElement('div', { className: 'h-9 bg-black rounded px-3 flex items-center gap-2 text-white text-xs' },
-                React.createElement('span', null, ''),
-                React.createElement('div', null,
-                  React.createElement('div', { className: 'text-[8px]' }, 'Download on the'),
-                  React.createElement('div', { className: 'font-semibold text-xs' }, 'App Store')
-                )
-              )
-            )
-          )
-        )
-      ),
-      
-      // Bottom Bar
-      React.createElement(
-        'div',
-        { className: 'border-t border-purple-500 pt-6 text-center' },
-        React.createElement(
-          'p',
-          { className: 'text-sm font-inter text-purple-200' },
-          '© Copyright Hirent 2025. All right reserved'
-        )
-      )
-    )
+          <p className="text-xs text-gray-300 mb-3">Subscribe</p>
+          <p className="text-xs text-gray-300 mb-4">
+            Get 10% off your first order
+          </p>
+
+          <div className="flex items-center border border-gray-300 rounded-md overflow-hidden w-52 bg-white">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="flex-1 px-2 py-2 text-gray-700 focus:outline-none text-xs"
+            />
+            <button className="bg-[#9e26da] hover:bg-purple-700 text-white text-xs px-3 py-2 h-full flex items-center justify-center">
+              ➤
+            </button>
+          </div>
+        </div>
+
+        {/* support */}
+        <div className="space-y-4">
+          <h3 className="font-bold text-base mb-5">Support</h3>
+          <p className="text-xs text-gray-300 flex items-center gap-2">
+            <i className="fas fa-map-marker-alt w-3"></i>
+            Naga City, Camarines Sur,<br />
+            Philippines 4400
+          </p>
+          <p className="text-xs text-gray-300 flex items-center gap-2">
+            <i className="fas fa-envelope w-3"></i>
+            info@hirent.com
+          </p>
+          <p className="text-xs text-gray-300 flex items-center gap-2">
+            <i className="fas fa-phone-alt w-3"></i>
+            +88015-88888-9999
+          </p>
+        </div>
+
+        {/* account */}
+        <div>
+          <h3 className="font-bold text-base mb-5">Account</h3>
+          <ul className="text-xs text-gray-300 space-y-4">
+            <li><a href="/#" className="hover:text-[#e3c6ff]">My Account</a></li>
+            <li><a href="/#" className="hover:text-[#e3c6ff]">Login / Register</a></li>
+            <li><a href="/#" className="hover:text-[#e3c6ff]">Cart</a></li>
+            <li><a href="/#" className="hover:text-[#e3c6ff]">Wishlist</a></li>
+            <li><a href="/#" className="hover:text-[#e3c6ff]">Shop</a></li>
+          </ul>
+        </div>
+
+        {/* quick link */}
+        <div>
+          <h3 className="font-bold text-base mb-5">Quick Link</h3>
+          <ul className="text-xs text-gray-300 space-y-4">
+            <li><a href="/#" className="hover:text-[#e3c6ff]">Privacy Policy</a></li>
+            <li><a href="/#" className="hover:text-[#e3c6ff]">Terms Of Use</a></li>
+            <li><a href="/#" className="hover:text-[#e3c6ff]">FAQ</a></li>
+            <li><a href="/#" className="hover:text-[#e3c6ff]">Contact</a></li>
+          </ul>
+        </div>
+
+        {/* download app */}
+        <div>
+          <h3 className="font-bold text-base mb-5">Download App</h3>
+          <p className="text-xs text-gray-300 mb-3">
+            Save $3 with App New User Only
+          </p>
+          <div className="flex items-center gap-3 mb-4">
+            <img src={qrCode} alt="QR Code" className="w-16 h-16 rounded-sm" />
+            <div className="flex flex-col gap-2">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                alt="Google Play"
+                className="w-24"
+              />
+              <img
+                src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+                alt="App Store"
+                className="w-24"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-4 text-gray-300 text-lg">
+            <a href="/#" className="hover:text-white"><i className="fab fa-facebook-f"></i></a>
+            <a href="/#" className="hover:text-white"><i className="fab fa-twitter"></i></a>
+            <a href="/#" className="hover:text-white"><i className="fab fa-instagram"></i></a>
+            <a href="/#" className="hover:text-white"><i className="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+      </div>
+
+      {/* copyright */}
+      <div className="text-center text-xs text-gray-400 mt-10 border-t border-gray-400 pt-6">
+        © Copyright Hirent 2025. All rights reserved.
+      </div>
+    </footer>
   );
 };
 

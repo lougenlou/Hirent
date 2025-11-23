@@ -13,6 +13,9 @@ import BrowseItems from "./components/items/BrowseItems";
 import HowItWorks from "./components/home/HowItWorks";
 import WhyChoose from "./components/home/WhyChoose";
 import Testimonials from "./components/home/Testimonials";
+// Layout components
+import Navbar from './components/layout/MainNav';
+import Footer from './components/layout/Footer';
 
 // Auth Pages
 import Signup from "./pages/auth/Signup";

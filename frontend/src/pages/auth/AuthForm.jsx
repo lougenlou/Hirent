@@ -93,11 +93,15 @@ const AuthForm = ({ mode }) => {
             navigate("/onboarding1");
         } else {
             console.log("Login data:", formData);
+<<<<<<< HEAD
+            navigate("/browse"); // change this to redirect to homepage after login
+=======
 
             // ✅ Add this line to mark user as logged in
             login("fake_token_123"); // stores in localStorage + updates context state
 
             navigate("/browse"); // redirect to homepage after login
+>>>>>>> main
         }
     };
 

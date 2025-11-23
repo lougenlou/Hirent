@@ -1,46 +1,37 @@
-<<<<<<< HEAD
+/* Import Inter Font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-=======
->>>>>>> origin
+/* Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-<<<<<<< HEAD
+/* Global Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-=======
-
+/* Body */
 body {
   margin: 0;
->>>>>>> origin
+  padding: 0;
+  overflow-x: hidden;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-/* Hide horizontal scrollbar globally */
-body {
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
 
-<<<<<<< HEAD
+/* HTML */
 html {
   overflow-x: hidden;
 }
 
-=======
+/* Anchor reset from origin */
 a {
   text-decoration: none !important;
 }
 a:hover {
   text-decoration: none !important;
 }
->>>>>>> origin

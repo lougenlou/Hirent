@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Layout components
-import Navbar from './components/layout/Navbar';
+import Navbar from './components/layout/MainNav';
 import Footer from './components/layout/Footer';
 
 // Landing page components

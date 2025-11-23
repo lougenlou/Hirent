@@ -15,10 +15,6 @@ import Testimonials from "./components/home/Testimonials";
 // Auth Pages
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
-<<<<<<< HEAD
-import OwnerInformation from "./pages/auth/Owner_Information";
-import OwnerSubmission from "./pages/auth/Owner_Submission";
-=======
 
 // Owner Registration Pages
 import OwnerInformation from "./pages/auth/Owner_Information";
@@ -29,17 +25,11 @@ import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import AddItem from "./pages/owner/AddItem";
 import OwnerProfile from "./pages/owner/OwnerProfile";
 
->>>>>>> main
 import Onboarding1 from "./pages/onboarding/Onboarding1";
 import Onboarding2 from "./pages/onboarding/Onboarding2";
 import Onboarding3 from "./pages/onboarding/Onboarding3";
 import Onboarding4 from "./pages/onboarding/Onboarding4";
 import OnboardingLayout from "./layouts/OnboardingLayout";
-<<<<<<< HEAD
-import BrowseRentals from "./pages/home/BrowseRentals";
-import "leaflet/dist/leaflet.css";
-=======
->>>>>>> main
 
 // Landing Page Component
 function LandingPage() {
@@ -78,15 +68,11 @@ function App() {
           <Route path="/onboarding3" element={<Onboarding3 />} />
           <Route path="/onboarding4" element={<Onboarding4 />} />
         </Route>
-<<<<<<< HEAD
-        <Route path="/browse" element={<BrowseRentals />} />
-=======
         {/* Owner Dashboard */}
         <Route path="/owner" element={<OwnerDashboard />} />
         <Route path="/owner/add-item" element={<AddItem />} />
         <Route path="/owner/profile" element={<OwnerProfile />} />
 
->>>>>>> main
       </Routes>
     </Router>
   );

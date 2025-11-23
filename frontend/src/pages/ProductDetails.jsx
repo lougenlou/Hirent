@@ -25,21 +25,25 @@ const ProductDetails = () => {
     rating: 4.5,
     reviews: 150,
     inStock: true,
+    quantity: 2,
+
+    // RENTAL PRICING
     price: 300.00,
     originalPrice: 500.00,
-    description: 'PlayStation 5 Controller Skin High quality vinyl with air channel adhesive for easy bubble free install & mess free removal Pressure sensitive.',
-    colors: [
-      { name: 'purple', code: '#A855F7' },
-      { name: 'red', code: '#EF4444' },
-      { name: 'yellow', code: '#F59E0B' }
-    ],
-    sizes: ['M', 'L'],
-    images: [
-      havicGamepad,
-      havicGamepad1,
-      havicGamepad2,
-      havicGamepad3
-    ]
+
+    // PRODUCT DESCRIPTION
+    description:
+      'High-quality gaming controller with ergonomic grip, responsive buttons, smooth analog sticks and durable build. Perfect for long gaming sessions.',
+
+    // 📌 NEW RENTAL ATTRIBUTES
+    condition: 'Excellent — Fully tested and sanitized',
+    brand: 'Havic',
+    model: 'HV-G92',
+    platformCompatibility: 'PC / PS3 / Android',
+    connectivity: 'USB Wired',
+    includedAccessories: 'Gamepad + USB Cable',
+
+    images: [havicGamepad, havicGamepad1, havicGamepad2, havicGamepad3],
   };
 
   const relatedProducts = [
@@ -88,23 +92,30 @@ const ProductDetails = () => {
     <div className="min-h-screen bg-white">
       <Navbar />
       <ProductSidebar />
-      
-      {/* Main Content with Left Sidebar Offset */}
-      <div className="ml-16">
-        {/* Breadcrumb */}
-        <div className="pl-32 pr-6 py-8">
-          <div className="flex items-center space-x-3 text-lg">
-            <a href="/" className="text-gray-400 hover:text-gray-600 transition">Home</a>
-            <span className="text-gray-400">/</span>
-            <a href="/categories" className="text-gray-400 hover:text-gray-600 transition">Categories</a>
-            <span className="text-gray-400">/</span>
-            <a href="/gadgets" className="text-gray-400 hover:text-gray-600 transition">Gadgets</a>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-900 font-medium">{product.name}</span>
-          </div>
-        </div>
 
-        {/* Main Product Section */}
+      {/* Main Content */}
+      <div className="ml-16">
+
+          {/* Breadcrumb */}
+          <div className="pl-32 pr-6 py-4">
+            <div className="flex items-center space-x-2 text-sm">
+              <a href="/" className="text-gray-400 hover:text-gray-600 transition">Home</a>
+              <span className="text-gray-300">/</span>
+
+              <a href="/categories" className="text-gray-400 hover:text-gray-600 transition">Categories</a>
+              <span className="text-gray-300">/</span>
+
+              <a href="/gadgets" className="text-gray-400 hover:text-gray-600 transition">Gadgets</a>
+              <span className="text-gray-300">/</span>
+
+              <span className="text-gray-900 font-medium truncate max-w-[200px]">
+                {product.name}
+              </span>
+            </div>
+          </div>
+
+
+        {/* Product Section */}
         <div className="pl-32 pr-6 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ImageGallery images={product.images} />

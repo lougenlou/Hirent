@@ -9,6 +9,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 <<<<<<< HEAD
 body {
@@ -55,7 +56,19 @@ a:hover {
   text-decoration: none !important;
 <<<<<<< HEAD
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+=======
+<<<<<<< HEAD
+}
 =======
 }
 >>>>>>> origin
 >>>>>>> fb5b9551f50f26dd278c1ec027b4cfebe2206411
+>>>>>>> main

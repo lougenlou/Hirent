@@ -1,36 +1,34 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-import ProductSidebar from './components/layout/ProductSidebar';
-import Cart from './pages/Cart';
-
-function Layout() {
-  const location = useLocation();
-  
-  // Show footer only on these routes
-  const showFooterRoutes = ['/cart'];
-  const shouldShowFooter = showFooterRoutes.includes(location.pathname);
-
-  return (
-    <div className="App">
-      <Navbar />
-      <ProductSidebar />
-      
-      <Routes>
-        <Route path="/cart" element={<Cart />} />
-        {/* Add your other routes here */}
-      </Routes>
-
-      {shouldShowFooter && <Footer />}
-    </div>
-  );
-}
+import Sidebar from './components/layout/Sidebar';
+import Booking from './pages/Booking';
 
 function App() {
   return (
     <Router>
-      <Layout />
+      <div className="min-h-screen flex flex-col">
+        {/* NAVBAR */}
+        <Navbar />
+
+        {/* MAIN LAYOUT: SIDEBAR + CONTENT */}
+        <div className="flex flex-1">
+          {/* SIDEBAR */}
+          <Sidebar />
+
+          {/* CONTENT AREA with left padding for spacing */}
+          <div className="flex-1 pl-6 pr-6 md:pl-10 md:pr-10 pb-12 overflow-x-hidden">
+            <Routes>
+              <Route path="/booking" element={<Booking />} />
+            </Routes>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <Footer />
+      </div>
     </Router>
   );
 }

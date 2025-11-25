@@ -20,11 +20,8 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('MongoDB connection error:', err.message));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes')); // User routes
-
-const homepageRoutes = require("./api/homepage/homepage.route");
-app.use("/api/homepage", homepageRoutes);
 
 // ====== ROUTES ======
 app.get('/', (req, res) => {

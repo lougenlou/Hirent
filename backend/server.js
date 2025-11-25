@@ -31,8 +31,11 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Base route for all auth-related requests
+// Auth routes
 app.use('/api/auth', require('./routes/auth'));
+
+// Item search & filtering routes (NEW)
+app.use('/api/items', require('./routes/itemsRoutes'));
 
 // ====== ERROR HANDLING MIDDLEWARE ======
 app.use(errorHandler); // catches thrown or unhandled errors

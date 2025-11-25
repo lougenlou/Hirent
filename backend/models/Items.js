@@ -10,4 +10,7 @@ const ItemSchema = new mongoose.Schema({
   featured: { type: Boolean, default: false }
 }, { timestamps: true });
 
+//  TEXT INDEX 
+ItemSchema.index({ title: "text", description: "text" });
+
 module.exports = mongoose.model("Item", ItemSchema);

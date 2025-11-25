@@ -1,8 +1,8 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const cors = require('cors');
-const errorHandler = require('./middleware/errorHandler'); // ✅ Global error handler
+const errorHandler = require('./middleware/errorHandler');
 
 // Load environment variables
 dotenv.config();
@@ -12,31 +12,27 @@ const app = express();
 
 // ====== MIDDLEWARE ======
 app.use(cors());
-app.use(express.json()); // Parse JSON request bodies
-
-// ====== DATABASE CONNECTION ======
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err.message));
-
-// Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/users', require('./routes/userRoutes')); // User routes
+app.use(express.json());
 
 // ====== ROUTES ======
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/items', require('./routes/itemsRoutes'));
+
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Auth routes
-app.use('/api/auth', require('./routes/auth'));
-
-// Item search & filtering routes (NEW)
-app.use('/api/items', require('./routes/itemsRoutes'));
-
 // ====== ERROR HANDLING MIDDLEWARE ======
-app.use(errorHandler); // catches thrown or unhandled errors
+app.use(errorHandler);
 
-// ====== START SERVER ======
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ====== DATABASE CONNECTION + START SERVER ======
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected ✅");
+
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch(err => console.error("MongoDB connection error:", err.message));
+

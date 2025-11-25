@@ -27,8 +27,12 @@ app.get('/', (req, res) => {
 // Auth routes
 app.use('/api/auth', require('./routes/auth'));
 
-// Item search & filtering routes (NEW)
+// Item search & filtering routes
 app.use('/api/items', require('./routes/itemsRoutes'));
+
+// ⭐⭐ Cart API routes (JUST ADDED)
+app.use('/api/cart', require('./routes/cartRoutes'));
+
 
 // ====== ERROR HANDLING MIDDLEWARE ======
 app.use(errorHandler); // catches thrown or unhandled errors

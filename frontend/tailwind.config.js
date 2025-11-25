@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
+    "./src/**/*.{js,jsx,ts,tsx}", // ← ensures Tailwind scans all your React files
+    "./src/assets/**/*.css", 
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
@@ -17,3 +19,4 @@ module.exports = {
   },
   plugins: [],
 }
+

@@ -1,19 +1,17 @@
-/* Import Inter Font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-/* Global Reset */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Body */
 body {
   margin: 0;
   padding: 0;
@@ -23,15 +21,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* HTML */
 html {
   overflow-x: hidden;
 }
 
-/* Anchor reset from origin */
 a {
   text-decoration: none !important;
 }
+
 a:hover {
   text-decoration: none !important;
 }

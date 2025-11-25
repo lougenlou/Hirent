@@ -1,5 +1,7 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProductDetails from './pages/ProductDetails';
+import './App.css';
 import "leaflet/dist/leaflet.css";
 
 // Public Components
@@ -11,6 +13,9 @@ import BrowseItems from "./components/items/BrowseItems";
 import HowItWorks from "./components/home/HowItWorks";
 import WhyChoose from "./components/home/WhyChoose";
 import Testimonials from "./components/home/Testimonials";
+// Layout components
+import Navbar from './components/layout/MainNav';
+import Footer from './components/layout/Footer';
 
 // Auth Pages
 import Signup from "./pages/auth/Signup";
@@ -52,6 +57,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Product Details Route */}
+        <Route path="/product/:id" element={<ProductDetails />} />
+        
 
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />

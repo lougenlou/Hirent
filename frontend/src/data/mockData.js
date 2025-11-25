@@ -1,3 +1,10 @@
+import gucci_dufflebag from "../assets/items/gucci_duffle_bag.png";
+import havit_hv from "../assets/items/havit_hv.png";
+import IPS_lcd from "../assets/items/IPS_lcd.png";
+import Keyboard from "../assets/items/Keyboard.png";
+import laptop from "../assets/items/laptop.png";
+import RGB_liquid_CPU from "../assets/items/RGB_liquid_CPU.png";
+
 export const mockDashboardStats = {
   totalListings: 15,
   listingsChange: "+2 this month",
@@ -6,29 +13,29 @@ export const mockDashboardStats = {
   pendingBookings: 7,
   pendingBookingsSubtext: "Awaiting approval",
   earnings: "₱ 5,500.00",
-  earningsChange: "+18% from last month"
+  earningsChange: "+18% from last month",
 };
 
 export const mockListings = [
   {
     id: 1,
-    name: "Gucci duffle bag",
+    name: "Gucci Duffle Bag",
     category: "Fashion",
     price: "₱960",
     availability: "Rented",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Active",
-    image: "/assets/items/gucci_duffle_bag.png"
+    image: gucci_dufflebag
   },
   {
     id: 2,
-    name: "HAVIT HV Gaming",
+    name: "Havit HV Gaming Mouse",
     category: "Gadgets",
     price: "₱560",
     availability: "Available",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Active",
-    image: "/assets/items/havit_hv.png"
+    image: havit_hv
   },
   {
     id: 3,
@@ -38,7 +45,7 @@ export const mockListings = [
     availability: "Rented",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Active",
-    image: "/assets/items/IPS_lcd.png"
+    image: IPS_lcd
   },
   {
     id: 4,
@@ -48,7 +55,7 @@ export const mockListings = [
     availability: "Available",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Active",
-    image: "/assets/items/Keyboard.png"
+    image: Keyboard
   },
   {
     id: 5,
@@ -58,7 +65,7 @@ export const mockListings = [
     availability: "Available",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Pending",
-    image: "/assets/items/laptop.png"
+    image: laptop
   },
   {
     id: 6,
@@ -68,6 +75,6 @@ export const mockListings = [
     availability: "Unavailable",
     bookedDates: "Oct 20 - 24, 2025",
     status: "Inactive",
-    image: "/assets/items/RGB_liquid_CPU.png"
+    image: RGB_liquid_CPU
   }
 ];

@@ -1,4 +1,4 @@
-export const validateUser = (req, res, next) => {
+const validateUser = (req, res, next) => {
     const { username, email, password } = req.body;
 
     if (!username || typeof username !== 'string') {
@@ -6,6 +6,6 @@ export const validateUser = (req, res, next) => {
     }
 
     next();
-}
+};
 
 module.exports = { validateUser };

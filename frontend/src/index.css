@@ -8,32 +8,29 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
+
 body {
   margin: 0;
-/* Global Reset */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Body */
+body {
+
 body {
   margin: 0;
-  padding: 0;
-  overflow-x: hidden;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 
-/* HTML */
 html {
   overflow-x: hidden;
 }
-
-/* Anchor reset from origin */
 
 a {
   text-decoration: none !important;
@@ -48,5 +45,6 @@ a:hover {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
 }
 }

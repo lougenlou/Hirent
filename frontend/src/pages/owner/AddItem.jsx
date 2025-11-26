@@ -1,7 +1,7 @@
 // src/pages/owner/AddItem.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../components/layout/Sidebar';
+import Sidebar from '../../components/layout/OwnerSidebar';
 import AddNewItemForm from '../../components/forms/AddNewItemForm';
 
 export default function AddItem() {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Sidebar from "../../components/layout/Sidebar";
+import Sidebar from "../../components/layout/OwnerSidebar";
 import profilePicture from "../../assets/profile/prof_pic.jpg";
 
 export default function Profile() {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../components/layout/Sidebar";
+import Sidebar from "../../components/layout/OwnerSidebar";
 import { mockDashboardStats, mockListings } from "../../data/mockData";
 
 // Stats Data with Updated Icons

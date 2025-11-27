@@ -46,6 +46,9 @@ app.use('/api/items', require('./routes/itemsRoutes'));
 // Cart routes
 app.use('/api/cart', require('./routes/cartRoutes'));
 
+// BOOKING ROUTES
+app.use('/api/bookings', require('./routes/bookingRoutes'));
+
 // ====== ERROR HANDLING MIDDLEWARE ======
 app.use(errorHandler); // ⬅ MUST be last
 

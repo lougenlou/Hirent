@@ -7,7 +7,9 @@ const ItemSchema = new mongoose.Schema({
   images: [{ type: String }],
   pricePerDay: Number,
   available: { type: Boolean, default: true },
-  featured: { type: Boolean, default: false }
+  featured: { type: Boolean, default: false },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+
 }, { timestamps: true });
 
 //  TEXT INDEX 

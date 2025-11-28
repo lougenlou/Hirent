@@ -22,7 +22,10 @@ const MainNav = () => {
         <div className="flex items-center justify-between max-w-7xl mx-auto h-full">
 
           {/* Logo */}
-          <div className="flex items-center h-full cursor-pointer" onClick={() => navigate("/")}>
+          <div
+            className="flex items-center h-full cursor-pointer"
+            onClick={() => navigate("/")}
+          >
             <img src={hirentLogo} alt="HiRENT" className="h-7" />
           </div>
 
@@ -34,15 +37,11 @@ const MainNav = () => {
                 <NavLink
                   key={link.name}
                   to={link.path}
-                  className={`flex items-center justify-center px-5 h-full transition-colors ${isActive
+                  className={`flex items-center justify-center px-5 h-full transition-colors ${
+                    isActive
                       ? "bg-[#59087f] text-white border-b-[4px] border-white"
                       : "text-white hover:bg-[#680e91]"
-                    }`}
-                  style={{
-                    margin: 0,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                  }}
+                  }`}
                 >
                   {link.name}
                 </NavLink>
@@ -51,31 +50,65 @@ const MainNav = () => {
 
             {/* “Be an Owner” */}
             <NavLink
-  to="/ownersignup"
-  className="flex items-center justify-center px-5 h-full transition-colors"
-  style={{ color: "#FFFB83" }}
->
-  <span className="underline underline-offset-2 hover:decoration-yellow-400 hover:text-yellow-300 transition-all">
-    Be an Owner
-  </span>
-</NavLink>
-
+              to="/ownersignup"
+              className="flex items-center justify-center px-5 h-full transition-colors"
+              style={{ color: "#FFFB83" }}
+            >
+              <span className="underline underline-offset-2 hover:decoration-yellow-400 hover:text-yellow-300 transition-all">
+                Be an Owner
+              </span>
+            </NavLink>
           </div>
 
-          {/* Buttons (Login / Register) */}
-          <div className="flex items-center space-x-3">
+          {/* Right side actions (Profile, Notification, Logout) */}
+          <div className="flex items-center space-x-4 text-white">
+
+            {/* Notification Icon */}
             <button
-              onClick={() => navigate("/login")}
-              className="w-20 h-8 bg-white/5 border border-white/70 text-white rounded-md font-inter font-semibold hover:bg-white/20 transition text-[13px]"
+              className="relative hover:opacity-80 transition"
+              onClick={() => navigate("/notifications")}
             >
-              Login
+              {/* Bell Icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14 10V6a4 4 0 10-8 0v4a2 2 0 01-.894 1.789l-.553.395A2 2 0 005 16h10a2 2 0 001.447-3.816l-.553-.395A2 2 0 0114 10z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10 20a2 2 0 002-2H8a2 2 0 002 2z"
+                />
+              </svg>
+
+              {/* Notification Badge (optional) */}
+              <span className="absolute -top-1 -right-1 bg-red-500 text-[10px] text-white w-4 h-4 flex justify-center items-center rounded-full">
+                3
+              </span>
             </button>
+
+            {/* Profile Button */}
             <button
-              onClick={() => navigate("/signup")}
-              className="w-24 h-8 bg-white rounded-md font-inter font-semibold hover:bg-gray-100 transition text-[13px]"
-              style={{ color: "#743593" }}
+              onClick={() => navigate("/profile")}
+              className="text-sm font-semibold hover:text-gray-200 transition"
             >
-              Register
+              Profile
+            </button>
+
+            {/* Logout Button */}
+            <button
+              onClick={() => navigate("/logout")}
+              className="text-sm font-semibold hover:text-gray-200 transition"
+            >
+              Logout
             </button>
           </div>
         </div>

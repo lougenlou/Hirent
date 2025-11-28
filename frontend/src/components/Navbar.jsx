@@ -1,14 +1,14 @@
 import React, { useState, useContext } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Search, Heart, ShoppingCart, User } from "lucide-react";
+import { Search, Heart, ShoppingCart, User, Bell } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import hirentLogo from "../assets/hirent-logo.png";
-import LogoutButton from "../components/LogoutButton"; // adjust the path
+import LogoutButton from "../components/LogoutButton";
 
 const Navbar = ({ onSearch }) => {
   const [inputValue, setInputValue] = useState("");
   const location = useLocation();
-  const { isLoggedIn, logout } = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
 
   const handleSearch = () => {
     if (onSearch) onSearch(inputValue.trim());
@@ -46,10 +46,11 @@ const Navbar = ({ onSearch }) => {
                 <NavLink
                   key={link.name}
                   to={link.path}
-                  className={`px-5 flex items-center h-full transition-colors ${isActive
-                    ? "bg-[#59087f] text-white border-b-[4px] border-white"
-                    : "text-white hover:bg-[#680e91]"
-                    }`}
+                  className={`px-5 flex items-center h-full transition-colors ${
+                    isActive
+                      ? "bg-[#59087f] text-white border-b-[4px] border-white"
+                      : "text-white hover:bg-[#680e91]"
+                  }`}
                 >
                   {link.name}
                 </NavLink>
@@ -57,6 +58,7 @@ const Navbar = ({ onSearch }) => {
             })}
           </div>
 
+          {/* Right Side (When Logged In) */}
           <div className="hidden lg:flex items-center h-full space-x-4">
             {isLoggedIn ? (
               <>
@@ -68,9 +70,9 @@ const Navbar = ({ onSearch }) => {
                     value={inputValue}
                     onChange={(e) => {
                       setInputValue(e.target.value);
-                      if (onSearch) onSearch(e.target.value); 
+                      if (onSearch) onSearch(e.target.value);
                     }}
-                    onKeyDown={handleKeyDown} 
+                    onKeyDown={handleKeyDown}
                     className="flex-1 outline-none text-[13px] bg-transparent placeholder-gray-400"
                   />
                   <Search
@@ -84,6 +86,10 @@ const Navbar = ({ onSearch }) => {
                   {[
                     { icon: <Heart className="w-5 h-5" />, path: "/wishlist" },
                     { icon: <ShoppingCart className="w-5 h-5" />, path: "/cart" },
+
+                    // 🔔 Added Notification Icon Here
+                    { icon: <Bell className="w-5 h-5" />, path: "/notifications" },
+
                     { icon: <User className="w-5 h-5" />, path: "/profile" },
                   ].map(({ icon, path }) => {
                     const isActive = location.pathname === path;
@@ -91,11 +97,11 @@ const Navbar = ({ onSearch }) => {
                       <NavLink
                         key={path}
                         to={path}
-                        className={`flex items-center justify-center h-full w-[40px] transition-colors ${isActive
-                          ? "bg-[#59087f] text-white border-b-[4px] border-white"
-                          : "text-white hover:bg-[#680e91]"
-                          }`}
-                        style={{ margin: 0, paddingTop: 0, paddingBottom: 0 }}
+                        className={`flex items-center justify-center h-full w-[40px] transition-colors ${
+                          isActive
+                            ? "bg-[#59087f] text-white border-b-[4px] border-white"
+                            : "text-white hover:bg-[#680e91]"
+                        }`}
                       >
                         {icon}
                       </NavLink>
@@ -107,7 +113,6 @@ const Navbar = ({ onSearch }) => {
                 <LogoutButton />
               </>
             ) : (
-              // main nav for guests (login/signup)
               <>
                 <NavLink
                   to="/login"

@@ -40,9 +40,9 @@ const RelatedItems = ({ products }) => {
                 className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
               />
 
-              {/* Add to Cart Button */}
+              {/* Add to collection Button */}
               <button className="absolute bottom-0 left-0 right-0 bg-[#7A1CA9] text-white py-2 font-semibold text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-purple-700">
-                Add To Cart
+                Add To collection
               </button>
             </div>
 

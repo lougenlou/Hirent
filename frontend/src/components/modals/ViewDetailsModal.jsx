@@ -78,7 +78,7 @@ export function ViewDetailsModal({ isOpen, onClose, itemId, rentalData }) {
         <>
             <div className="fixed inset-0 bg-black/40 z-50" onClick={onClose} />
             <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-20">
-                <div className="bg-white cart-scale rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-y-auto" onClick={e => e.stopPropagation()}>
+                <div className="bg-white collection-scale rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-y-auto" onClick={e => e.stopPropagation()}>
                     {/* Header */}
                     <div className="sticky top-0 bg-white border-b rounded-t-2xl border-gray-200 px-6 py-4 z-20 flex items-center justify-between">
                         <div className="flex items-center gap-4 flex-1">

@@ -17,7 +17,8 @@ const MainNav = () => {
     <>
       <nav
         className="px-6 md:px-16 lg:px-24 fixed top-0 left-0 w-full z-50 shadow-sm"
-        style={{ backgroundColor: "#7A1CA9", height: "55px" }}
+        style={{ background: "linear-gradient(180deg, #7A1CA9 0%, #A01FC9 100%)",
+          height: "60px" }}
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto h-full">
 

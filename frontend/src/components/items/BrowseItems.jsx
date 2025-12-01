@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, Eye, ShoppingCart, Check, MapPin } from "lucide-react";
+import { Heart, Eye, ShoppingBag, Check, MapPin } from "lucide-react";
 
 const BrowseItems = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const BrowseItems = () => {
     setWishlist((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
-  const handleAddToCart = (item) => {
+  const handleAddTocollection = (item) => {
     if (!justAdded.includes(item.id)) {
       setJustAdded((prev) => [...prev, item.id]);
       setTimeout(() => setJustAdded((prev) => prev.filter((id) => id !== item.id)), 2000);
@@ -43,8 +43,8 @@ const BrowseItems = () => {
   };
 
   return (
-    <section className="py-2 px-6 md:px-16 lg:px-24 bg-white">
-      <div className="cart-scale max-w-7xl mx-auto">
+    <section className="py-2 px-8 md:px-16 lg:px-36 bg-white">
+      <div className="collection-scale max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mt-12">Browse Items</h2>
@@ -105,7 +105,7 @@ const BrowseItems = () => {
                         Book Item
                       </button>
                       <button
-                        onClick={() => handleAddToCart(item)}
+                        onClick={() => handleAddTocollection(item)}
                         className={`flex-[1] border border-[#7A1CA9] rounded-br-2xl font-medium py-2.5 flex justify-center items-center gap-1 transition-all duration-300 text-[12.5px] ${justAdded.includes(item.id)
                             ? "bg-green-500 border-green-500 text-white hover:bg-green-600 hover:border-green-600"
                             : "text-[#7A1CA9] hover:bg-purple-100"
@@ -117,7 +117,7 @@ const BrowseItems = () => {
                           </>
                         ) : (
                           <>
-                            <ShoppingCart size={16} className="text-[#7A1CA9]" /> Add To Cart
+                            <ShoppingBag size={16} className="text-[#7A1CA9]" /> Add To collection
                           </>
                         )}
                       </button>

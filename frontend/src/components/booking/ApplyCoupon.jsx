@@ -12,23 +12,30 @@ const ApplyCoupon = ({ couponData, setCouponData }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-xl font-semibold mb-4">Apply Coupon</h2>
-      
-      <div className="flex gap-3">
-        <input
-          type="text"
-          placeholder="Enter Code (Optional)"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        <button
-          onClick={handleApply}
-          className="px-6 py-2 bg-[#7A1CA9] text-white rounded-lg font-medium hover:bg-purple-700 transition"
-        >
-          Apply
-        </button>
+      <h2 className="text-[16px] text-gray-800 mb-4">Apply Coupon</h2>
+
+      <div className="flex flex-col gap-2">
+        <label className="text-[15px] text-black font-medium">
+          Enter Code (Optional)
+        </label>
+
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={code}
+            placeholder="e.g., SAVE10"
+            onChange={(e) => setCode(e.target.value)}
+            className="flex-1 px-4 py-2 border text-[15px] font-base border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <button
+            onClick={handleApply}
+            className="px-4 py-1 bg-[#7A1CA9] text-sm text-white rounded-lg font-medium hover:bg-purple-700 transition"
+          >
+            Apply
+          </button>
+        </div>
       </div>
+
     </div>
   );
 };

@@ -32,19 +32,27 @@ a:hover {
   scrollbar-width: none;
 }
 
-.cart-scale {
+.collection-scale {
     transform: scale(0.9);
     transform-origin: top center;
-    width: 111%; /* compensate for 90% scale */
+    width: 125%;
+    margin-left: -2%; 
+    margin-right: -2%;
 }
 
 @media (min-width: 1024px) {
-    .cart-scale {
+    .collection-scale {
         transform: scale(0.9);
         transform-origin: top center;
         width: 111%; /* keep consistent scaling */
     }
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+
 
 .carousel-edge-fade {
   position: relative;

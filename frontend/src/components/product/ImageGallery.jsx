@@ -38,7 +38,7 @@ const ImageGallery = ({ images }) => {
       </div>
 
       {/* Main Image */}
-      <div className="relative flex-1 bg-white border rounded-xl shadow-sm flex items-center justify-center p-3">
+      <div className="relative flex-1 bg-gray-100 border rounded-xl shadow-sm flex items-center justify-center p-3">
 
         {/* Prev Arrow */}
         <button

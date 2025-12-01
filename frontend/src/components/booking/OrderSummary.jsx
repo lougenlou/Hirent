@@ -10,24 +10,26 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+      <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
       
       <div className="space-y-4 mb-6">
         {/* Product Info */}
-        <div>
-          <h3 className="font-semibold text-gray-900 mb-1">{product.name}</h3>
-          <p className="text-[#7A1CA9] font-bold">
-            ₱{product.pricePerDay}
-            <span className="text-sm text-gray-500"> per day</span>
-          </p>
-        </div>
+        <div className="flex items-center justify-between">
+  <h3 className="font-medium text-gray-900">{product.name}</h3>
+
+  <p className="text-[#7A1CA9] font-bold">
+    ₱{product.pricePerDay}
+    <span className="text-[15px] font-normal text-gray-600"> per day</span>
+  </p>
+</div>
+
         
         {/* Price Breakdown */}
-        <div className="border-t pt-4">
+        <div className="border-t pt-4 border-gray-300">
 
           {/* Subtotal */}
-          <div className="flex justify-between text-sm mb-1">
-            <span className="text-gray-600">Subtotal</span>
+          <div className="flex justify-between text-[15px] mb-1">
+            <span className="text-gray-800">Subtotal</span>
             <span className="text-gray-900">
               {pricing.subtotal > 0 ? formatCurrency(pricing.subtotal) : "---"}
             </span>
@@ -35,7 +37,7 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
 
           {/* Subtotal Explanation */}
           {pricing.subtotal > 0 && (
-            <p className="text-xs text-gray-500 mb-3 ml-1">
+            <p className="text-sm text-[#7A1CA9] mb-3 ml-1">
               ({rentalData.days} {rentalData.days === 1 ? "day" : "days"}
               {" × "}
               {formatCurrency(product.pricePerDay)}
@@ -44,14 +46,14 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
           )}
 
           {/* Discount — ALWAYS ₱0.00 */}
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-600">Discount</span>
+          <div className="flex justify-between text-[15px] mb-2">
+            <span className="text-gray-800">Discount</span>
             <span className="text-gray-900">₱0.00</span>
           </div>
 
           {/* Shipping */}
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-600">Shipping Fee</span>
+          <div className="flex justify-between text-[15px] mb-2">
+            <span className="text-gray-800">Shipping Fee</span>
             <span className="text-gray-900">
               {pricing.shippingFee > 0
                 ? `+${formatCurrency(pricing.shippingFee)}`
@@ -60,8 +62,8 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
           </div>
 
           {/* Security Deposit */}
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-600">Security Deposit</span>
+          <div className="flex justify-between text-[15px] mb-2">
+            <span className="text-gray-800">Security Deposit</span>
             <span className="text-gray-900">
               +{formatCurrency(pricing.securityDeposit)}
             </span>
@@ -69,10 +71,10 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
         </div>
         
         {/* Total + Actions */}
-        <div className="border-t pt-4">
+        <div className="border-t pt-4 border-gray-300">
           <div className="flex justify-between items-center mb-4">
             <span className="font-semibold text-gray-900">Total</span>
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-xl font-bold text-gray-900">
               {formatCurrency(pricing.total)}
             </span>
           </div>
@@ -83,11 +85,11 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
             </p>
           </div>
           
-          <button className="w-full bg-[#7A1CA9] text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition mb-3">
+          <button className="w-full bg-[#7A1CA9] text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition mb-3">
             Place Booking
           </button>
           
-          <button className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition">
+          <button className="w-full bg-white border border-gray-300 text-gray-800 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition">
             Cancel
           </button>
         </div>

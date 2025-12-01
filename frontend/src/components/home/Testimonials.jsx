@@ -146,7 +146,7 @@ const Testimonials = () => {
 
   return React.createElement(
     'section',
-    { className: 'py-24 px-6 md:px-16 lg:px-24 bg-gray-50 overflow-hidden' },
+    { className: 'py-24 px-8 md:px-16 lg:px-36 bg-gray-50 overflow-hidden' },
     React.createElement(
       'div',
       { className: 'max-w-7xl mx-auto' },

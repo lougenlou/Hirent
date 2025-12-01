@@ -1,335 +1,496 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../components/layouts/OwnerSidebar";
-import { mockDashboardStats, mockListings } from "../../data/mockData";
+import {
+  Search,
+  Bell,
+  Calendar,
+  Download,
+  ChevronDown,
+  Eye
+} from "lucide-react";
 
-// Stats Data with Updated Icons
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
+import cameraImg from "../../assets/items/camera.png";
+import droneImg from "../../assets/items/drone.png";
+import laptopImg from "../../assets/items/laptop.png";
+import camera1Img from "../../assets/items/camera1.png";
+import gimbalImg from "../../assets/items/gimbal.png";
+
+import gcashIcon from "../../assets/payment/GCash.png";
+import paypalIcon from "../../assets/payment/paypal.png";
+import mayaIcon from "../../assets/payment/maya.png";
+import bankIcon from "../../assets/payment/bank.png";
+import cashIcon from "../../assets/payment/cash.png";
+
+import totalBookingsIcon from "../../assets/icons/total.svg";
+import activeRentalsIcon from "../../assets/icons/active.svg";
+import pendingBookingsIcon from "../../assets/icons/pending.svg";
+import totalEarningsIcon from "../../assets/icons/earnings.svg";
+
+import Sidebar from "../../components/layouts/OwnerSidebar";
+import profPic from "../../assets/profile/prof_pic.jpg";
+import sampleBookings from "../../data/sampleBookings";
+import DropdownPortal from "../../components/button/DropdownPortal";
+
+
+
+// Compute stats dynamically
+const totalBookings = sampleBookings.length;
+const activeRentals = sampleBookings.filter(
+  b => b.status === "Pending" || b.status === "Active"
+).length;
+const totalListings = [...new Set(sampleBookings.map(b => b.item))].length;
+const totalEarnings = sampleBookings.reduce((sum, b) => sum + Number(b.pricePerDay), 0);
+
 const stats = [
   {
     label: "Total Listings",
-    value: mockDashboardStats.totalListings,
-    sublabel: mockDashboardStats.listingsChange,
-    icon: "/assets/icons/listing1.png",
-    iconBg: "bg-purple-600",
-    sublabelColor: "text-green-600",
+    value: totalBookings,
+    sublabel: "+2 this month",
+    sublabelColor: "text-green-500",
+    date: "Updated just now",
+    icon: totalBookingsIcon, // icon added here
   },
   {
     label: "Active Rentals",
-    value: mockDashboardStats.activeRentals,
-    sublabel: mockDashboardStats.activeRentalsSubtext,
-    icon: "/assets/icons/calendar.png",
-    iconBg: "bg-purple-600",
-    sublabelColor: "text-red-600",
+    value: activeRentals,
+    sublabel: "3 ending soon",
+    sublabelColor: "text-red-500",
+    date: "Updated just now",
+    icon: activeRentalsIcon,
   },
   {
     label: "Pending Bookings",
-    value: mockDashboardStats.pendingBookings,
-    sublabel: mockDashboardStats.pendingBookingsSubtext,
-    icon: "/assets/icons/bookings1.png",
-    iconBg: "bg-purple-600",
-    sublabelColor: "text-orange-500",
+    value: totalListings,
+    sublabel: "Awaiting approval",
+    sublabelColor: "text-yellow-500",
+    date: "Updated just now",
+    icon: pendingBookingsIcon,
   },
   {
     label: "Earnings This Month",
-    value: mockDashboardStats.earnings,
-    sublabel: mockDashboardStats.earningsChange,
-    icon: "/assets/icons/dollar1.png",
-    iconBg: "bg-purple-600",
-    sublabelColor: "text-green-600",
+    value: `₱ ${totalEarnings.toLocaleString()}`,
+    sublabel: "+18% from last month",
+    sublabelColor: "text-green-500",
+    date: "Updated just now",
+    icon: totalEarningsIcon,
   },
 ];
 
-// Actions Dropdown Component - NO EMOJIS
-const ActionsDropdown = ({ listing }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const handleEdit = () => {
-    console.log('Edit listing:', listing);
-    navigate(`/owner/edit-item/${listing.id}`);
-    setIsOpen(false);
-  };
-
-  const handleDelete = () => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete "${listing.name}"?`);
-    if (confirmDelete) {
-      console.log('Delete listing:', listing);
-    }
-    setIsOpen(false);
-  };
-
-  const handleView = () => {
-    console.log('View listing:', listing);
-    navigate(`/owner/listing/${listing.id}`);
-    setIsOpen(false);
-  };
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="text-gray-400 hover:text-gray-600 font-bold text-xl focus:outline-none"
-      >
-        ⋮
-      </button>
-      
-      {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 z-10" 
-            onClick={() => setIsOpen(false)}
-          />
-          
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
-            <div className="py-1">
-              <button
-                onClick={handleView}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                View Details
-              </button>
-              <button
-                onClick={handleEdit}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Edit
-              </button>
-              <button
-                onClick={handleDelete}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
 
 export default function OwnerDashboard() {
   const navigate = useNavigate();
 
-  const handleAddListing = () => {
-    navigate('/owner/add-item');
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const downloadButtonRef = React.useRef(null);
+  const dashboardRef = React.useRef(null);
+
+
+  const ActionsDropdown = ({ booking }) => {
+    return (
+      <button
+        onClick={() => console.log("View booking", booking.id)}
+        className="w-8 h-8 flex items-center justify-center rounded-lg border hover:bg-gray-100 transition"
+      >
+        <Eye className="w-4 h-4 text-gray-600" />
+      </button>
+    );
+  };
+
+  const paymentIcons = {
+    gcash: gcashIcon,
+    maya: mayaIcon,
+    paypal: paypalIcon,
+    "bank transfer": bankIcon,
+    cash: cashIcon,
+  };
+
+
+  const itemImages = {
+    camera: cameraImg,
+    drone: droneImg,
+    laptop: laptopImg,
+    camera1: camera1Img,
+    gimbal: gimbalImg,
+  };
+
+  const avatarPNGs = [
+    "https://randomuser.me/api/portraits/men/1.jpg",
+    "https://randomuser.me/api/portraits/women/2.jpg",
+    "https://randomuser.me/api/portraits/men/3.jpg",
+    "https://randomuser.me/api/portraits/women/4.jpg",
+  ];
+
+
+  const getRenterAvatar = (renter, index) => {
+    // Pick avatar based on index for simplicity
+    return avatarPNGs[index % avatarPNGs.length];
   };
 
   const exportToCSV = () => {
-    const headers = ["Item Name", "Category", "Price", "Availability", "Booked Dates", "Status"];
-    const csvData = mockListings.map(listing => [
-      listing.name,
-      listing.category,
-      listing.price,
-      listing.availability,
-      listing.bookedDates,
-      listing.status
+    // --- STATS ---
+    const statsHeader = ["Stat", "Value"];
+    const statsRows = stats.map(s => [s.label, s.value]);
+
+    // --- BOOKINGS TABLE ---
+    const bookingsHeader = ["Booking ID", "Item", "Price", "Renter", "Booked Date", "Payment Method", "Status"];
+    const bookingsRows = sampleBookings.map(b => [
+      b.id,
+      b.item,
+      `₱ ${b.pricePerDay}`,
+      b.renter,
+      b.bookedDate,
+      b.paymentMethod,
+      b.status,
     ]);
 
+    // Combine stats and bookings with an empty row in between
     const csvContent = [
-      headers.join(","),
-      ...csvData.map(row => row.join(","))
-    ].join("\n");
+      ["DASHBOARD STATS"],
+      statsHeader,
+      ...statsRows,
+      [], // empty row
+      ["BOOKINGS TABLE"],
+      bookingsHeader,
+      ...bookingsRows,
+    ]
+      .map(row => row.join(","))
+      .join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    // Download CSV
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'my-listings.csv';
-    document.body.appendChild(link);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "dashboard-data.csv");
     link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
-  const exportToPDF = () => {
-    let pdfContent = "MY LISTINGS\n\n";
-    pdfContent += "Item Name | Category | Price | Availability | Booked Dates | Status\n";
-    pdfContent += "=".repeat(80) + "\n";
 
-    mockListings.forEach(listing => {
-      pdfContent += `${listing.name} | ${listing.category} | ${listing.price} | ${listing.availability} | ${listing.bookedDates} | ${listing.status}\n`;
+  const exportDashboardToPDF = () => {
+    const doc = new jsPDF();
+
+    // --- STATS ---
+    doc.setFontSize(14);
+    doc.text("Dashboard Stats", 14, 15);
+
+    stats.forEach((stat, index) => {
+      doc.setFontSize(12);
+      doc.text(`${stat.label}: ${stat.value}`, 14, 25 + index * 10);
     });
 
-    const blob = new Blob([pdfContent], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'my-listings.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+    // --- BOOKINGS TABLE ---
+    const tableColumn = ["Booking ID", "Item", "Price", "Renter", "Booked Date", "Payment", "Status"];
+    const tableRows = [];
 
-  const getAvailabilityColor = (availability) => {
-    switch (availability) {
-      case "Rented":
-        return "bg-blue-100 text-blue-700";
-      case "Available":
-        return "bg-green-100 text-green-700";
-      case "Unavailable":
-        return "bg-gray-200 text-gray-600";
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
-  };
+    sampleBookings.forEach(b => {
+      const row = [
+        b.id,
+        b.item,
+        `₱ ${b.pricePerDay}`,
+        b.renter,
+        b.bookedDate,
+        b.paymentMethod,
+        b.status,
+      ];
+      tableRows.push(row);
+    });
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Active":
-        return "bg-green-500 text-white";
-      case "Inactive":
-        return "bg-gray-400 text-white";
-      case "Pending":
-        return "bg-yellow-500 text-white";
-      default:
-        return "bg-gray-300 text-gray-700";
-    }
+    autoTable(doc, {
+      startY: 60,
+      head: [tableColumn],
+      body: tableRows,
+      styles: { fontSize: 10 },
+    });
+
+    doc.save("dashboard-data.pdf");
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
 
-      <main className="cart-scale flex-1 mt-12">
-        <div className="text-gray-400 text-xs mb-2">My Dashboard</div>
-        <h2 className="text-2xl font-bold mb-1">
-          Hello, <span className="text-black">Genlord!</span>
-        </h2>
-        <div className="text-gray-500 mb-8 text-base">
-          Your hub to add, edit, and monitor all your listings and rental activity
+      {/* Main Content */}
+      <main ref={dashboardRef} className="collection-scale flex-1 py-8">
+
+        {/* TOP NAV */}
+        <div className="flex justify-between items-center mb-5">
+
+          {/* Search */}
+          <div className="flex items-center bg-white px-4 py-2 rounded-xl shadow-sm border max-w-sm w-full">
+            <Search className="w-4 h-4 text-gray-500" />
+            <input
+              placeholder="Search"
+              className="ml-2 w-full bg-transparent focus:outline-none text-sm text-gray-700"
+            />
+          </div>
+
+          {/* PROFILE */}
+          <div className="flex items-center gap-5">
+            <Bell className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center gap-2">
+              <img
+                src={profPic}
+                alt="profile"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <div>
+                <p className="font-semibold text-gray-900">Genlord</p>
+                <p className="text-xs text-gray-500">Owner</p>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col hover:shadow-md transition-shadow"
+        <hr className="borde-gray-200 mb-5"></hr>
+
+        {/* TITLE + DOWNLOAD */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-1">
+              Welcome, <span className="text-[#7A1CA9] font-bold">Genlord 👋</span>
+            </h1>
+            <p className="text-gray-600 text-sm">
+              Manage your booking data easily with us
+            </p>
+          </div>
+
+          <div className="relative inline-block text-left">
+            <button
+              ref={downloadButtonRef}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-2 bg-[#7A1CA9] text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-purple-700 transition"
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-600">{stat.label}</span>
-                <span className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.iconBg}`}>
-                  <img src={stat.icon} alt={stat.label} className="w-6 h-6" />
-                </span>
-              </div>
-              <div className="text-2xl font-bold mb-0.5">{stat.value}</div>
-              <div className={`text-xs font-medium ${stat.sublabelColor}`}>{stat.sublabel}</div>
+              <Download className="w-4 h-4" />
+              Download
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            <DropdownPortal open={dropdownOpen} buttonRef={downloadButtonRef}>
+              <button
+                onClick={exportToCSV}
+                className="block text-sm w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                Download as CSV
+              </button>
+              <button
+                onClick={exportDashboardToPDF}
+                className="block text-sm w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                Download as PDF
+              </button>
+
+            </DropdownPortal>
+          </div>
+        </div>
+
+        {/* STATS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+          {stats.map((stat, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-xl p-4 shadow-sm border relative"
+            >
+              {/* Icon box */}
+              {stat.icon && (
+                <div className="absolute top-4 right-4 rounded-lg flex items-center justify-center">
+                  <img src={stat.icon} alt={`${stat.label} icon`} className="w-10 h-10" />
+                </div>
+              )}
+
+
+              <p className="text-[13px] text-gray-700 mb-2">{stat.label}</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+
+              {stat.sublabel && (
+                <p className={`text-[13px] ${stat.sublabelColor}`}>{stat.sublabel}</p>
+              )}
+
+              {/* Full-width horizontal line right below sublabel */}
+              {stat.sublabel && (
+                <hr className="border-gray-200 mt-2 my-2 -mx-4" />
+
+              )}
+
+              <p className="text-xs text-gray-400">{stat.date}</p>
             </div>
           ))}
+
         </div>
 
-        {mockListings.length > 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-            <div className="p-6 border-b flex justify-between items-center">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">My Listings</h2>
-                <p className="text-sm text-gray-500">Manage all your rental items</p>
-              </div>
-              <div className="flex gap-2">
-                <button 
-                  onClick={exportToCSV}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition"
-                >
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/128/3502/3502477.png" 
-                    alt="CSV" 
-                    className="w-4 h-4" 
-                  />
-                  CSV
-                </button>
-                <button 
-                  onClick={exportToPDF}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition"
-                >
-                  <img 
-                    src="https://cdn-icons-png.flaticon.com/128/7180/7180363.png" 
-                    alt="PDF" 
-                    className="w-4 h-4" 
-                  />
-                  PDF
-                </button>
-              </div>
+
+        {/* REVENUE + SCHEDULE */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+          {/* Revenue */}
+          <div className="lg:col-span-2 bg-white p-6 rounded-xl border shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Revenue Statistics
+              </h2>
+              <select className="border text-sm px-3 py-1.5 rounded-lg text-gray-600">
+                <option>This Month</option>
+              </select>
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Item</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Availability</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Booked Dates</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {mockListings.map((listing) => (
-                    <tr key={listing.id} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-14 h-14 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden p-1">
-                            <img 
-                              src={listing.image} 
-                              alt={listing.name}
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm">{listing.name}</p>
-                            <p className="text-xs text-gray-500">{listing.category}</p>
-                          </div>
+
+            {/* Placeholder chart */}
+            <div className="h-52 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 font-medium">
+              Bar Chart Placeholder
+            </div>
+          </div>
+
+          {/* Booking Schedule */}
+          <div className="bg-white p-6 rounded-xl border shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Booking Schedule
+              </h2>
+              <button className="border rounded-lg p-2 hover:bg-gray-100">
+                <Calendar className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Placeholder Calendar */}
+            <div className="h-52 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 font-medium">
+              Calendar Placeholder
+            </div>
+          </div>
+        </div>
+
+        {/* BOOKINGS TABLE */}
+        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+          {/* Header of BOOKINGS TABLE */}
+          <div className="p-6 flex justify-between items-center">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Bookings</h2>
+              <p className="text-sm text-gray-500">
+                Manage all your booking activity
+              </p>
+            </div>
+
+            <div>
+              <button
+                onClick={() => navigate("/owner/bookings")}
+                className="px-3 py-1.5 border text-sm rounded-lg hover:bg-gray-50"
+              >
+                See All
+              </button>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="border-b">
+                <tr className="text-gray-400 font-normal">
+                  <th className="px-6 py-3 font-normal">Booking ID</th>
+                  <th className="px-6 py-3 font-normal">Item & Price</th>
+                  <th className="px-6 py-3 font-normal">Renter</th>
+                  <th className="px-6 py-3 font-normal">Booked Date</th>
+                  <th className="px-6 py-3 font-normal">Payment Method</th>
+                  <th className="px-6 py-3 font-normal">Status</th>
+                  <th className="px-6 py-3 font-normal">Action</th>
+                </tr>
+              </thead>
+
+
+              <tbody className="divide-y">
+                {sampleBookings.map((row, i) => (
+                  <tr key={row.id} className="hover:bg-purple-50 transition">
+                    {/* Booking ID */}
+                    <td className="px-6 py-4"><span className="text-gray-600">{row.id}</span></td>
+
+                    {/* Item */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        {/* Image with gray rounded background */}
+                        <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden">
+                          <img
+                            src={itemImages[row.itemKey]}
+                            alt={row.item}
+                            className="w-10 h-10 object-contain"
+                          />
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="font-bold text-purple-600">{listing.price}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-lg ${getAvailabilityColor(listing.availability)}`}>
-                          {listing.availability}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm text-gray-600">{listing.bookedDates}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex px-3 py-1.5 text-xs font-semibold rounded-full ${getStatusColor(listing.status)}`}>
-                          {listing.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <ActionsDropdown listing={listing} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="p-4 border-t flex justify-center">
-              <button className="text-purple-600 hover:text-purple-700 text-sm font-semibold">View all</button>
-            </div>
+
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">{row.item}</span>
+                          {row.pricePerDay && (
+                            <span className="text-[13px] text-gray-500">₱ {row.pricePerDay} per day</span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+
+
+                    {/* Renter */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={getRenterAvatar(row.renter, i)} // pass row index from map
+                          alt={row.renter}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900">{row.renter}</span>
+                          <span className="text-xs text-gray-500">{row.renterEmail}</span>
+                        </div>
+                      </div>
+                    </td>
+
+
+                    {/* Booked Date */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-600">{row.bookedDate}</span>
+                      </div>
+                    </td>
+
+                    {/* Payment Method */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={paymentIcons[row.paymentMethod.toLowerCase()]}
+                          alt={row.paymentMethod}
+                          className="w-5 h-5 object-contain"
+                        />
+                        <span>{row.paymentMethod}</span>
+                      </div>
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 rounded-md text-xs font-medium ${row.status === "Completed"
+                          ? "bg-green-50 text-green-500"
+                          : row.status === "Cancelled"
+                            ? "bg-red-50 text-red-500"
+                            : row.status === "Pending"
+                              ? "bg-yellow-50 text-yellow-500"
+                              : row.status === "Active"
+                                ? "bg-orange-50 text-orange-500"
+                                : "bg-gray-50 text-gray-600"
+                          }`}
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+
+                    {/* Action */}
+                    <td className="px-6 py-4">
+                      <ActionsDropdown booking={row} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+
+
+            </table>
           </div>
-        ) : (
-          <div className="bg-white border border-gray-200 rounded-xl py-12 px-8 flex flex-col items-center">
-            <div className="w-40 h-40 rounded-full bg-transparent flex items-center justify-center mb-4">
-              <img src="/assets/bg/circle.png" alt="Empty state" className="w-32 h-32 rounded-full opacity-60" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2 text-center text-gray-900">
-              Aw, you still don't have items
-            </h3>
-            <p className="text-gray-500 text-center mb-4 max-w-md">
-              Your hub to add, edit, and monitor all your listings and rental activity
-            </p>
-            <button 
-              onClick={handleAddListing}
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition"
-            >
-              Add a New Listing +
-            </button>
-          </div>
-        )}
+        </div>
       </main>
     </div>
   );

@@ -22,7 +22,7 @@ const HowItWorks = () => {
 
   return (
     <section
-      className="py-20 px-6 md:px-16 lg:px-24 relative"
+      className="py-20 px-8 md:px-16 lg:px-36 relative"
       style={{
         backgroundImage: 'url(/assets/bg/howitworks_bg.png)',
         backgroundSize: 'cover',
@@ -30,7 +30,7 @@ const HowItWorks = () => {
         backgroundColor: '#7A1CA9'
       }}
     >
-      <div className="cart-scale max-w-7xl mx-auto relative z-10">
+      <div className="collection-scale max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">

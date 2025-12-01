@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
 import "../../assets/Auth.css";
 import hirentLogo from "../../assets/hirent-logo-purple.png";
 import bg from "../../assets/auth-bg.jpg";
@@ -90,18 +90,17 @@ const AuthForm = ({ mode }) => {
 
         setError("");
 
-        // TODO: Integrate with backend Axios request here
+        // generate token and login
+        const token = generateFakeToken();
+        login(token);
+
+        // navigate based on mode
         if (mode === "signup") {
             console.log("Signup data:", formData);
-            navigate("/homepage"); // redirect to homepage after signup
+            navigate("/homepage"); // after signup
         } else {
             console.log("Login data:", formData);
-
-            // Use fake token with cart included
-            const fakeToken = generateFakeToken();
-            login(fakeToken); // stores in localStorage + updates context state
-
-            navigate("/browse"); // redirect to browse page after login
+            navigate("/"); // landing page after login
         }
 
     };
@@ -130,14 +129,22 @@ const AuthForm = ({ mode }) => {
 
 
                         <div className="w-full flex flex-col items-start ml-12">
+                            {mode === "signup" && (
+                                <Link
+                                    to="/ownersignup"
+                                    className="text-[13px] font-medium text-[#7a19aa] hover:underline mb-1"
+                                >
+                                    Be an Owner <span className="text-[13px]">➔</span>
+                                </Link>
+                            )}
                             <h2 className="text-[23px] font-bold text-gray-800">
                                 {mode === "signup" ? "Get started with Hirent" : "Log In"}
                             </h2>
-
                             <p className="text-[14.5px] font-medium text-gray-600 mb-4">
                                 {mode === "signup" ? "Sign up now and explore the platform" : "Continue to Hirent"}
                             </p>
                         </div>
+
 
                         <form className="space-y-2 w-[90%]" onSubmit={handleSubmit}>
                             {mode === "signup" && (

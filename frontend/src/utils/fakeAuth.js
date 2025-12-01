@@ -1,5 +1,5 @@
 // utils/fakeAuth.js
-import sampleUserCart from "../data/sampleUserCart"; // adjust path if needed
+import sampleUsercollection from "../data/sampleUsercollection"; // adjust path if needed
 import { Base64 } from "js-base64";
 
 export const generateFakeToken = (userId = 1) => {
@@ -9,7 +9,7 @@ export const generateFakeToken = (userId = 1) => {
     email: "johndoe@example.com",
     role: "user",
     exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // 24h expiry
-    cart: sampleUserCart,
+    collection: sampleUsercollection,
     wishlist: [1, 5, 7],
   };
 

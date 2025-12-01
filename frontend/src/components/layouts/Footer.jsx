@@ -59,7 +59,7 @@ const Footer = () => {
                     <ul className="text-xs text-gray-300 space-y-4">
                         <li><a href="#" className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200">My Account</a></li>
                         <li><a href="#" className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200">Login / Register</a></li>
-                        <li><a href="#" className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200">Cart</a></li>
+                        <li><a href="#" className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200">collection</a></li>
                         <li><a href="#" className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200">Wishlist</a></li>
                         <li><a href="#" className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200">Shop</a></li>
                     </ul>

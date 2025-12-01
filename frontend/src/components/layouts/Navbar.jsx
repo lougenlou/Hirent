@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Search, Heart, ShoppingCart, User } from "lucide-react";
+import { Search, Bookmark, ShoppingBag, Bell, Menu } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import hirentLogo from "../../assets/hirent-logo.png";
 import { getFakeUser } from "../../utils/fakeAuth";
@@ -10,6 +10,10 @@ const Navbar = ({ onSearch }) => {
   const location = useLocation();
   const { isLoggedIn, logout } = useContext(AuthContext);
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+
   const handleSearch = () => {
     if (onSearch) onSearch(inputValue.trim());
   };
@@ -18,46 +22,51 @@ const Navbar = ({ onSearch }) => {
     if (e.key === "Enter") handleSearch();
   };
 
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Browse", path: "/browse" },
-    { name: "How It Works", path: "/how-it-works" },
-    { name: "About Us", path: "/about" },
-  ];
-
-  const [cartCount, setCartCount] = useState(0);
+  const [collectionCount, setCollectionCount] = useState(0);
 
   useEffect(() => {
     const user = getFakeUser();
-    if (user && user.cart) {
-      setCartCount(user.cart.length);
-    } else {
-      setCartCount(0);
-    }
+    if (user && user.collection) setCollectionCount(user.collection.length);
+    else setCollectionCount(0);
   }, []);
 
   return (
     <>
+      {/* --- NAVBAR --- */}
       <nav
-        className="px-6 md:px-16 lg:px-24 fixed top-0 left-0 w-full z-50 shadow-sm"
-        style={{ backgroundColor: "#7A1CA9", height: "55px" }}
+        className="px-2 md:px-4 lg:px-6 fixed top-0 left-0 w-full z-50 shadow-sm"
+        style={{
+          background: "linear-gradient(180deg, #7A1CA9 0%, #A01FC9 100%)",
+          height: "60px"
+        }}
       >
-        <div className="flex items-center justify-between max-w-7xl mx-auto h-full">
 
-          {/* Logo */}
-          <div className="flex items-center h-full mr-28">
+        <div className="mx-auto px-4 md:px-6 lg:px-8 flex items-center justify-between h-full max-w-[1400px]">
+
+          {/* LEFT AREA: Menu Icon + Logo */}
+          <div className="flex items-center h-full space-x-3">
+            {/* Menu Icon: show on mobile only */}
+            <Menu
+              className="w-5 h-5 text-white cursor-pointer hover:opacity-80 transition lg:hidden"
+              onClick={toggleSidebar}
+            />
             <img src={hirentLogo} alt="HiRENT" className="h-6" />
           </div>
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center h-full font-inter text-[13px]">
-            {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
+            {[
+              { name: "Home", path: "/" },
+              { name: "Browse", path: "/browse" },
+              { name: "How It Works", path: "/how-it-works" },
+              { name: "About Us", path: "/about" },
+            ].map((link) => {
+              const active = location.pathname === link.path;
               return (
                 <NavLink
                   key={link.name}
                   to={link.path}
-                  className={`px-5 flex items-center h-full transition-colors ${isActive
+                  className={`px-5 flex items-center h-full transition-colors ${active
                     ? "bg-[#59087f] text-white border-b-[4px] border-white"
                     : "text-white hover:bg-[#680e91]"
                     }`}
@@ -68,7 +77,8 @@ const Navbar = ({ onSearch }) => {
             })}
           </div>
 
-          <div className="hidden lg:flex items-center h-full space-x-2 ml-14">
+          {/* RIGHT AREA (search/icons) */}
+          <div className="hidden lg:flex items-center h-full space-x-2">
             {isLoggedIn ? (
               <>
                 {/* Search Bar */}
@@ -93,43 +103,39 @@ const Navbar = ({ onSearch }) => {
                 {/* Icons */}
                 <div className="flex h-full">
                   {[
-                    { icon: <Heart className="w-5 h-5" />, path: "/wishlist" },
+                    { icon: <Bookmark className="w-5 h-5" />, path: "/wishlist" },
                     {
                       icon: (
                         <div className="relative">
-                          <ShoppingCart className="w-5 h-5" />
-                          {cartCount > 0 && (
+                          <ShoppingBag className="w-5 h-5" />
+                          {collectionCount > 0 && (
                             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                              {cartCount}
+                              {collectionCount}
                             </span>
                           )}
                         </div>
                       ),
-                      path: "/cart",
+                      path: "/collection",
                     },
-                    { icon: <User className="w-5 h-5" />, path: "/profile" },
+                    { icon: <Bell className="w-5 h-5" />, path: "/notifications" },
                   ].map(({ icon, path }) => {
-                    const isActive = location.pathname === path;
+                    const active = location.pathname === path;
                     return (
                       <NavLink
                         key={path}
                         to={path}
-                        className={`flex items-center justify-center h-full w-[40px] transition-colors ${isActive
+                        className={`flex items-center justify-center h-full w-[40px] transition-colors ${active
                           ? "bg-[#59087f] text-white border-b-[4px] border-white"
                           : "text-white hover:bg-[#680e91]"
                           }`}
-                        style={{ margin: 0, paddingTop: 0, paddingBottom: 0 }}
                       >
                         {icon}
                       </NavLink>
                     );
                   })}
                 </div>
-
-
               </>
             ) : (
-              // main nav for guests (login/signup)
               <>
                 <NavLink
                   to="/login"

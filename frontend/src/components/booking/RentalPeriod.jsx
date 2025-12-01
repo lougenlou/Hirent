@@ -1,4 +1,5 @@
-import React from 'react';
+import { Calendar } from "lucide-react";
+import React, { useRef } from "react";
 
 const RentalPeriod = ({ rentalData, setRentalData }) => {
 
@@ -110,10 +111,26 @@ const RentalPeriod = ({ rentalData, setRentalData }) => {
     }
   };
 
+  const startRef = useRef(null);
+  const endRef = useRef(null);
+
+  const openPicker = (ref) => {
+    if (!ref.current) return;
+
+    // Best browser support
+    if (ref.current.showPicker) {
+      ref.current.showPicker();
+    } else {
+      // fallback for Safari/iOS
+      ref.current.focus();
+      ref.current.click();
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-xl font-semibold mb-2">Rental Period</h2>
-      <p className="text-sm text-gray-500 mb-6">
+      <h2 className="text-[16px] text-gray-800">Rental Period</h2>
+      <p className="text-[15px] text-gray-600 mb-6">
         Start date must be scheduled 1–2 days after booking.
       </p>
 
@@ -121,35 +138,67 @@ const RentalPeriod = ({ rentalData, setRentalData }) => {
 
         {/* Start Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-[15px] font-medium text-black mb-2">
             Start Date
           </label>
-          <input
-            type="date"
-            value={rentalData.startDate}
-            onChange={handleStartDateChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+
+          <div className="relative">
+            <input
+              ref={startRef}
+              type="date"
+              value={rentalData.startDate}
+              onChange={(e) => {
+                const start = e.target.value;
+                setRentalData((prev) => ({ ...prev, startDate: start }));
+
+                if (rentalData.durationValue > 0) {
+                  autoComputeEndDate(start, rentalData.durationValue, rentalData.durationType);
+                }
+              }}
+              className="w-full px-4 py-2 text-[15px] border border-gray-300 rounded-lg 
+                focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
+            />
+
+            <Calendar
+              onClick={() => openPicker(startRef)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-800 cursor-pointer"
+            />
+          </div>
         </div>
 
         {/* End Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-[15px] font-medium text-black mb-2">
             End Date
           </label>
-          <input
-            type="date"
-            value={rentalData.endDate}
-            onChange={handleEndDateChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+
+          <div className="relative">
+            <input
+              ref={endRef}
+              type="date"
+              value={rentalData.endDate}
+              onChange={(e) => {
+                const end = e.target.value;
+                setRentalData((prev) => ({ ...prev, endDate: end }));
+
+                if (rentalData.startDate && end) {
+                  computeDurationFromDates(rentalData.startDate, end);
+                }
+              }}
+              className="w-full px-4 py-2 text-[15px] border border-gray-300 rounded-lg 
+                focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
+            />
+
+            <Calendar
+              onClick={() => openPicker(endRef)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-800 cursor-pointer"
+            />
+          </div>
         </div>
 
         {/* Rental Duration */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-[15px] font-medium text-black mb-2">
             Rental Duration
           </label>
 
@@ -160,7 +209,7 @@ const RentalPeriod = ({ rentalData, setRentalData }) => {
               min="1"
               value={rentalData.durationValue}
               onChange={handleDurationNumberChange}
-              className="w-20 px-3 py-2 border border-gray-300 rounded-lg 
+              className="w-20 px-3 py-2 text-[15px] border border-gray-300 rounded-lg 
                 focus:outline-none focus:ring-2 focus:ring-purple-500 text-center"
             />
 
@@ -168,12 +217,12 @@ const RentalPeriod = ({ rentalData, setRentalData }) => {
             <select
               value={rentalData.durationType}
               onChange={handleDurationTypeChange}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none 
+              className="px-3 py-2 text-[15px] border border-gray-300 rounded-lg focus:outline-none 
                 focus:ring-2 focus:ring-purple-500"
             >
-              <option value="days">Days</option>
-              <option value="weeks">Weeks</option>
-              <option value="months">Months</option>
+              <option value="days" className="text-[14px]">Days</option>
+              <option value="weeks" className="text-[14px]">Weeks</option>
+              <option value="months" className="text-[14px]">Months</option>
             </select>
           </div>
         </div>

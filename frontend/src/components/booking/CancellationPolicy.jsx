@@ -3,7 +3,7 @@ import React from 'react';
 const CancellationPolicy = () => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-xl font-semibold mb-4">Cancellation Policy</h2>
+      <h2 className="text-lg font-semibold mb-4">Cancellation Policy</h2>
       
       <div className="space-y-4">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -12,8 +12,8 @@ const CancellationPolicy = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p className="font-medium text-blue-900 mb-2">Flexible Cancellation</p>
-              <p className="text-sm text-blue-800">
+              <p className="font-medium text-blue-800 mb-0.5">Flexible Cancellation</p>
+              <p className="text-sm text-blue-700">
                 Free cancellation up to 48 hours before the rental start date. Get a full refund minus payment processing fees.
               </p>
             </div>
@@ -50,9 +50,9 @@ const CancellationPolicy = () => {
         </div>
         
         <div className="text-sm text-gray-600 space-y-2">
-          <p>• Refunds will be processed within 5-7 business days</p>
-          <p>• Security deposits are fully refundable upon item return and inspection</p>
-          <p>• Owner reserves the right to cancel bookings due to item unavailability</p>
+          <p>  <span className="text-[16px] text-[#7A1CA9] mr-0.5">•</span> Refunds will be processed within 5-7 business days</p>
+          <p>  <span className="text-[16px] text-[#7A1CA9] mr-0.5">•</span> Security deposits are fully refundable upon item return and inspection</p>
+          <p>  <span className="text-[16px] text-[#7A1CA9] mr-0.5">•</span> Owner reserves the right to cancel bookings due to item unavailability</p>
         </div>
       </div>
     </div>

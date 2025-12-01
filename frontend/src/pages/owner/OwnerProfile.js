@@ -56,7 +56,7 @@ export default function Profile() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
 
-      <main className="cart-scale flex-1 mt-12">
+      <main className="collection-scale flex-1 mt-12">
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>

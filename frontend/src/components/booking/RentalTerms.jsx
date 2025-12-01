@@ -6,33 +6,33 @@ const RentalTerms = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-xl font-semibold mb-4">Rental Terms & Conditions</h2>
+      <h2 className="text-lg font-semibold mb-4">Rental Terms & Conditions</h2>
       
       <div className="border border-gray-200 rounded-lg p-4 mb-4">
         <h3 className="font-medium text-gray-900 mb-3">Key Terms Summary</h3>
         <ul className="space-y-2 text-sm text-gray-700">
           <li className="flex items-start gap-2">
-            <span className="text-purple-600 mt-1">•</span>
+            <span className="text-[16px] text-[#7A1CA9]">•</span>
             <span>You must be at least 18 years old to rent items on HiRent</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-purple-600 mt-1">•</span>
+            <span className="text-[16px] text-[#7A1CA9]">•</span>
             <span>Valid government-issued ID required for verification</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-purple-600 mt-1">•</span>
+            <span className="text-[16px] text-[#7A1CA9]">•</span>
             <span>Renter is responsible for any damage or loss during rental period</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-purple-600 mt-1">•</span>
+            <span className="text-[16px] text-[#7A1CA9]">•</span>
             <span>Items must be returned in the same condition as received</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-purple-600 mt-1">•</span>
+            <span className="text-[16px] text-[#7A1CA9]">•</span>
             <span>Subletting or transferring the rental to another party is prohibited</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-purple-600 mt-1">•</span>
+            <span className="text-[16px] text-[#7A1CA9]">•</span>
             <span>Late returns are subject to additional fees as outlined in the Late Return Policy</span>
           </li>
         </ul>
@@ -77,7 +77,7 @@ const RentalTerms = () => {
             type="checkbox"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
-            className="w-5 h-5 mt-0.5 text-purple-600 rounded border-gray-300 focus:ring-2 focus:ring-purple-500"
+            className="w-5 h-5 mt-0.5 accent-[#7A1CA9] rounded border-gray-300"
           />
           <span className="text-sm text-gray-700">
             I have read and agree to the <span className="font-medium text-purple-600">Rental Terms & Conditions</span>, <span className="font-medium text-purple-600">Cancellation Policy</span>, and <span className="font-medium text-purple-600">Late Return Policy</span>. I understand that I am responsible for the rented item during the rental period.

@@ -12,7 +12,7 @@ export default function DeliveryTrackingModal({ isOpen, onClose, trackingData })
             {/* Modal */}
             <div className="fixed inset-0 z-50  flex items-center justify-center p-4">
                 <div
-                    className="bg-white rounded-2xl cart-scale shadow-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
+                    className="bg-white rounded-2xl collection-scale shadow-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}

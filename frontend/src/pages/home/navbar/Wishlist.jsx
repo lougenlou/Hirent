@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapPin, Calendar, ShoppingCart } from "lucide-react";
-import Footer from "../../../components/layouts/Footer";
-import Sidebar from "../../../components/layouts/Sidebar";
+import { MapPin, Calendar, ShoppingBag } from "lucide-react";
 import SortDropdown from "../../../components/filters/SortDropdown";
 import emptyWishlist from "../../../assets/empty-wishlist.png";
 import emptyItems from "../../../assets/empty-listings.png";
@@ -33,7 +31,7 @@ const WishlistPage = () => {
     const [sortOrder, setSortOrder] = useState("latest");
 
     useEffect(() => {
-              document.title = "Hirent — Wishlist";
+              document.title = "Hirent — Saved For Later";
           
               return () => {
                 document.title = "Hirent";
@@ -101,15 +99,13 @@ const WishlistPage = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-[#fbfbfb]">
-            <div className="flex flex-1">
-                {/* LEFT SIDEBAR */}
-                <Sidebar />
+            <div className="flex flex-1 ml-16">
 
                 {/* MAIN CONTENT */}
-                <div className="cart-scale flex-1 mb-10">
+                <div className="collection-scale flex-1 mb-10">
                     <div className="max-w-8xl mx-auto pt-12">
                         <div>
-                            <h1 className="text-[20px] font-bold">Your Wishlist</h1>
+                            <h1 className="text-[20px] font-bold">Saved For Later</h1>
                             <p className="text-[15px] text-gray-500 mb-6">All Saved Items</p>
                         </div>
 
@@ -158,7 +154,7 @@ const WishlistPage = () => {
                                 ) : (
                                     <div className="flex flex-col items-center justify-center h-[60vh] w-full">
                                         <img src={emptyWishlist} className="w-92 h-64 mb-3" />
-                                        <h2 className="text-[22px] font-bold">Your Wishlist is Empty</h2>
+                                        <h2 className="text-[22px] font-bold">Your Saved List is Empty</h2>
                                         <p className="text-gray-500 text-center max-w-sm mb-4">
                                             Looks like you haven’t saved any items yet.
                                         </p>
@@ -227,8 +223,8 @@ const WishlistPage = () => {
 
                                                 <button className="w-full bg-[#7A1CA9] px-3 py-2 text-sm text-white border rounded-lg 
     hover:bg-purple-700 transition flex items-center justify-center gap-2">
-                                                    <ShoppingCart className="w-4 h-4" />
-                                                    Add to Cart
+                                                    <ShoppingBag className="w-4 h-4" />
+                                                    Add to collection
                                                 </button>
 
                                             </div>
@@ -240,8 +236,6 @@ const WishlistPage = () => {
                     </div>
                 </div>
             </div>
-
-            <Footer />
         </div>
     );
 };

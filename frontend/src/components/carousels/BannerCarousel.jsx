@@ -15,7 +15,7 @@ const BannerCarousel = () => {
     }, []);
 
     return (
-        <div className="w-full flex justify-start mb-8">
+        <div className="w-full flex justify-start mb-6">
             {/* Fixed container for all banners */}
             <div className=" w-full h-auto object-cover">
                 {banners.map((banner, index) => (
@@ -23,7 +23,7 @@ const BannerCarousel = () => {
                         key={index}
                         src={banner}
                         alt={`Banner ${index + 1}`}
-                        className={` absolute top-0 left-0 w-full h-auto object-contain transition-opacity duration-1000 ease-in-out
+                        className={` absolute top-2 left-0 w-full h-auto object-contain transition-opacity duration-1000 ease-in-out
                             ${index === current ? "opacity-100 z-10" : "opacity-0 z-0"}`}
                     />
                 ))}

@@ -21,13 +21,17 @@
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "framer-motion": "^12.23.25",
     "js-base64": "^3.7.8",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.2",
-    "react-icons-kit": "^2.0.0"
+    "react-icons": "^5.5.0",
+    "react-icons-kit": "^2.0.0",
+    "recharts": "^2.10.4"
   },
   "devDependencies": {
+    "@babel/helper-define-polyfill-provider": "^0.6.5",
     "sass": "^1.93.2"
   }
 }

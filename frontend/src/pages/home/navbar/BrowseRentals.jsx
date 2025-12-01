@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, MapPin, Star, ShoppingCart, Check, Eye } from "lucide-react";
+import { Star, MapPin, Bookmark, Eye, Check, ShoppingBag } from "lucide-react";
 import SortDropdown from "../../../components/filters/SortDropdown";
 import FilterSidebar from "../../../components/filters/FilterSidebar";
 import Navbar from "../../../components/layouts/MainNav";
 import BannerCarousel from "../../../components/carousels/BannerCarousel";
-import Footer from "../../../components/layouts/Footer";
 import emptyListingsVector from "../../../assets/empty-listings.png";
 import dayjs from "dayjs";
 import mockListings from "../../../data/mockData";
@@ -13,7 +12,7 @@ import { Base64 } from 'js-base64';
 import { getFakeUser, generateFakeToken } from '../../../utils/fakeAuth';
 
 const BrowseRentals = () => {
-    
+
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
     const [listings, setListings] = useState([]);
@@ -28,15 +27,15 @@ const BrowseRentals = () => {
     });
     const [sortOption, setSortOption] = useState("Popular");
     const [loading, setLoading] = useState(true);
-    const [cartItems, setCartItems] = useState([]);
+    const [collectionItems, setcollectionItems] = useState([]);
 
     useEffect(() => {
-    document.title = "Hirent — Browse";
+        document.title = "Hirent — Browse";
 
-    return () => {
-      document.title = "Hirent";
-    };
-  }, []);
+        return () => {
+            document.title = "Hirent";
+        };
+    }, []);
 
     useEffect(() => {
         let user = getFakeUser();
@@ -46,18 +45,18 @@ const BrowseRentals = () => {
             user = getFakeUser();
         }
 
-        // Load user's cart from token
-        setCartItems(user.cart || []);
+        // Load user's collection from token
+        setcollectionItems(user.collection || []);
     }, []);
     const [wishlist, setWishlist] = useState([]);
     const [justAdded, setJustAdded] = useState([]);
 
 
-    const handleAddToCart = (item) => {
-        const existingCart = cartItems || [];
+    const handleAddToCollection = (item) => {
+        const existingcollection = collectionItems || [];
 
-        if (!existingCart.find((i) => i.id === item.id)) {
-            const newCartItem = {
+        if (!existingcollection.find((i) => i.id === item.id)) {
+            const newcollectionItem = {
                 ...item,
                 days: 1,
                 userEnteredCoupon: "",
@@ -66,15 +65,15 @@ const BrowseRentals = () => {
                 addedAt: new Date().toISOString(),
             };
 
-            const newCart = [...existingCart, newCartItem];
-            setCartItems(newCart);
+            const newcollection = [...existingcollection, newcollectionItem];
+            setcollectionItems(newcollection);
 
             // Update localStorage
-            localStorage.setItem("cartItems", JSON.stringify(newCart));
+            localStorage.setItem("collectionItems", JSON.stringify(newcollection));
 
             // Update fake user token
             const user = getFakeUser();
-            const updatedUser = { ...user, cart: newCart };
+            const updatedUser = { ...user, collection: newcollection };
             const base64Payload = Base64.encode(JSON.stringify(updatedUser));
             const newToken = `fakeHeader.${base64Payload}.fakeSignature`;
             localStorage.setItem("fakeToken", newToken);
@@ -86,6 +85,7 @@ const BrowseRentals = () => {
             }, 2000); // 2 seconds
         }
     };
+
 
     // wishlist
     const toggleWishlist = (id) => {
@@ -229,12 +229,12 @@ const BrowseRentals = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white">
+        <div className="flex flex-col ml-16 min-h-screen bg-white">
             {/* Navbar */}
             <Navbar onSearch={(query) => setSearchQuery(query)} />
 
             {/* Banner */}
-            <BannerCarousel />
+            <BannerCarousel/>
 
             <div className="mt-32"></div>
 
@@ -294,22 +294,15 @@ const BrowseRentals = () => {
                                                 onClick={() => toggleWishlist(item.id)}
                                                 className="bg-white rounded-full shadow p-1 hover:bg-gray-200 transition"
                                             >
-                                                <Heart
+                                                <Bookmark
                                                     size={18}
                                                     strokeWidth={1.5}
                                                     className={`transition ${wishlist.includes(item.id)
-                                                        ? "fill-[#ec0b0b] stroke-[#ec0b0b]"
-                                                        : "stroke-[#af50df]"
+                                                        ? "fill-[#ecce0b] stroke-[#ecce0b]"
+                                                        : "stroke-[#565656]"
                                                         }`}
                                                 />
 
-                                            </button>
-
-                                            <button
-                                                onClick={() => window.location.href = `/product/${item.id}`}
-                                                className="bg-white rounded-full shadow p-1 hover:bg-gray-200 transition"
-                                            >
-                                                <Eye className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
                                             </button>
                                         </div>
 
@@ -326,14 +319,14 @@ const BrowseRentals = () => {
                                         <div className="flex w-full rounded-b-2xl overflow-hidden">
                                             <button
                                                 onClick={() => navigate(`/booking/${item.id}`)}
-                                                className="flex-[0.9] bg-[#7A1CA9] hover:bg-[#681690] text-white text-[12.5px] font-medium py-2.5 flex justify-center items-center transition"
+                                                className="flex-[0.8] bg-[#7A1CA9] hover:bg-[#681690] text-white text-[12.5px] font-medium py-2.5 flex justify-center items-center transition"
                                             >
                                                 Book Item
                                             </button>
 
                                             <button
-                                                onClick={() => handleAddToCart(item)}
-                                                className={`flex-[1] border border-[#7A1CA9] rounded-br-2xl font-medium py-2.5 flex justify-center items-center gap-1 transition-all duration-300 text-[12.5px] ${justAdded.includes(item.id)
+                                                onClick={() => handleAddToCollection(item)}
+                                                className={`flex-[1] border border-[#7A1CA9] rounded-br-2xl font-medium py-2.5 flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-300 text-[12.5px] ${justAdded.includes(item.id)
                                                     ? "bg-green-500 border-green-500 text-white hover:bg-green-600 hover:border-green-600"
                                                     : "text-[#7A1CA9] hover:bg-purple-100"
                                                     }`}
@@ -344,12 +337,12 @@ const BrowseRentals = () => {
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <ShoppingCart size={16} className="text-[#7A1CA9]" /> Add To Cart
+                                                        Add To Collection
                                                     </>
                                                 )}
                                             </button>
-
                                         </div>
+
                                     </div>
 
                                     {/* Product Info */}
@@ -438,8 +431,6 @@ const BrowseRentals = () => {
                     )}
                 </main>
             </div>
-
-            <Footer />
         </div>
     );
 };

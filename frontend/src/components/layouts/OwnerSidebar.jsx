@@ -35,7 +35,7 @@ const OwnerSidebar = () => {
 
     return (
         <div
-            className="bg-white border-r border-gray-200 flex flex-col min-h-screen w-72 z-20
+            className="bg-white border-r border-gray-200 flex flex-col min-h-screen w-64 z-20
              transition-shadow duration-300 hover:shadow-lg"
         >
 

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../../../components/layouts/Sidebar";
-import Footer from "../../../components/layouts/Footer";
 import { useNavigate } from "react-router-dom";
 import { Calendar, CalendarPlus, MapPin, Eye, MessageCircle, CircleOff, BadgeCheck, CircleCheckBig, ClockFading } from "lucide-react";
 import mockListings from "../../../data/mockData";
-import sampleUserCart from "../../../data/sampleUserCart";
+import sampleUsercollection from "../../../data/sampleUsercollection";
 import CancelConfirmationModal from "../../../components/modals/CancelModal";
 import { ViewDetailsModal } from "../../../components/modals/ViewDetailsModal";
 import SortDropdown from "../../../components/filters/SortDropdown";
@@ -40,9 +38,9 @@ const MyRentalsPage = () => {
             user = getFakeUser();
         }
 
-        const cartData = user.cart?.length ? user.cart : sampleUserCart;
+        const collectionData = user.collection?.length ? user.collection : sampleUsercollection;
 
-        const merged = cartData
+        const merged = collectionData
             .map(r => {
                 const product = mockListings.find(p => p.id === r.id);
                 if (!product) return null;
@@ -112,11 +110,10 @@ const MyRentalsPage = () => {
     return (
         <div className="flex flex-col min-h-screen bg-[#fbfbfb]">
             {/* MAIN FLEX */}
-            <div className="flex flex-1">
-                <Sidebar />
+            <div className="flex flex-1 ml-16">
 
                 {/* MAIN CONTENT */}
-                <div className="cart-scale flex-1 pt-12 mb-15">
+                <div className="collection-scale flex-1 pt-12 mb-15">
                     <h1 className="text-[20px] font-bold">My Rentals</h1>
                     <p className="text-gray-500 mb-8 text-[15px]">
                         View and manage the items you have booked.
@@ -391,7 +388,6 @@ const MyRentalsPage = () => {
                 rentalData={rentals}
                 itemId={selectedRentalId}
             />
-            <Footer />
         </div>
     );
 };

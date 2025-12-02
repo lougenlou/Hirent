@@ -15,8 +15,6 @@ app.use(cors());
 app.use(express.json()); // Parse JSON request bodies
 
 // ⭐ OPTIONAL BUT HIGHLY RECOMMENDED
-// This will catch malformed JSON before your routes run,
-// and pass it to errorHandler properly.
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
     return next({
@@ -46,8 +44,11 @@ app.use('/api/items', require('./routes/itemsRoutes'));
 // Cart routes
 app.use('/api/cart', require('./routes/cartRoutes'));
 
-// BOOKING ROUTES
+// Booking routes
 app.use('/api/bookings', require('./routes/bookingRoutes'));
+
+// ⭐ GOOGLE CALENDAR SYNC ROUTES (NEW)
+app.use('/api/calendar', require('./routes/calendarRoutes'));  // ⬅️ ADD THIS
 
 // ====== ERROR HANDLING MIDDLEWARE ======
 app.use(errorHandler); // ⬅ MUST be last

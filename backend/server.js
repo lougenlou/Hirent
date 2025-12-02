@@ -50,6 +50,10 @@ app.use('/api/bookings', require('./routes/bookingRoutes'));
 // ⭐ GOOGLE CALENDAR SYNC ROUTES (NEW)
 app.use('/api/calendar', require('./routes/calendarRoutes'));  // ⬅️ ADD THIS
 
+// ====== EARNINGS & PAYOUT ROUTES (NEW) ======
+app.use('/api/earnings', require('./routes/earnings'));        // ⬅️ Add earnings routes
+app.use('/api/payouts', require('./routes/payouts'));          // ⬅️ Add payout request routes
+
 // ====== ERROR HANDLING MIDDLEWARE ======
 app.use(errorHandler); // ⬅ MUST be last
 

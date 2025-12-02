@@ -3,9 +3,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const errorHandler = require('./middleware/errorHandler');
+const passport = require("passport");
+require("./config/passport");
 
 // Load environment variables
-dotenv.config();
+require ("dotenv").config();
+const authRoutes = require('./routes/authRoutes');
 
 // Initialize Express app
 const app = express();
@@ -13,6 +16,7 @@ const app = express();
 // ====== MIDDLEWARE ======
 app.use(cors());
 app.use(express.json());
+app.use(passport.initialize());
 
 // ====== ROUTES ======
 app.use('/api/auth', require('./routes/authRoutes'));

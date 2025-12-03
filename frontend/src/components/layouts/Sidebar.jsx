@@ -20,9 +20,8 @@ const Sidebar = ({ onExpand }) => {
     { icon: Home, link: "/", label: "Home" },
     { icon: ClipboardCheck, link: "/my-rentals", label: "My Rentals" },
     { icon: CalendarPlus, link: "/booking", label: "Booking" },
-    { icon: MessageCircle, link: "/chat", label: "Chat" },
-    { icon: User, link: "/profile", label: "Profile" },
-    { icon: Settings, link: "/settings", label: "Settings" },
+    { icon: MessageCircle, link: "/chat", label: "Messages" },
+    { icon: User, link: "/account", label: "Account Management" },
   ];
 
   const isActive = (path) => {
@@ -34,7 +33,7 @@ const Sidebar = ({ onExpand }) => {
     <div
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
-      className={`fixed left-0 top-0 h-full bg-[#ffffff] transition-all duration-300 
+      className={`fixed left-0 top-0 h-full bg-[#ffffff] rounded-r-xl transition-all duration-300 
                  ${expanded ? "w-64" : "w-16"} overflow-hidden`} // <-- prevent overflow
       style={{ zIndex: 2000 }}
     >

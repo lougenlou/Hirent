@@ -11,19 +11,19 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
-      
+
       <div className="space-y-4 mb-6">
         {/* Product Info */}
         <div className="flex items-center justify-between">
-  <h3 className="font-medium text-gray-900">{product.name}</h3>
+          <h3 className="font-medium text-gray-900">{product.name}</h3>
 
-  <p className="text-[#7A1CA9] font-bold">
-    ₱{product.pricePerDay}
-    <span className="text-[15px] font-normal text-gray-600"> per day</span>
-  </p>
-</div>
+          <p className="text-[#7A1CA9] font-bold">
+            ₱{product.pricePerDay}
+            <span className="text-[15px] font-normal text-gray-600"> per day</span>
+          </p>
+        </div>
 
-        
+
         {/* Price Breakdown */}
         <div className="border-t pt-4 border-gray-300">
 
@@ -69,7 +69,7 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
             </span>
           </div>
         </div>
-        
+
         {/* Total + Actions */}
         <div className="border-t pt-4 border-gray-300">
           <div className="flex justify-between items-center mb-4">
@@ -78,20 +78,29 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
               {formatCurrency(pricing.total)}
             </span>
           </div>
-          
+
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
             <p className="text-sm text-yellow-800">
               Select rental dates to see total price
             </p>
           </div>
-          
-          <button className="w-full bg-[#7A1CA9] text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition mb-3">
+
+          <button
+            className="w-full bg-gradient-to-r from-[#b23cd9] to-[#7A1CA9] text-white text-[15px] py-3 
+  rounded-lg font-medium transition-all duration-300 ease-in-out 
+  hover:opacity-90 active:scale-95 mb-3"
+          >
             Place Booking
           </button>
-          
-          <button className="w-full bg-white border border-gray-300 text-gray-800 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition">
+
+          <button
+            className="w-full bg-white border text-[15px] border-gray-300 text-gray-800 py-2.5 
+  rounded-lg font-medium transition-all duration-300 ease-in-out 
+  hover:bg-gray-50 active:scale-95"
+          >
             Cancel
           </button>
+
         </div>
       </div>
     </div>

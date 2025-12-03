@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapPin, Calendar, ShoppingBag } from "lucide-react";
+import { MapPin, Calendar, Star, ShoppingBag } from "lucide-react";
 import SortDropdown from "../../../components/filters/SortDropdown";
 import emptyWishlist from "../../../assets/empty-wishlist.png";
 import emptyItems from "../../../assets/empty-listings.png";
@@ -31,12 +31,12 @@ const WishlistPage = () => {
     const [sortOrder, setSortOrder] = useState("latest");
 
     useEffect(() => {
-              document.title = "Hirent — Saved For Later";
-          
-              return () => {
-                document.title = "Hirent";
-              };
-            }, []);
+        document.title = "Hirent — Saved For Later";
+
+        return () => {
+            document.title = "Hirent";
+        };
+    }, []);
 
     useEffect(() => {
         let filtered = mockListings.filter((item) =>
@@ -98,18 +98,41 @@ const WishlistPage = () => {
 
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#fbfbfb]">
+        <div className="flex flex-col min-h-screen pt-5 px-10 md:px-20 lg:px-42 pb-20 bg-[#fbfbfb]">
             <div className="flex flex-1 ml-16">
 
                 {/* MAIN CONTENT */}
-                <div className="collection-scale flex-1 mb-10">
-                    <div className="max-w-8xl mx-auto pt-12">
+                <div className="flex-1 mb-10">
+                    <div className="max-w-8xl mx-auto pt-8">
                         <div>
-                            <h1 className="text-[20px] font-bold">Saved For Later</h1>
-                            <p className="text-[15px] text-gray-500 mb-6">All Saved Items</p>
+                            <div className="p-1 mb-6">
+                                <div className="flex items-start gap-5">
+
+                                    {/* Gradient Icon Box */}
+                                    <div className="p-3 rounded-xl bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200">
+                                        <Star className="w-10 h-10 text-[#a12fda]" />
+                                    </div>
+
+                                    {/* Line + Text */}
+                                    <div className="flex items-start gap-4">
+
+                                        {/* Text Group */}
+                                        <div>
+                                            <h1 className="text-[24px] mt-1 font-bold text-gray-800">
+                                                Saved For Later
+                                            </h1>
+                                            <p className="text-gray-500 text-[15px]">
+                                                All Saved Items
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mb-4 items-center">
+                        <div className="flex flex-wrap gap-2 mb-8 items-center">
 
                             {/* CATEGORY BUTTONS */}
                             <div className="flex gap-1.5 flex-wrap">
@@ -117,9 +140,9 @@ const WishlistPage = () => {
                                     <button
                                         key={cat}
                                         onClick={() => setFilter(cat)}
-                                        className={`px-2 py-1 rounded-lg text-sm ${filter === cat
+                                        className={`px-2 py-1 rounded-full transition text-[13px] ${filter === cat
                                             ? "bg-[#7A1CA9] text-white"
-                                            : "bg-gray-100 text-gray-800"
+                                            : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"
                                             }`}
                                     >
                                         {cat === "All"

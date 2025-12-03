@@ -66,10 +66,14 @@ const Navbar = ({ onSearch }) => {
                 <NavLink
                   key={link.name}
                   to={link.path}
-                  className={`px-5 flex items-center h-full transition-colors ${active
-                    ? "bg-[#59087f] text-white border-b-[4px] border-white"
-                    : "text-white hover:bg-[#680e91]"
-                    }`}
+                  className={`px-5 flex items-center h-full transition-colors relative 
+  after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 
+  after:bottom-0 after:w-full after:h-[4px] after:bg-white 
+  after:origin-center after:transition-transform after:duration-300
+  ${active
+                            ? "bg-[#59087f] text-white after:scale-x-100"
+                            : "text-white hover:bg-[#680e91] after:scale-x-0"
+                          }`}
                 >
                   {link.name}
                 </NavLink>
@@ -124,10 +128,15 @@ const Navbar = ({ onSearch }) => {
                       <NavLink
                         key={path}
                         to={path}
-                        className={`flex items-center justify-center h-full w-[40px] transition-colors ${active
-                          ? "bg-[#59087f] text-white border-b-[4px] border-white"
-                          : "text-white hover:bg-[#680e91]"
+                        className={`px-3 flex items-center h-full transition-colors relative 
+  after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 
+  after:bottom-0 after:w-full after:h-[4px] after:bg-white 
+  after:origin-center after:transition-transform after:duration-300
+  ${active
+                            ? "bg-[#59087f] text-white after:scale-x-100"
+                            : "text-white hover:bg-[#680e91] after:scale-x-0"
                           }`}
+
                       >
                         {icon}
                       </NavLink>

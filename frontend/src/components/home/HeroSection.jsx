@@ -17,7 +17,7 @@ const HeroSection = () => {
       {/* Gradient overlay */}
       <div className="absolute inset-0" />
 
-      <div className="collection-scale max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col md:flex-row items-center md:items-start">
           {/* Left: Text content */}
           <div className="max-w-3xl md:flex-1">

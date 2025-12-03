@@ -52,7 +52,7 @@ const SortDropdown = ({ onSortChange, options = ["Popular", "Newest", "Lowest Pr
         value={selected}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        className="bg-transparent text-[13px] focus:outline-none text-[#7A1CA9] font-light cursor-pointer appearance-none border-none p-0 m-0 leading-tight"
+        className="bg-transparent text-[13px] focus:outline-none text-[#7A1CA9] cursor-pointer appearance-none border-none p-0 m-0 leading-tight"
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>
@@ -64,7 +64,7 @@ const SortDropdown = ({ onSortChange, options = ["Popular", "Newest", "Lowest Pr
       {/* Hidden span for dynamic width */}
       <span
         ref={textRef}
-        className="absolute invisible whitespace-pre font-light text-sm"
+        className="absolute invisible whitespace-pre  text-sm"
       >
         {selected}
       </span>

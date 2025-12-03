@@ -39,6 +39,7 @@ import ProductDetails from './pages/ProductDetails';
 //pages from sidebar
 import MyRentals from "./pages/home/sidebar/MyRentals";
 import Booking from './pages/home/sidebar/Booking';
+import Account from './pages/home/sidebar/Account';
 
 // owner dashboard
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
@@ -137,6 +138,7 @@ function App() {
 
             <Route path="/my-rentals" element={<MyRentals />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/account" element={<Account />} />
           </Route>
         </Routes>
       </Router>

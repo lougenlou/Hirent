@@ -9,6 +9,7 @@ import ReturnDetails from '../../../components/booking/ReturnDetails';
 import CancellationPolicy from '../../../components/booking/CancellationPolicy';
 import RentalTerms from '../../../components/booking/RentalTerms';
 import LateReturnPolicy from '../../../components/booking/LateReturnPolicy';
+import { CalendarCheck } from "lucide-react";
 
 const Booking = () => {
   const [rentalData, setRentalData] = useState({
@@ -52,71 +53,95 @@ const Booking = () => {
   const pricing = calculatePricing();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fbfbfb]">
-            {/* MAIN FLEX */}
-            <div className="flex flex-1 ml-16">
+    <div className="flex flex-col min-h-screen pt-5 px-10 md:px-20 lg:px-42 pb-20 bg-[#fbfbfb]">
+      {/* MAIN FLEX */}
+      <div className="flex flex-1 ml-16">
 
-      <div className="collection-scale flex flex-col lg:flex-row mt-12  gap-6 ">
+        <div className="flex flex-col lg:flex-row mt-12 gap-6 ">
 
-        {/* Left Column - Main Content */}
-        <div className="flex-1 lg:w-2/3 space-y-5">
-          <div>
-            <h1 className="text-[20px] font-bold">Complete Your Booking</h1>
-            <p className="text-gray-500 mb-8 text-[15px]">
-              Finalize your rental details and review everything before confirming your booking.
-            </p>
-          </div>
-          <ItemSummary
-            product={productData}
-            days={rentalData.days}
-            coupon={couponData}
-          />
+          {/* Left Column - Main Content */}
+          <div className="flex-1 lg:w-2/3 space-y-5">
 
-          <ApplyCoupon
-            couponData={couponData}
-            setCouponData={setCouponData}
-          />
+            {/* Container */}
+            <div className="p-6 bg-white rounded-xl shadow-sm">
+              <div className="flex items-start gap-5">
 
-          <RentalPeriod
-            rentalData={rentalData}
-            setRentalData={setRentalData}
-          />
+                {/* Gradient Icon Box */}
+                <div className="p-3 rounded-xl bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200">
+                  <CalendarCheck className="w-10 h-10 text-[#a12fda]" />
+                </div>
 
-          <LateReturnPolicy />
+                {/* Line + Text */}
+                <div className="flex items-start gap-4">
 
-          <PaymentMethod
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
-          />
+                  {/* Text Group */}
+                  <div>
+                    <h1 className="text-[22px] mt-1 font-bold text-gray-800">
+                      Complete Your Booking
+                    </h1>
+                    <p className="text-gray-500 mt-0.5 text-[15px]">
+                      Finalize your rental details and review everything before confirming your booking.
+                    </p>
+                  </div>
 
-          <DeliveryMethod
-            deliveryMethod={deliveryMethod}
-            setDeliveryMethod={setDeliveryMethod}
-          />
+                </div>
 
-          <ReturnDetails
-            deliveryMethod={deliveryMethod}
-          />
+              </div>
+            </div>
 
-          <CancellationPolicy />
 
-          <RentalTerms />
-        </div>
 
-        {/* Right Column - Order Summary (Sticky Container) */}
-        <div className="lg:w-1/3">
-          <div className="sticky top-24 self-start">
-            <OrderSummary
+            <ItemSummary
               product={productData}
-              pricing={pricing}
-              rentalData={rentalData}
+              days={rentalData.days}
+              coupon={couponData}
             />
+
+            <ApplyCoupon
+              couponData={couponData}
+              setCouponData={setCouponData}
+            />
+
+            <RentalPeriod
+              rentalData={rentalData}
+              setRentalData={setRentalData}
+            />
+
+            <LateReturnPolicy />
+
+            <PaymentMethod
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+            />
+
+            <DeliveryMethod
+              deliveryMethod={deliveryMethod}
+              setDeliveryMethod={setDeliveryMethod}
+            />
+
+            <ReturnDetails
+              deliveryMethod={deliveryMethod}
+            />
+
+            <CancellationPolicy />
+
+            <RentalTerms />
+          </div>
+
+          {/* Right Column - Order Summary (Sticky Container) */}
+          <div className="lg:w-1/3">
+            <div className="sticky top-24 self-start">
+              <OrderSummary
+                product={productData}
+                pricing={pricing}
+                rentalData={rentalData}
+              />
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
-    
+
   );
 };
 

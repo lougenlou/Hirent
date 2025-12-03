@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import emptycollection from "../../../assets/empty-collection.png";
-import { User, Calendar, Truck, CircleCheckBig, Clock, Package, MessageCircle, Pencil, CalendarPlus, ShieldAlert } from "lucide-react";
+import { User, Calendar, Truck, ShoppingBag, CircleCheckBig, Clock, Package, MessageCircle, Pencil, CalendarPlus, ShieldAlert } from "lucide-react";
 import sampleUsercollection from "../../../data/sampleUsercollection";
 import SortDropdown from "../../../components/filters/SortDropdown";
 import CancelConfirmationModal from "../../../components/modals/CancelModal";
@@ -18,13 +18,13 @@ const CollectionPage = () => {
     const [collectionItems, setcollectionItems] = useState([]);
 
     useEffect(() => {
-          document.title = "Hirent — Collection";
-      
-          return () => {
+        document.title = "Hirent — Collection";
+
+        return () => {
             document.title = "Hirent";
-          };
-        }, []);
-      
+        };
+    }, []);
+
 
     useEffect(() => {
         let user = getFakeUser();
@@ -207,33 +207,54 @@ const CollectionPage = () => {
     const approvedGrandTotalWithDeposit = approvedGrandTotal + approvedSecurityDepositTotal;
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#fbfbfb]">
+        <div className="flex flex-col min-h-screen pt-5 px-10 md:px-20 lg:px-42 pb-20 bg-[#fbfbfb]">
             <div className="flex flex-1 ml-16">
-                <div className="collection-scale flex-1 mb-15">
-                    <div className="max-w-8xl mx-auto pt-12">
-                        <div>
-                            <h1 className="text-[20px] font-bold">Your Collection</h1>
-                            <p className="text-[15px] text-gray-500 mb-6">Items you gathered for booking</p>
+                <div className="flex-1 mb-15">
+                    <div className="max-w-8xl mx-auto pt-8">
+                        <div className="p-1 mb-6">
+                            <div className="flex items-start gap-5">
+
+                                {/* Gradient Icon Box */}
+                                <div className="p-3 rounded-xl bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200">
+                                    <ShoppingBag className="w-10 h-10 text-[#a12fda]" />
+                                </div>
+
+                                {/* Line + Text */}
+                                <div className="flex items-start gap-4">
+
+                                    {/* Text Group */}
+                                    <div>
+                                        <h1 className="text-[24px] mt-1 font-bold text-gray-800">
+                                            Your Collection
+                                        </h1>
+                                        <p className="text-gray-500 text-[15px]">
+                                            Items you gathered for booking
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                            </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-1 mb-4 items-center">
+                        <div className="flex flex-wrap gap-1 mb-6 items-center">
                             {/* Category Buttons */}
-                            <div className="flex gap-1.5">
+                            <div className="flex gap-2">
                                 <button
                                     onClick={() => setFilter("all")}
-                                    className={`px-2 py-1 rounded-lg text-sm ${filter === "all" ? "bg-[#7A1CA9] text-white" : "bg-gray-100 text-gray-800"}`}
+                                    className={`px-2 py-1 rounded-full transition text-[13px] ${filter === "all" ? "bg-[#7A1CA9] text-white" : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"}`}
                                 >
                                     All Items ({collectionItems.length})
                                 </button>
                                 <button
                                     onClick={() => setFilter("approved")}
-                                    className={`px-2 py-1 rounded-lg text-sm ${filter === "approved" ? "bg-[#7A1CA9] text-white" : "bg-gray-100 text-gray-800"}`}
+                                    className={`px-2 py-1 rounded-full transition text-[13px] ${filter === "approved" ? "bg-[#7A1CA9] text-white" : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"}`}
                                 >
                                     Approved ({collectionItems.filter(item => item.status === "approved").length})
                                 </button>
                                 <button
                                     onClick={() => setFilter("pending")}
-                                    className={`px-2 py-1 rounded-lg text-sm ${filter === "pending" ? "bg-[#7A1CA9] text-white" : "bg-gray-100 text-gray-800"}`}
+                                    className={`px-2 py-1 rounded-full transition text-[13px] ${filter === "pending" ? "bg-[#7A1CA9] text-white" : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"}`}
                                 >
                                     Pending ({waitingCount})
                                 </button>
@@ -275,18 +296,18 @@ const CollectionPage = () => {
                                             </div>
                                         )}
                                         {sortedItems.map(item => (
-                                            <div key={item.id} className="relative bg-white p-4 border rounded-xl shadow-sm hover:shadow-md">
+                                            <div key={item.id} className="relative shadow-sm cursor-pointer transform transition hover:scale-[1.01] bg-white p-4 w-full lg:w-[900px] border rounded-xl hover:shadow-md">
                                                 {item.status === "approved" || item.status === "pending" ? (
                                                     <button
                                                         onClick={() => openCancelModal(item.id)}
-                                                        className="absolute top-4 right-4 text-red-500 hover:text-red-700 px-3 py-1 text-sm font-medium border border-red-300 rounded-lg bg-red-50"
+                                                        className="absolute top-4 right-4 text-red-500 hover:text-red-700 px-3 py-1 text-[13px] font-medium border border-red-300 rounded-lg bg-red-50"
                                                     >
                                                         Cancel Booking
                                                     </button>
                                                 ) : (
                                                     <button
                                                         onClick={() => handleRemoveItem(item.id)}
-                                                        className="absolute top-4 right-4 text-red-500 hover:text-red-700 px-3 py-1 text-sm font-medium border border-red-300 rounded-lg bg-red-50"
+                                                        className="absolute top-4 right-4 text-red-500 hover:text-red-700 px-3 py-1 text-[13px] font-medium border border-red-300 rounded-lg bg-red-50"
                                                     >
                                                         Remove to collection
                                                     </button>
@@ -386,7 +407,7 @@ const CollectionPage = () => {
                                                                 {item.status === "approved" ? (
                                                                     <button
                                                                         onClick={() => alert(`Contacting owner: ${item.owner}`)}
-                                                                        className="px-3 py-1.5 mt-2 text-sm border rounded-lg flex items-center gap-1 hover:bg-gray-50"
+                                                                        className="px-3 py-1.5 mt-2 text-[13px] border rounded-lg flex items-center gap-1 hover:bg-gray-50"
                                                                     >
                                                                         <MessageCircle className="w-4 h-4 mr-0.5" />
                                                                         Message Owner
@@ -394,7 +415,7 @@ const CollectionPage = () => {
                                                                 ) : item.status === "pending" ? (
                                                                     <button
                                                                         onClick={() => navigate(`/edit-booking/${item.id}`)}
-                                                                        className="px-3 py-1.5 mt-2  text-sm border rounded-lg flex items-center gap-1 hover:bg-gray-50"
+                                                                        className="px-3 py-1.5 mt-2  text-[13px] border rounded-lg flex items-center gap-1 hover:bg-gray-50"
                                                                     >
                                                                         <Pencil className="w-4 h-4 mr-0.5" />
                                                                         Edit Booking Details
@@ -402,7 +423,7 @@ const CollectionPage = () => {
                                                                 ) : (
                                                                     <button
                                                                         onClick={() => navigate(`/booking/${item.id}`)}
-                                                                        className="px-3 py-1.5 mt-2  text-sm border rounded-lg flex items-center gap-1 hover:bg-gray-50"
+                                                                        className="px-3 py-1.5 mt-2  text-[13px] border rounded-lg flex items-center gap-1 hover:bg-gray-50"
                                                                     >
                                                                         <CalendarPlus className="w-4 h-4 mr-0.5" />
                                                                         Continue to Booking

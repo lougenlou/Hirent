@@ -22,7 +22,7 @@ const HowItWorks = () => {
 
   return (
     <section
-      className="py-20 px-8 md:px-16 lg:px-36 relative"
+      className="py-16 px-8 md:px-16 lg:px-36 relative"
       style={{
         backgroundImage: 'url(/assets/bg/howitworks_bg.png)',
         backgroundSize: 'cover',
@@ -30,9 +30,9 @@ const HowItWorks = () => {
         backgroundColor: '#7A1CA9'
       }}
     >
-      <div className="collection-scale max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-14">
           <h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">
             How It Works
           </h2>
@@ -55,7 +55,7 @@ const HowItWorks = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-36 text-center">
           {steps.map((step) => (
             <div key={step.number} className="flex flex-col items-center">
-              <h3 className="text-[20px] font-medium text-white mb-4">
+              <h3 className="text-[22px] font-semibold text-white mb-2">
                 {step.title}
               </h3>
               <p className="font-thin text-[16px] text-gray-100">

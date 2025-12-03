@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, CalendarPlus, MapPin, Eye, MessageCircle, CircleOff, BadgeCheck, CircleCheckBig, ClockFading } from "lucide-react";
+import { Calendar, CalendarPlus, MapPin, Eye, MessageCircle, CircleOff, BadgeCheck, CircleCheckBig, ClockFading, Package } from "lucide-react";
 import mockListings from "../../../data/mockData";
 import sampleUsercollection from "../../../data/sampleUsercollection";
 import CancelConfirmationModal from "../../../components/modals/CancelModal";
@@ -22,12 +22,12 @@ const MyRentalsPage = () => {
     const [sortOrder, setSortOrder] = useState("latest");
 
     useEffect(() => {
-                  document.title = "Hirent — My Rentals";
-              
-                  return () => {
-                    document.title = "Hirent";
-                  };
-                }, []);
+        document.title = "Hirent — My Rentals";
+
+        return () => {
+            document.title = "Hirent";
+        };
+    }, []);
 
     useEffect(() => {
         let user = getFakeUser();
@@ -108,33 +108,56 @@ const MyRentalsPage = () => {
     });
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#fbfbfb]">
+        <div className="flex flex-col min-h-screen pt-5 px-10 md:px-20 lg:px-42 pb-20 bg-[#fbfbfb]">
             {/* MAIN FLEX */}
             <div className="flex flex-1 ml-16">
 
                 {/* MAIN CONTENT */}
-                <div className="collection-scale flex-1 pt-12 mb-15">
-                    <h1 className="text-[20px] font-bold">My Rentals</h1>
-                    <p className="text-gray-500 mb-8 text-[15px]">
-                        View and manage the items you have booked.
-                    </p>
+                <div className="flex-1 pt-12 mb-15">
+                    <div className="p-1 mb-6">
+                        <div className="flex items-start gap-5">
+
+                            {/* Gradient Icon Box */}
+                            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200">
+                                <Package className="w-10 h-10 text-[#a12fda]" />
+                            </div>
+
+                            {/* Line + Text */}
+                            <div className="flex items-start gap-4">
+
+                                {/* Text Group */}
+                                <div>
+                                    <h1 className="text-[22px] mt-1.5 font-bold text-gray-800">
+                                        My Rentals
+                                    </h1>
+                                    <p className="text-gray-500 mt-0.5 text-[15px]">
+                                        View and manage the items you have booked.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
 
                     {/* FILTER + SORT */}
                     <div className="flex items-center mb-4 gap-2">
                         <button
                             onClick={() => setFilter("all")}
-                            className={`px-3 py-1 rounded-lg text-sm ${filter === "all"
+                            className={`px-2 py-1 rounded-full transition text-[13px] ${filter === "all"
                                 ? "bg-[#7A1CA9] text-white"
-                                : "bg-gray-100"
+                                : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"
                                 }`}>
                             All ({rentals.length})
                         </button>
 
                         <button
                             onClick={() => setFilter("approved")}
-                            className={`px-3 py-1 rounded-lg text-sm ${filter === "approved"
+                            className={`px-2 py-1 rounded-full transition text-[13px] ${filter === "approved"
                                 ? "bg-[#7A1CA9] text-white"
-                                : "bg-gray-100 text-gray-800"
+                                : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"
                                 }`}>
                             Approved (
                             {rentals.filter((r) => r.status === "approved").length}
@@ -143,9 +166,9 @@ const MyRentalsPage = () => {
 
                         <button
                             onClick={() => setFilter("pending")}
-                            className={`px-3 py-1 rounded-lg text-sm ${filter === "pending"
+                            className={`px-2 py-1 rounded-full transition text-[13px] ${filter === "pending"
                                 ? "bg-[#7A1CA9] text-white"
-                                : "bg-gray-100 text-gray-800"
+                                : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"
                                 }`}>
                             Pending (
                             {rentals.filter((r) => r.status === "pending").length}
@@ -154,18 +177,18 @@ const MyRentalsPage = () => {
 
                         <button
                             onClick={() => setFilter("cancelled")}
-                            className={`px-3 py-1 rounded-lg text-sm ${filter === "cancelled"
+                            className={`px-2 py-1 rounded-full transition text-[13px] ${filter === "cancelled"
                                 ? "bg-[#7A1CA9] text-white"
-                                : "bg-gray-100 text-gray-800"
+                                : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"
                                 }`}>
                             Cancelled ({rentals.filter((r) => r.status === "cancelled").length})
                         </button>
 
                         <button
                             onClick={() => setFilter("completed")}
-                            className={`px-3 py-1 rounded-lg text-sm ${filter === "completed"
+                            className={`px-2 py-1 rounded-full transition text-[13px] ${filter === "completed"
                                 ? "bg-[#7A1CA9] text-white"
-                                : "bg-gray-100 text-gray-800"
+                                : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"
                                 }`}>
                             Completed ({rentals.filter((r) => r.status === "completed").length})
                         </button>

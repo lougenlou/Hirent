@@ -112,7 +112,7 @@ const Testimonials = () => {
       { 
         key: index, 
         className: 'bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition flex-shrink-0',
-        style: { minWidth: '350px', width: '350px' }
+        style: { minWidth: '380px', width: '380px', minHeight: '150px' }
       },
       
       // Stars
@@ -146,7 +146,7 @@ const Testimonials = () => {
 
   return React.createElement(
     'section',
-    { className: 'py-24 px-8 md:px-16 lg:px-36 bg-gray-50 overflow-hidden' },
+    { className: 'py-20 px-12 md:px-16 lg:px-42 bg-gray-50 justify-center overflow-hidden' },
     React.createElement(
       'div',
       { className: 'max-w-7xl mx-auto' },
@@ -155,8 +155,8 @@ const Testimonials = () => {
       React.createElement(
         'div',
         { className: 'text-center mb-12' },
-        React.createElement('h3', { className: 'text-[26px] font-semibold text-gray-900' }, 'Our Happy Customers'),
-        React.createElement('p', { className: 'text-gray-600 text-[15px] mb-1' }, 'Real stories from real members who transformed their lives with Hirent')
+        React.createElement('h3', { className: 'text-[28px] mb-1 font-semibold text-gray-900' }, 'Our Happy Customers'),
+        React.createElement('p', { className: 'text-gray-600 text-[16px] mb-1' }, 'Real stories from real members who transformed their lives with Hirent')
       ),
       
       // Testimonials Carousel
@@ -164,7 +164,7 @@ const Testimonials = () => {
         'div',
         { 
           ref: scrollRef,
-          className: 'flex gap-8 overflow-x-hidden cursor-grab active:cursor-grabbing select-none',
+          className: 'flex gap-6 overflow-x-hidden cursor-grab active:cursor-grabbing select-none',
           style: { 
             scrollBehavior: 'auto',
             WebkitOverflowScrolling: 'touch'

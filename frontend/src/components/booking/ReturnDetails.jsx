@@ -47,7 +47,7 @@ const ReturnDetails = () => {
       {/* OPTION — CASH ON RETURN */}
       <div className="mb-4">
          <label
-          className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition
+          className={`flex items-center text-[15px] gap-3 p-4 border rounded-xl cursor-pointer transition
           ${depositMethod === "cash"
               ? "border-[#7A1CA9] bg-purple-50"
               : "border-gray-300 hover:bg-gray-50"
@@ -78,7 +78,7 @@ const ReturnDetails = () => {
       {/* OPTION — DEDUCT FROM CARD */}
       <div className="mb-4">
         <label
-          className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition
+          className={`flex items-center text-[15px]  gap-3 p-4 border rounded-xl cursor-pointer transition
           ${depositMethod === "card"
               ? "border-[#7A1CA9] bg-purple-50"
               : "border-gray-300 hover:bg-gray-50"
@@ -109,7 +109,7 @@ const ReturnDetails = () => {
       {/* OPTION — E-WALLET */}
       <div className="mb-6">
         <label
-          className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition
+          className={`flex items-center text-[15px]  gap-3 p-4 border rounded-xl cursor-pointer transition
           ${depositMethod === "ewallet"
               ? "border-[#7A1CA9] bg-purple-50"
               : "border-gray-300 hover:bg-gray-50"
@@ -133,7 +133,7 @@ const ReturnDetails = () => {
 
             {/* GCASH */}
             <label
-              className={`flex items-center gap-3 flex-1 px-4 py-2.5 rounded-full cursor-pointer transition ${selectedEwallet === "gcash"
+              className={`flex items-center text-[15px]  gap-3 flex-1 px-4 py-2.5 rounded-full cursor-pointer transition ${selectedEwallet === "gcash"
                   ? "border border-[#7A1CA9] bg-purple-50"
                   : "border border-gray-300 hover:bg-gray-50"
                 }`}
@@ -155,7 +155,7 @@ const ReturnDetails = () => {
 
             {/* MAYA */}
             <label
-              className={`flex items-center gap-3 flex-1 px-4 py-2.5 rounded-full cursor-pointer transition ${selectedEwallet === "maya"
+              className={`flex items-center text-[15px]  gap-3 flex-1 px-4 py-2.5 rounded-full cursor-pointer transition ${selectedEwallet === "maya"
                   ? "border border-[#7A1CA9] bg-purple-100"
                   : "border border-gray-300 hover:bg-gray-50"
                 }`}

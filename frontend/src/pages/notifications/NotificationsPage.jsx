@@ -11,12 +11,12 @@ const NotificationsPage = () => {
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-            document.title = "Hirent — Notifications";
-        
-            return () => {
-              document.title = "Hirent";
-            };
-          }, []);
+    document.title = "Hirent — Notifications";
+
+    return () => {
+      document.title = "Hirent";
+    };
+  }, []);
 
   // =====================================================================
   // TODO: Replace mock notifications with backend API request
@@ -258,24 +258,44 @@ const NotificationsPage = () => {
 
   return (
     <div
-      className="min-h-screen pt-10 px-6 md:px-20 lg:px-40 pb-10"
+      className="min-h-screen pt-10 px-8 md:px-20 lg:px-40 pb-20"
       style={{
-        background:
-          "linear-gradient(180deg, #F6F3FF 0%, #EFE9FF 40%, #E6DEFF 100%)",
+        background: "#fbfbfb",
       }}
     >
       {/* HEADER */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-          <Bell className="w-7 h-7 text-[#7A1CA9]" />
-          Notifications
-        </h1>
+      <div className="flex items-center justify-between mt-2 mb-6">
+        <div className="p-1 mb-2">
+          <div className="flex items-start gap-5">
+
+            {/* Gradient Icon Box */}
+            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200">
+              <Bell className="w-10 h-10 text-[#a12fda]" />
+            </div>
+
+            {/* Line + Text */}
+            <div className="flex items-start gap-4">
+
+              {/* Text Group */}
+              <div>
+                <h1 className="text-[24px] mt-1 font-bold text-gray-800">
+                  Notifications
+                </h1>
+                <p className="text-gray-500 text-[15px]">
+                  See new messages, mentions, and activity notifications.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
 
         <div className="flex gap-2">
           {notifications.some((n) => n.unread) && (
             <button
               onClick={markAllAsRead}
-              className="px-4 py-1.5 rounded-full text-sm bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20 transition"
+              className="px-4 py-1.5 rounded-full text-sm bg-purple-50 text-[#8417bb] border border-[#7A1CA9]/30 hover:bg-[#7A1CA9]/20 transition"
             >
               Mark All Read
             </button>
@@ -284,7 +304,7 @@ const NotificationsPage = () => {
           {notifications.length > 0 && (
             <button
               onClick={clearAll}
-              className="px-4 py-1.5 rounded-full text-sm text-white bg-red-500 hover:bg-red-600 transition flex items-center gap-1 shadow-sm"
+              className="px-4 py-1.5 rounded-full text-sm text-red-500 hover:text-red-700 text-[13px] font-medium border border-red-300 bg-red-50 flex items-center gap-1 shadow-sm"
             >
               <Trash2 className="w-4 h-4" />
               Clear All
@@ -294,16 +314,15 @@ const NotificationsPage = () => {
       </div>
 
       {/* FILTERS */}
-      <div className="flex gap-3 mb-4 overflow-x-auto pb-1">
+      <div className="flex gap-2 mb-8 overflow-x-auto pb-1">
         {["all", "booking", "payment", "alert", "system"].map((cat) => (
           <button
             key={cat}
             onClick={() => setFilter(cat)}
-            className={`px-4 py-1.5 rounded-full text-sm transition ${
-              filter === cat
-                ? "bg-[#7A1CA9] text-white shadow-md"
-                : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"
-            }`}
+            className={`px-3 py-1 rounded-full text-[13px] transition ${filter === cat
+              ? "bg-[#7A1CA9] text-white shadow-md"
+              : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20"
+              }`}
           >
             {cat === "all" ? "All" : cat.charAt(0).toUpperCase() + cat.slice(1)}
           </button>
@@ -325,18 +344,16 @@ const NotificationsPage = () => {
             <div
               key={notif.id}
               onClick={() => markAsRead(notif.id, notif.redirect)}
-              className={`w-full px-5 py-4 rounded-2xl bg-white shadow-md cursor-pointer transform transition hover:scale-[1.01] ${
-                notif.unread ? "border-l-4 border-[#7A1CA9]" : "opacity-90"
-              }`}
+              className={`w-full px-5 py-4 rounded-2xl bg-white shadow-md cursor-pointer transform transition hover:scale-[1.01] ${notif.unread ? "border-l-4 border-[#7A1CA9]" : "opacity-90"
+                }`}
             >
               <div className="flex items-start gap-4">
                 {renderIcon(notif.type)}
 
                 <div className="flex-1">
                   <p
-                    className={`text-[15px] ${
-                      notif.unread ? "font-semibold" : "font-normal"
-                    }`}
+                    className={`text-[15px] ${notif.unread ? "font-semibold" : "font-normal"
+                      }`}
                   >
                     {notif.message}
                   </p>

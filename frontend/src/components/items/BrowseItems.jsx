@@ -43,16 +43,17 @@ const BrowseItems = () => {
   };
 
   return (
-    <section className="py-2 px-8 md:px-16 lg:px-36 bg-white">
-      <div className="collection-scale max-w-7xl mx-auto">
+    <section className="py-5 pb-12 px-8 md:px-16 lg:px-36 bg-white">
+
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mt-12">Browse Items</h2>
+        <div className="text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mt-5">Browse Items</h2>
           <p className="text-gray-500 text-[16px] mt-1">Browse through our popular items and find exactly what you need</p>
         </div>
 
         {/* Carousel container without overflow-hidden */}
-        <div className="relative pb-2">
+        <div className="relative pb-10">
           <div className="flex gap-6 transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)` }}>
             {items.map((item, index) => {
               // Calculate center positions
@@ -147,10 +148,10 @@ const BrowseItems = () => {
         </div>
 
         {/* Login button */}
-        <div className="mt-16 flex justify-center">
+        <div className=" flex justify-center">
           <button
             onClick={() => navigate("/login")}
-            className="px-4 py-2 border-2 rounded-lg font-inter font-semibold text-sm inline-flex items-center gap-2 text-[#7A1CA9] border-[#7A1CA9] hover:bg-purple-50 transition-colors"
+            className="px-4 py-2 border-2 rounded-lg font-inter font-semibold text-sm inline-flex items-center gap-2 text-[#7A1CA9] border-[#7A1CA9] hover:bg-purple-50 transition-colors "
           >
             Login to see more
           </button>

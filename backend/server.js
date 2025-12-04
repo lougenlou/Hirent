@@ -14,7 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // Parse JSON request bodies
 
-// ⭐ OPTIONAL BUT HIGHLY RECOMMENDED
+// OPTIONAL BUT HIGHLY RECOMMENDED
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
     return next({
@@ -47,12 +47,15 @@ app.use('/api/cart', require('./routes/cartRoutes'));
 // Booking routes
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 
-// ⭐ GOOGLE CALENDAR SYNC ROUTES (NEW)
-app.use('/api/calendar', require('./routes/calendarRoutes'));  // ⬅️ ADD THIS
+// Review routes 
+app.use('/api/reviews', require('./routes/reviewRoutes'));
 
-// ====== EARNINGS & PAYOUT ROUTES (NEW) ======
-app.use('/api/earnings', require('./routes/earnings'));        // ⬅️ Add earnings routes
-app.use('/api/payouts', require('./routes/payouts'));          // ⬅️ Add payout request routes
+// CALENDAR SYNC ROUTES
+app.use('/api/calendar', require('./routes/calendarRoutes'));
+
+// ====== EARNINGS & PAYOUT ROUTES ======
+app.use('/api/earnings', require('./routes/earnings'));
+app.use('/api/payouts', require('./routes/payouts'));
 
 // ====== ERROR HANDLING MIDDLEWARE ======
 app.use(errorHandler); // ⬅ MUST be last

@@ -1,26 +1,32 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // make sure this path is correct
+const User = require('../models/User'); // ensure path is correct
 
 module.exports = async (req, res, next) => {
-  const token = req.header('Authorization');
+  const authHeader = req.header('Authorization');
 
-  if (!token) {
-    return res.status(401).json({ msg: 'No token, authorization denied' });
+  if (!authHeader) {
+    return res.status(401).json({ msg: 'Authorization header missing' });
   }
 
-  try {
-    // Token format: "Bearer <token>"
-    const splitToken = token.split(' ')[1];
-    const decoded = jwt.verify(splitToken, process.env.JWT_SECRET);
+  // Ensure format is "Bearer <token>"
+  const parts = authHeader.split(' ');
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    return res.status(401).json({ msg: 'Invalid authorization format' });
+  }
 
-    // Fetch user from DB
-    const user = await User.findById(decoded.userId).select('-password'); // exclude password
+  const token = parts[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Fetch user and remove password
+    const user = await User.findById(decoded.userId).select('-password');
     if (!user) {
       return res.status(401).json({ msg: 'User not found, authorization denied' });
     }
 
     // Attach user object to request
-    req.user = user; // now req.user.id, req.user.role, etc. are accessible
+    req.user = user;
     next();
   } catch (err) {
     console.error('Auth middleware error:', err.message);

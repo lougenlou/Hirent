@@ -9,8 +9,8 @@ const ItemSchema = new mongoose.Schema({
   available: { type: Boolean, default: true },
   featured: { type: Boolean, default: false },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-
-  // ⭐ REVIEW & RATING SUPPORT (ADDED)
+  
+  // REVIEW & RATING SUPPORT (delete comment sa next push)
   averageRating: { type: Number, default: 0 },     // For showing average 4.7 stars
   ratingsCount: { type: Number, default: 0 },      // Total number of reviews
   ratingsBreakdown: {                              // For rating bars UI

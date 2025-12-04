@@ -23,6 +23,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/items', require('./routes/itemsRoutes'));
 app.use("/api/wishlist", require("./routes/wishlistRoutes"));
+app.use("/api/locations", require("./routes/locationRoutes"));
 
 app.get('/', (req, res) => {
   res.send('API is running...');

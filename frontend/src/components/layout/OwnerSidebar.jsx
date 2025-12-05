@@ -5,6 +5,7 @@ import {
     LayoutList,
     PackagePlus,
     CalendarClock,
+    Undo2,
     Wallet,
     User,
     LogOut
@@ -21,6 +22,10 @@ const OwnerSidebar = () => {
         { icon: LayoutList, link: '/owner/my-listings', label: 'My Listings' },
         { icon: PackagePlus, link: '/owner/add-item', label: 'Add Item' },
         { icon: CalendarClock, link: '/owner/bookings', label: 'Bookings' },
+
+        // ⭐ NEW MENU ITEM
+        { icon: Undo2, link: '/owner/returns', label: 'Returns' },
+
         { icon: Wallet, link: '/owner/earnings', label: 'Earnings' },
         { icon: User, link: '/owner/profile', label: 'Profile' }
     ];

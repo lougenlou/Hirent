@@ -10,6 +10,7 @@ import MyListings from "./pages/owner/MyListings";
 import OwnerEarnings from "./pages/owner/OwnerEarnings";
 import OwnerReturns from "./pages/owner/OwnerReturns";
 import OwnerSettings from "./pages/owner/OwnerSettings";
+import OwnerBookings from "./pages/owner/OwnerBookings";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/owner/dashboard" element={<OwnerDashboard />} />
         <Route path="/owner/my-listings" element={<MyListings />} />
         <Route path="/owner/add-item" element={<AddItem />} />
+        <Route path="/owner/bookings" element={<OwnerBookings />} />
         <Route path="/owner/returns" element={<OwnerReturns />} />
         <Route path="/owner/earnings" element={<OwnerEarnings />} />
         <Route path="/owner/profile" element={<OwnerProfile />} />

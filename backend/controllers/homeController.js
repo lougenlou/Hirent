@@ -16,10 +16,10 @@ exports.getPersonalizedHome = async (req, res) => {
       .limit(5);
 
     // 3. Cart activitys
-    //let cart = [];
-    //if (Items.schema.paths.inCartUsers) {
-      //cart = await Items.find({ inCartUsers: userId }).limit(5);
-    //}
+    let cart = [];
+    if (Items.schema.paths.inCartUsers) {
+      cart = await Items.find({ inCartUsers: userId }).limit(5);
+    }
 
     // 4. Recently viewed items
     let recentlyViewed = [];
@@ -30,7 +30,7 @@ exports.getPersonalizedHome = async (req, res) => {
     }
 
     // 5. Booking history
-    //const bookingHistory = []; 
+    const bookingHistory = []; 
 
     // 6. Recommendations based on categories
     let recommended = [];

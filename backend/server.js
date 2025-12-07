@@ -41,4 +41,13 @@ mongoose.connect(process.env.MONGO_URI)
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch(err => console.error("MongoDB connection error:", err.message));
+// Item search & filtering routes
+app.use('/api/items', require('./routes/itemsRoutes'));
+
+// ⭐⭐ Cart API routes (JUST ADDED)
+app.use('/api/cart', require('./routes/cartRoutes'));
+
+
+// ====== ERROR HANDLING MIDDLEWARE ======
+app.use(errorHandler); // catches thrown or unhandled errors
 

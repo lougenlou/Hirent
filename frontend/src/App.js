@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import MainLayout from "./components/layouts/MainLayout";
 
@@ -10,6 +15,8 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import OwnerSignup from "./pages/auth/OwnerSignup";
 import OwnerSetup from "./pages/auth/OwnerSetup";
+import AdminLogin from "./pages/auth/AdminLogin";
+import AdminSignup from "./pages/auth/AdminSignup";
 
 //main layout
 import { useContext } from "react";
@@ -22,7 +29,7 @@ import Footer from "./components/layouts/Footer";
 import HeroSection from "./components/home/HeroSection";
 import FeaturedCategories from "./components/home/FeaturedCategories";
 import HowItWorks from "./components/home/HowItWorks";
-import BrowseItems from './components/items/BrowseItems';
+import BrowseItems from "./components/items/BrowseItems";
 import WhyChoose from "./components/home/WhyChoose";
 import Testimonials from "./components/home/Testimonials";
 
@@ -34,21 +41,29 @@ import AboutPage from "./pages/home/navbar/AboutPage";
 import { HowItWorksSection } from "./pages/home/navbar/HowItWorks";
 import NotificationsPage from "./pages/notifications/NotificationsPage";
 
-import ProductDetails from './pages/ProductDetails';
+import ProductDetails from "./pages/ProductDetails";
 
 //pages from sidebar
 import MyRentals from "./pages/home/sidebar/MyRentals";
-import Booking from './pages/home/sidebar/Booking';
-import Messages from './pages/home/sidebar/Messages';
-import Account from './pages/home/sidebar/Account';
+import Booking from "./pages/home/sidebar/Booking";
+import Messages from "./pages/home/sidebar/Messages";
+import Returns from "./pages/home/sidebar/Returns";
+import Account from "./pages/home/sidebar/Account";
 
 // owner dashboard
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import AddItem from "./pages/owner/AddItem";
-import MyListings from './pages/owner/MyListings';
-import OwnerBookingsDashboard from './pages/owner/OwnerBookingsDashboard';
-import OwnerEarnings from "./pages/owner/OwnerEarnings"; 
+import MyListings from "./pages/owner/MyListings";
+import OwnerBookings from "./pages/owner/OwnerBookings";
+import OwnerMessages from "./pages/owner/OwnerMessages";
+import OwnerReturns from "./pages/owner/OwnerReturns";
+import OwnerEarnings from "./pages/owner/OwnerEarnings";
 import OwnerProfile from "./pages/owner/OwnerProfile";
+import OwnerSettings from "./pages/owner/OwnerSettings";
+
+//admin
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 //map css
 import "leaflet/dist/leaflet.css";
@@ -68,7 +83,11 @@ function LandingPage() {
 
   const sectionVariants = {
     hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
   };
 
   return (
@@ -84,25 +103,50 @@ function LandingPage() {
       >
         <HeroSection />
       </motion.section>
-      
+
       {/* Other landing page sections */}
-      <motion.section variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <FeaturedCategories />
       </motion.section>
 
-      <motion.section variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <BrowseItems />
       </motion.section>
 
-      <motion.section variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <HowItWorks />
       </motion.section>
 
-      <motion.section variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <WhyChoose />
       </motion.section>
 
-      <motion.section variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
+      <motion.section
+        variants={sectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <Testimonials />
       </motion.section>
 
@@ -113,40 +157,48 @@ function LandingPage() {
 
 function App() {
   return (
-
     <AuthProvider>
       <ThemeProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/ownersignup" element={<OwnerSignup />} />
-          <Route path="/ownersetup" element={<OwnerSetup />} />
+        <Router>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/ownersignup" element={<OwnerSignup />} />
+            <Route path="/ownersetup" element={<OwnerSetup />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/admin-signup" element={<AdminSignup />} />
 
-          <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-          <Route path="/owner/add-item" element={<AddItem />} />
-          <Route path="/owner/my-listings" element={<MyListings />} />
-          <Route path="/owner/bookings" element={<OwnerBookingsDashboard />} />
-          <Route path="/owner/earnings" element={<OwnerEarnings />} />
-          <Route path="/owner/profile" element={<OwnerProfile />} />
-          
-          <Route element={<MainLayout />}>
-            <Route path="/browse" element={<BrowseRentals />} />
-            <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/how-it-works" element={<HowItWorksSection />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/collection" element={<Collection />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
 
-            <Route path="/my-rentals" element={<MyRentals />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/chat" element={<Messages />} />
-            <Route path="/account" element={<Account />} />
-          </Route>
-        </Routes>
-      </Router>
+            <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+            <Route path="/owner/add-item" element={<AddItem />} />
+            <Route path="/owner/my-listings" element={<MyListings />} />
+            <Route path="/owner/bookings" element={<OwnerBookings />} />
+            <Route path="/owner/returns" element={<OwnerReturns />} />
+            <Route path="/owner/messages" element={<OwnerMessages />} />
+            <Route path="/owner/earnings" element={<OwnerEarnings />} />
+            <Route path="/owner/profile" element={<OwnerProfile />} />
+            <Route path="/owner/settings" element={<OwnerSettings />} />
+
+            <Route element={<MainLayout />}>
+              <Route path="/browse" element={<BrowseRentals />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/how-it-works" element={<HowItWorksSection />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/collection" element={<Collection />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+
+              <Route path="/my-rentals" element={<MyRentals />} />
+              <Route path="/booking" element={<Booking />} />
+              <Route path="/returns" element={<Returns />} />
+              <Route path="/chat" element={<Messages />} />
+              <Route path="/account" element={<Account />} />
+            </Route>
+          </Routes>
+        </Router>
       </ThemeProvider>
     </AuthProvider>
   );

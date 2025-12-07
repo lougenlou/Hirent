@@ -34,7 +34,7 @@ export default function PaymentMethodModal({
 
                 <div className="border-t border-gray-200"></div>
 
-                <div className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 p-6">
+                <div className="bg-gray-50     p-6">
                     <form onSubmit={savePaymentMethod} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* TYPE */}
                         <div>

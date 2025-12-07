@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ApplyCoupon from '../../../components/booking/ApplyCoupon';
-import DeliveryMethod from '../../../components/booking/DeliveryMethod';
-import ItemSummary from '../../../components/booking/ItemSummary';
-import OrderSummary from '../../../components/booking/OrderSummary';
-import PaymentMethod from '../../../components/booking/PaymentMethod';
-import RentalPeriod from '../../../components/booking/RentalPeriod';
-import ReturnDetails from '../../../components/booking/ReturnDetails';
-import CancellationPolicy from '../../../components/booking/CancellationPolicy';
-import RentalTerms from '../../../components/booking/RentalTerms';
-import LateReturnPolicy from '../../../components/booking/LateReturnPolicy';
+import ApplyCoupon from "../../../components/booking/ApplyCoupon";
+import DeliveryMethod from "../../../components/booking/DeliveryMethod";
+import ItemSummary from "../../../components/booking/ItemSummary";
+import OrderSummary from "../../../components/booking/OrderSummary";
+import PaymentMethod from "../../../components/booking/PaymentMethod";
+import RentalPeriod from "../../../components/booking/RentalPeriod";
+import ReturnDetails from "../../../components/booking/ReturnDetails";
+import CancellationPolicy from "../../../components/booking/CancellationPolicy";
+import RentalTerms from "../../../components/booking/RentalTerms";
+import LateReturnPolicy from "../../../components/booking/LateReturnPolicy";
 import { ArrowLeft, CalendarCheck } from "lucide-react";
 
 const Booking = () => {
   const navigate = useNavigate();
   const [rentalData, setRentalData] = useState({
-    startDate: '',
-    endDate: '',
+    startDate: "",
+    endDate: "",
     days: 4,
   });
 
@@ -25,21 +25,23 @@ const Booking = () => {
     discount: 10,
   });
 
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [deliveryMethod, setDeliveryMethod] = useState('delivery');
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
 
   const productData = {
-    name: 'Professional DSLR Camera Kit',
-    owner: 'Sarah Johnson',
-    location: 'Naga City, Camarines Sur',
+    name: "Professional DSLR Camera Kit",
+    owner: "Sarah Johnson",
+    location: "Naga City, Camarines Sur",
     pricePerDay: 800,
-    image: '/assets/products/Canon.png',
+    image: "/assets/products/Canon.png",
   };
 
   const calculatePricing = () => {
     const subtotal = productData.pricePerDay * rentalData.days;
-    const discountAmount = couponData.applied ? (subtotal * couponData.discount) / 100 : 0;
-    const shippingFee = deliveryMethod === 'delivery' ? 20 : 0;
+    const discountAmount = couponData.applied
+      ? (subtotal * couponData.discount) / 100
+      : 0;
+    const shippingFee = deliveryMethod === "delivery" ? 20 : 0;
     const securityDeposit = 700;
     const total = subtotal - discountAmount + shippingFee + securityDeposit;
 
@@ -56,19 +58,16 @@ const Booking = () => {
 
   return (
     <div className="flex min-h-screen px-4 pl-24 bg-[#fbfbfb] pt-10 pb-20">
-
       {/* MAIN WRAPPER */}
       <div className="flex w-full gap-4">
-
         {/* LEFT COLUMN */}
         <div className="w-[430px] flex-shrink-0 sticky top-10 self-start">
-
           {/* Header */}
           <div className="bg-white p-5 rounded-xl shadow-sm mb-4">
             {/* Back Button */}
             <div className="mb-4">
               <button
-                onClick={() => navigate(-1)} // Go back to the previous page
+                onClick={() => navigate(-1)}
                 className="flex items-center text-[#7A1CA9] text-sm font-medium hover:underline"
               >
                 <ArrowLeft className="w-4 h-4 mr-1" />
@@ -84,13 +83,14 @@ const Booking = () => {
                   Complete Your Booking
                 </h1>
                 <p className="text-gray-500 text-sm mt-0.5">
-                  Finalize rental details and review before confirming your booking.
+                  Finalize rental details and review before confirming your
+                  booking.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Order Summary (Sticky) */}
+          {/* Order Summary */}
           <div className="sticky top-36">
             <OrderSummary
               product={productData}
@@ -98,27 +98,19 @@ const Booking = () => {
               rentalData={rentalData}
             />
           </div>
-
         </div>
 
-        {/* RIGHT COLUMN — scrollable section */}
+        {/* RIGHT COLUMN */}
         <div className="flex-1 space-y-4">
-
           <ItemSummary
             product={productData}
             days={rentalData.days}
             coupon={couponData}
           />
 
-          <ApplyCoupon
-            couponData={couponData}
-            setCouponData={setCouponData}
-          />
+          <ApplyCoupon couponData={couponData} setCouponData={setCouponData} />
 
-          <RentalPeriod
-            rentalData={rentalData}
-            setRentalData={setRentalData}
-          />
+          <RentalPeriod rentalData={rentalData} setRentalData={setRentalData} />
 
           <LateReturnPolicy />
 
@@ -139,10 +131,8 @@ const Booking = () => {
           <RentalTerms />
         </div>
       </div>
-
     </div>
   );
-
 };
 
 export default Booking;

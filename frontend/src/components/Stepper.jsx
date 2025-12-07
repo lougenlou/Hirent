@@ -10,7 +10,6 @@ const Stepper = ({ currentStep }) => {
   return (
     <div className="w-full flex flex-col items-center gap-3">
       <div className="flex w-full max-w-[800px] gap-0">
-
         {/* Segment 1 */}
         <div className="w-1/3 h-2 bg-gray-200 rounded-l-full overflow-hidden">
           <div
@@ -51,7 +50,6 @@ const Stepper = ({ currentStep }) => {
             }}
           ></div>
         </div>
-
       </div>
     </div>
   );

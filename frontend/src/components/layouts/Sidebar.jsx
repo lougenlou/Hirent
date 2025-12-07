@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Menu, Home, ClipboardCheck, CalendarPlus, MessageCircle, User, Settings } from "lucide-react";
+import { Menu, Home, ClipboardCheck, CalendarPlus, Undo2, MessageCircle, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = ({ onExpand }) => {
@@ -20,6 +20,7 @@ const Sidebar = ({ onExpand }) => {
     { icon: Home, link: "/", label: "Home" },
     { icon: ClipboardCheck, link: "/my-rentals", label: "My Rentals" },
     { icon: CalendarPlus, link: "/booking", label: "Booking" },
+    { icon: Undo2, link: "/returns", label: "Return Item" },
     { icon: MessageCircle, link: "/chat", label: "Messages" },
     { icon: User, link: "/account", label: "Account Management" },
   ];

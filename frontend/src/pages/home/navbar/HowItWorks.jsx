@@ -71,7 +71,6 @@ export function HowItWorksSection() {
     <section className="collection-scale relative min-h-screen py-12 overflow-hidden">
       <FloatingParticles />
 
-      {/* Background glowing orbs */}
       <div className="absolute top-20 left-20 w-[26rem] h-[26rem] bg-purple-400/20 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-20 w-[26rem] h-[26rem] bg-pink-400/20 rounded-full blur-3xl" />
 
@@ -99,7 +98,8 @@ export function HowItWorksSection() {
           </h1>
 
           <p className="text-gray-600 max-w-2xl mx-auto text-md">
-            Renting on HiRent is fast, secure, and effortless. Here's how the process works.
+            Renting on HiRent is fast, secure, and effortless. Here's how the
+            process works.
           </p>
         </motion.div>
 

@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Bell, CheckCircle, Info, AlertCircle, Dot, Trash2 } from "lucide-react";
+import {
+  Bell,
+  CheckCircle,
+  Info,
+  AlertCircle,
+  Dot,
+  Trash2,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const NotificationsPage = () => {
@@ -18,15 +25,9 @@ const NotificationsPage = () => {
     };
   }, []);
 
-  // =====================================================================
-  // TODO: Replace mock notifications with backend API request
-  // =====================================================================
   useEffect(() => {
     const loadMockData = () => {
       const mock = [
-        // ============================
-        // BOOKING NOTIFICATIONS
-        // ============================
         {
           id: 1,
           type: "info",
@@ -49,7 +50,8 @@ const NotificationsPage = () => {
           id: 3,
           type: "info",
           category: "booking",
-          message: "A renter asked a question about your listing 'DJI Mini Drone'.",
+          message:
+            "A renter asked a question about your listing 'DJI Mini Drone'.",
           redirect: "/owner/messages",
           time: "3 hours ago",
           unread: true,
@@ -76,15 +78,13 @@ const NotificationsPage = () => {
           id: 6,
           type: "info",
           category: "booking",
-          message: "A nearby listing similar to your recent search is now available.",
+          message:
+            "A nearby listing similar to your recent search is now available.",
           redirect: "/browse",
           time: "4 hours ago",
           unread: true,
         },
 
-        // ============================
-        // PAYMENT NOTIFICATIONS
-        // ============================
         {
           id: 7,
           type: "success",
@@ -130,10 +130,6 @@ const NotificationsPage = () => {
           time: "6 hours ago",
           unread: true,
         },
-
-        // ============================
-        // SYSTEM / ACCOUNT
-        // ============================
         {
           id: 12,
           type: "info",
@@ -147,7 +143,8 @@ const NotificationsPage = () => {
           id: 13,
           type: "alert",
           category: "system",
-          message: "New login detected from a different device. Review activity.",
+          message:
+            "New login detected from a different device. Review activity.",
           redirect: "/security",
           time: "5 days ago",
           unread: true,
@@ -170,9 +167,7 @@ const NotificationsPage = () => {
           time: "2 days ago",
           unread: false,
         },
-        // ============================
-        // ALERTS
-        // ============================
+
         {
           id: 17,
           type: "alert",
@@ -195,7 +190,8 @@ const NotificationsPage = () => {
           id: 19,
           type: "alert",
           category: "alert",
-          message: "Action required: Update missing details on your new listing.",
+          message:
+            "Action required: Update missing details on your new listing.",
           redirect: "/owner/listings",
           time: "10 hours ago",
           unread: true,
@@ -209,35 +205,20 @@ const NotificationsPage = () => {
     loadMockData();
   }, []);
 
-  // =====================================================================
-  // TODO: Replace with API call to mark single notification as read
-  // =====================================================================
   const markAsRead = (id, redirect) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
     );
 
-    // TODO: PATCH /notifications/:id/read
-
     if (redirect) navigate(redirect);
   };
 
-  // =====================================================================
-  // TODO: Replace with API call to mark ALL notifications as read
-  // =====================================================================
   const markAllAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
-
-    // TODO: PATCH /notifications/read-all
   };
 
-  // =====================================================================
-  // TODO: Replace with API call to CLEAR all notifications
-  // =====================================================================
   const clearAll = () => {
     setNotifications([]);
-
-    // TODO: DELETE /notifications/clear
   };
 
   const renderIcon = (type) => {
@@ -264,10 +245,9 @@ const NotificationsPage = () => {
       }}
     >
       {/* HEADER */}
-      <div className="flex items-center justify-between mt-2 mb-6">
+      <div className="flex items-center justify-between mt-2 mb-2">
         <div className="p-1 mb-2">
           <div className="flex items-start gap-5">
-
             {/* Gradient Icon Box */}
             <div className="p-3 rounded-xl bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200">
               <Bell className="w-10 h-10 text-[#a12fda]" />
@@ -275,7 +255,6 @@ const NotificationsPage = () => {
 
             {/* Line + Text */}
             <div className="flex items-start gap-4">
-
               {/* Text Group */}
               <div>
                 <h1 className="text-[24px] mt-1 font-bold text-purple-900">
@@ -285,9 +264,7 @@ const NotificationsPage = () => {
                   See new messages, mentions, and activity notifications.
                 </p>
               </div>
-
             </div>
-
           </div>
         </div>
 
@@ -319,10 +296,11 @@ const NotificationsPage = () => {
           <button
             key={cat}
             onClick={() => setFilter(cat)}
-            className={`px-3 py-1 rounded-full text-[13px] transition ${filter === cat
-              ? "bg-[#7A1CA9] text-white shadow-md"
-              : "bg-[#7A1CA9]/10 text-[#7A1CA9] border border-[#7A1CA9]/20 /20 hover:bg-[#7A1CA9]/20"
-              }`}
+            className={`px-3 py-1 rounded-lg text-[13px] transition ${
+              filter === cat
+                ? "bg-[#7A1CA9] text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-[#7A1CA9]/10"
+            }`}
           >
             {cat === "all" ? "All" : cat.charAt(0).toUpperCase() + cat.slice(1)}
           </button>
@@ -331,7 +309,9 @@ const NotificationsPage = () => {
 
       {/* LOADING */}
       {loading && (
-        <p className="text-center text-gray-500 text-sm">Loading notifications...</p>
+        <p className="text-center text-gray-500 text-sm">
+          Loading notifications...
+        </p>
       )}
 
       {/* ERROR */}
@@ -344,23 +324,27 @@ const NotificationsPage = () => {
             <div
               key={notif.id}
               onClick={() => markAsRead(notif.id, notif.redirect)}
-              className={`w-full px-5 py-4 rounded-2xl bg-white shadow-md cursor-pointer transform transition hover:scale-[1.01] ${notif.unread ? "border-l-4 border-[#7A1CA9] " : "opacity-90"
-                }`}
+              className={`w-full px-5 py-4 rounded-2xl bg-white shadow-md cursor-pointer transform transition hover:scale-[1.01] ${
+                notif.unread ? "border-l-4 border-[#7A1CA9] " : "opacity-90"
+              }`}
             >
               <div className="flex items-start gap-4">
                 {renderIcon(notif.type)}
 
                 <div className="flex-1">
                   <p
-                    className={`text-[15px] ${notif.unread ? "font-semibold" : "font-normal"
-                      }`}
+                    className={`text-[15px] ${
+                      notif.unread ? "font-semibold" : "font-normal"
+                    }`}
                   >
                     {notif.message}
                   </p>
                   <p className="text-gray-500 text-xs mt-1">{notif.time}</p>
                 </div>
 
-                {notif.unread && <Dot className="text-[#7A1CA9] w-6 h-6 mt-1" />}
+                {notif.unread && (
+                  <Dot className="text-[#7A1CA9] w-6 h-6 mt-1" />
+                )}
               </div>
             </div>
           ))}

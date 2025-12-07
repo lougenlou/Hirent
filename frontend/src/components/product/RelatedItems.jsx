@@ -11,11 +11,11 @@ const RelatedItems = ({ products }) => {
       </div>
 
       {/* Products Grid - Removed extra padding */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 -ml-px">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mr-28">
         {products.map((product) => (
-          <div key={product.id} className="group relative bg-white  text-purple-900   rounded-lg overflow-hidden  shadow-lg transition-shadow">
+          <div key={product.id} className="group relative bg-white  text-purple-900 rounded-2xl overflow-hidden  shadow-lg transition-shadow">
             {/* Product Image Container */}
-            <div className="relative bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 aspect-square flex items-center justify-center p-5 mb-2 rounded-lg overflow-hidden">
+            <div className="relative bg-gray-50 aspect-square flex items-center justify-center p-6 mb-2 rounded-lg overflow-hidden">
               {/* Discount Badge */}
               {product.discount && (
                 <div className="absolute top-3 left-3 bg-[#7A1CA9] text-white px-2.5 py-1 rounded text-xs font-bold z-10">

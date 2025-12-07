@@ -97,7 +97,7 @@ export function ViewDetailsModal({ isOpen, onClose, itemId, rentalData }) {
                         {/* Rental Details */}
                         <div className="space-y-2">
                             <h3 className=" text-gray-900  text-[15px]">Rental Details</h3>
-                            <div className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 rounded-xl p-4 space-y-4">
+                            <div className="bg-gray-50     rounded-xl p-4 space-y-4">
                                 {/* Date Booked */}
                                 <div className="flex items-center gap-3">
                                     <div className="w-9 h-9 bg-white  text-purple-900   rounded-lg flex items-center justify-center flex-shrink-0">
@@ -191,7 +191,7 @@ export function ViewDetailsModal({ isOpen, onClose, itemId, rentalData }) {
                         <div className="space-y-2">
                             <h3 className=" text-gray-900  text-[15px]">Price Summary</h3>
 
-                            <div className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 rounded-xl p-4 space-y-1.5">
+                            <div className="bg-gray-50     rounded-xl p-4 space-y-1.5">
                                 {(() => {
                                     const listing = mockListings.find(l => l.id === rental.id);
 
@@ -304,7 +304,7 @@ export function ViewDetailsModal({ isOpen, onClose, itemId, rentalData }) {
                         {(rental.status === "approved" || rental.status === "pending") && rental.delivery && (
                             <div className="space-y-2">
                                 <h3 className=" text-gray-900  text-[15px]">Delivery Status</h3>
-                                <div className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 rounded-xl p-4 space-y-2">
+                                <div className="bg-gray-50     rounded-xl p-4 space-y-2">
                                     {steps.map((step, index) => {
                                         const isCompleted = rental.status === "approved" && index < currentStepIndex;
                                         const isCurrent = rental.status === "approved" && index === currentStepIndex;

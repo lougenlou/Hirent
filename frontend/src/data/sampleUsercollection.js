@@ -20,8 +20,8 @@ const sampleUsercollection = [
       currentLocation: "Warehouse",
       courier: "Tricycle",
       confirmedAt: "2025-11-10 10:00 PM",
-      preparingAt: "2025-11-11 09:30 AM"
-    }
+      preparingAt: "2025-11-11 09:30 AM",
+    },
   },
 
   {
@@ -45,8 +45,8 @@ const sampleUsercollection = [
       currentLocation: "Processing",
       courier: null,
       confirmedAt: null,
-      preparingAt: null
-    }
+      preparingAt: null,
+    },
   },
   {
     id: 5, // DJI Mini Drone
@@ -69,8 +69,8 @@ const sampleUsercollection = [
       currentLocation: "Packing Station",
       courier: "LBC Express",
       confirmedAt: "2025-11-17 15:00",
-      preparingAt: "2025-11-18 08:00"
-    }
+      preparingAt: "2025-11-18 08:00",
+    },
   },
   {
     id: 3, // Electric Bike
@@ -83,7 +83,7 @@ const sampleUsercollection = [
     paymentMethod: "Paypal (user@example.com)",
     location: "Naga City, Camarines Sur",
     couponDiscount: 0,
-    delivery: null
+    delivery: null,
   },
   {
     id: 4, // Drill Set
@@ -96,7 +96,7 @@ const sampleUsercollection = [
     paymentMethod: "Credit Card (Visa ****4321)",
     location: "Naga City, Camarines Sur",
     couponDiscount: 0,
-    delivery: null
+    delivery: null,
   },
   {
     id: 6, // Yamaha Keyboard
@@ -117,8 +117,8 @@ const sampleUsercollection = [
       currentLocation: "Warehouse",
       courier: "J&T Express",
       confirmedAt: "2025-11-14 11:30",
-      preparingAt: "2025-11-15 09:00"
-    }
+      preparingAt: "2025-11-15 09:00",
+    },
   },
   {
     id: 7, // Projector Set
@@ -139,8 +139,8 @@ const sampleUsercollection = [
       currentLocation: "Processing",
       courier: null,
       confirmedAt: null,
-      preparingAt: null
-    }
+      preparingAt: null,
+    },
   },
   {
     id: 8, // Camping Tent
@@ -153,7 +153,7 @@ const sampleUsercollection = [
     paymentMethod: "Paypal (user2@example.com)",
     location: "Naga City, Camarines Sur",
     couponDiscount: 0,
-    delivery: null
+    delivery: null,
   },
 ];
 

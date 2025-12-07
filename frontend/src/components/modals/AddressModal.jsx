@@ -42,7 +42,7 @@ export default function AddressModal({
         <div className="border-t border-gray-200"></div>
 
         {/* Form Container */}
-        <div className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 p-6">
+        <div className="bg-gray-50     p-6">
           <form onSubmit={saveAddress} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             {/* Type and Specify Type (only show if NOT editing) */}

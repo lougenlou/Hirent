@@ -32,7 +32,7 @@ const DeliveryMethod = ({ deliveryMethod, setDeliveryMethod }) => {
       {/* Pickup Option */}
       <label
         className={`flex items-start gap-3 p-5 rounded-xl cursor-pointer transition 
-    border ${deliveryMethod === "pickup" ? "border-[#7A1CA9]  bg-purple-50" : "border-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:bg-gray-900"}`}
+    border ${deliveryMethod === "pickup" ? "border-[#7A1CA9]  bg-purple-50" : "border-gray-300 hover:bg-gray-50    "}`}
       >
         <input
           type="radio"
@@ -57,7 +57,7 @@ const DeliveryMethod = ({ deliveryMethod, setDeliveryMethod }) => {
         <textarea
           placeholder="Any special requests or instructions for the owner..."
           rows="4"
-          className="w-full h-24 px-4 py-3 text-[15px] placeholder:text-gray-400 bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+          className="w-full h-24 px-4 py-3 text-[15px] placeholder:text-gray-400 bg-gray-50     rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
           maxLength={500}
         />
         <p className="text-[15px] text-gray-500 mt-0.5">0/500 characters</p>

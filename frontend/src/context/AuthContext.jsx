@@ -1,11 +1,9 @@
 import React, { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
-
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("fakeToken"));
 
-  // Keep login state in sync with localStorage
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("fakeToken"));
   useEffect(() => {
     const handleStorageChange = () => {
       setIsLoggedIn(!!localStorage.getItem("fakeToken"));
@@ -23,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("fakeToken");
     setIsLoggedIn(false);
   };
-
+  
   return (
     <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
       {children}

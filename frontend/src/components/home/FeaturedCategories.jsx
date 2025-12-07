@@ -44,7 +44,7 @@ export default function FeaturedCategories() {
   };
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 py-5 flex justify-center">
+    <section className="bg-gray-50     py-5 flex justify-center">
     <div className="w-full max-w-[1400px] mx-auto px-6">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-semibold  text-gray-900  mt-12">Featured Categories</h2>

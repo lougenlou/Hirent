@@ -83,12 +83,12 @@ const PaymentMethod = ({ paymentMethod, setPaymentMethod }) => {
               <input
                 type="text"
                 placeholder="Card Number"
-                className="px-4 py-2 text-[15px] text-black border bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="px-4 py-2 text-[15px] text-black border bg-gray-50     border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <input
                 type="text"
                 placeholder="CVV"
-                className="px-4 py-2 text-[15px] border bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="px-4 py-2 text-[15px] border bg-gray-50     border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
@@ -96,12 +96,12 @@ const PaymentMethod = ({ paymentMethod, setPaymentMethod }) => {
               <input
                 type="text"
                 placeholder="Cardholder Name"
-                className="px-4 py-2 text-[15px] border bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="px-4 py-2 text-[15px] border bg-gray-50     border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <input
                 type="text"
                 placeholder="Expiry (MM/YY)"
-                className="px-4 py-2  text-[15px] border bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="px-4 py-2  text-[15px] border bg-gray-50     border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 

@@ -39,7 +39,7 @@ const RentalTerms = () => {
       </div>
       
       {showFullTerms && (
-        <div className="border border-gray-200 rounded-lg p-4 mb-4 max-h-60 overflow-y-auto bg-gray-50 dark:bg-gray-900 dark:bg-gray-900">
+        <div className="border border-gray-200 rounded-lg p-4 mb-4 max-h-60 overflow-y-auto bg-gray-50    ">
           <h4 className="font-medium  text-gray-900  mb-2">Full Terms and Conditions</h4>
           <div className="text-sm text-gray-700 space-y-3">
             <p>

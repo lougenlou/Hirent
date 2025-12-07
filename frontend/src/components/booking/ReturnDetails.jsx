@@ -26,7 +26,7 @@ const ReturnDetails = () => {
       <div className="mb-6">
         <h3 className="font-medium mb-2">Security Deposit Amount</h3>
 
-        <div className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 p-4 rounded-lg flex items-center justify-between">
+        <div className="bg-gray-50     p-4 rounded-lg flex items-center justify-between">
           <div>
             <p className="text-2xl font-bold  text-gray-900 ">₱1000.00</p>
             <p className="text-[15px] text-gray-600 mt-1">Set by item owner</p>
@@ -50,7 +50,7 @@ const ReturnDetails = () => {
           className={`flex items-center text-[15px] gap-3 p-4 border rounded-xl cursor-pointer transition
           ${depositMethod === "cash"
               ? "border-[#7A1CA9]  bg-purple-50"
-              : "border-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:bg-gray-900"
+              : "border-gray-300 hover:bg-gray-50    "
             }`}
         >
           <input
@@ -81,7 +81,7 @@ const ReturnDetails = () => {
           className={`flex items-center text-[15px]  gap-3 p-4 border rounded-xl cursor-pointer transition
           ${depositMethod === "card"
               ? "border-[#7A1CA9]  bg-purple-50"
-              : "border-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:bg-gray-900"
+              : "border-gray-300 hover:bg-gray-50    "
             }`}
         >
           <input
@@ -112,7 +112,7 @@ const ReturnDetails = () => {
           className={`flex items-center text-[15px]  gap-3 p-4 border rounded-xl cursor-pointer transition
           ${depositMethod === "ewallet"
               ? "border-[#7A1CA9]  bg-purple-50"
-              : "border-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:bg-gray-900"
+              : "border-gray-300 hover:bg-gray-50    "
             }`}
         >
           <input
@@ -135,7 +135,7 @@ const ReturnDetails = () => {
             <label
               className={`flex items-center text-[15px]  gap-3 flex-1 px-4 py-2.5 rounded-full cursor-pointer transition ${selectedEwallet === "gcash"
                   ? "border border-[#7A1CA9]  bg-purple-50"
-                  : "border border-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:bg-gray-900"
+                  : "border border-gray-300 hover:bg-gray-50    "
                 }`}
               onClick={() => setSelectedEwallet("gcash")}
             >
@@ -157,7 +157,7 @@ const ReturnDetails = () => {
             <label
               className={`flex items-center text-[15px]  gap-3 flex-1 px-4 py-2.5 rounded-full cursor-pointer transition ${selectedEwallet === "maya"
                   ? "border border-[#7A1CA9]  bg-purple-100"
-                  : "border border-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:bg-gray-900"
+                  : "border border-gray-300 hover:bg-gray-50    "
                 }`}
               onClick={() => setSelectedEwallet("maya")}
             >
@@ -217,7 +217,7 @@ const ReturnDetails = () => {
         <textarea
           rows="4"
           placeholder="Enter any special notes or concerns about the item's return..."
-          className= "w-full h-24 px-4 py-3 text-[15px] placeholder:text-gray-400 bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+          className= "w-full h-24 px-4 py-3 text-[15px] placeholder:text-gray-400 bg-gray-50     rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
           maxLength={500}
         />
         <p className="text-[15px] text-gray-500 mt-0.5">0/500 characters</p>

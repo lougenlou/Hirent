@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Search, Bookmark, ShoppingBag, Bell, Menu } from "lucide-react";
+import { Search, Heart, ShoppingBag, Bell, Menu } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import hirentLogo from "../../assets/hirent-logo.png";
 import { getFakeUser } from "../../utils/fakeAuth";
@@ -107,7 +107,7 @@ const Navbar = ({ onSearch }) => {
                 {/* Icons */}
                 <div className="flex h-full">
                   {[
-                    { icon: <Bookmark className="w-5 h-5" />, path: "/wishlist" },
+                    { icon: <Heart className="w-5 h-5" />, path: "/wishlist" },
                     {
                       icon: (
                         <div className="relative">

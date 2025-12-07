@@ -39,6 +39,8 @@ const transformBookings = (bookings) =>
     bookedDates: new Date(b.bookedDate.split(" - ")[0]),
     bookedDateEnd: new Date(b.bookedDate.split(" - ")[1]),
     price: `₱ ${b.pricePerDay}`,
+    discount: b.discount || 0, // default discount to 0 if not provided
+    securityDeposit: b.securityDeposit || 0, // default security deposit to 0 if not provided
   }));
 
 export default function OwnerBookingsDashboard() {
@@ -73,17 +75,14 @@ export default function OwnerBookingsDashboard() {
   }, [debouncedSearch]);
 
   return (
-    <div className="flex bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 min-h-screen">
+    <div className="flex bg-gray-50 pl-72 pr-8 min-h-screen">
       <Sidebar />
 
-      <div className="flex-1 mt-12 px-6">
+      <div className="flex-1 py-10">
         {/* HEADER + SEARCH */}
-        <div className="flex justify-between items-start mb-10">
+        <div className="flex justify-between items-start mb-6">
           <div className="flex flex-col w-full max-w-md">
-            <h2 className="text-gray-500 text-[13px] mb-1">Bookings</h2>
-            <h1 className="text-2xl font-semibold  text-gray-900  mb-1">
-              Hello, <span className="text-[#7A1CA9]">Genlord!</span>
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Bookings</h1>
             <p className="text-gray-600 text-[15px] mb-4">
               View and manage all bookings from renters
             </p>
@@ -123,7 +122,9 @@ export default function OwnerBookingsDashboard() {
             onConfirm={() => {
               setBookings((prev) =>
                 prev.map((b) =>
-                  b.id === approvalModalData.id ? { ...b, status: "Approved" } : b
+                  b.id === approvalModalData.id
+                    ? { ...b, status: "Approved" }
+                    : b
                 )
               );
               setApprovalModalData(null);

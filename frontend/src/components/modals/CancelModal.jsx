@@ -15,7 +15,7 @@ const CancelConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
                 <div className="flex justify-end gap-3">
                     <button
                         onClick={onClose}
-                        className="text-[12px] px-2.5 py-1.5 font-medium  border rounded-lg hover:bg-gray-50 dark:bg-gray-900 dark:bg-gray-900"
+                        className="text-[12px] px-2.5 py-1.5 font-medium  border rounded-lg hover:bg-gray-50    "
                     >
                         Keep Booking
                     </button>

@@ -1,12 +1,20 @@
+// src/pages/owner/OwnerEarnings.jsx
 import React, { useState, useEffect } from "react";
 import OwnerSidebar from "../../components/layouts/OwnerSidebar";
-
-import { Wallet } from "lucide-react";
-
+import {
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
+  CalendarRange,
+  TrendingUp,
+  PiggyBank,
+  CreditCard,
+  Download,
+} from "lucide-react";
 import {
   LineChart,
   Line,
-  collectionesianGrid,
+  CartesianGrid,
   Tooltip,
   XAxis,
   YAxis,
@@ -18,7 +26,7 @@ import {
   Cell,
 } from "recharts";
 
-// Item image map
+// Item image map (public/assets/items)
 const imageMap = {
   "Gucci Duffle Bag": "/assets/items/gucci_duffle_bag.png",
   "Gaming Headset": "/assets/items/havit_hv.png",
@@ -32,26 +40,40 @@ const fallbackIcon = () => (
   <Wallet className="w-10 h-10 text-purple-700 opacity-60" />
 );
 
-// Colors
-const donutColors = ["#a78bfa", "#c4b5fd", "#ddd6fe"];
+// Donut colors
+const donutColors = ["#7A1CA9", "#A855F7", "#C4B5FD", "#DDD6FE"];
 
-// Soft block (Notion style)
-const block = "bg-white  text-purple-900   rounded-2xl border border-gray-200 shadow-sm p-8";
+// Soft block shell
+const block = "bg-white rounded-2xl border border-gray-100 shadow-sm p-5";
 
-// Gradient pill tag — Section Header
-const SectionHeader = ({ title }) => (
-  <div className="flex items-center gap-3 mb-6">
-    <span
-      className="px-3 py-1 rounded-full text-xs font-semibold text-white"
-      style={{
-        background: "linear-gradient(90deg, #7A1CA9, #B27CFF)",
-      }}
-    >
-      {title}
-    </span>
-    <div className="flex-1 border-t border-gray-200"></div>
-  </div>
-);
+// Custom tooltip for line chart
+const EarningsTooltip = ({ active, payload, label }) => {
+  if (!active || !payload || !payload.length) return null;
+  const value = payload[0].value || 0;
+  return (
+    <div className="bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-200 px-3 py-2 text-xs">
+      <p className="font-semibold text-gray-800 mb-1">{label}</p>
+      <p className="text-[#7A1CA9] font-bold">₱{value.toLocaleString()}</p>
+    </div>
+  );
+};
+
+// Custom tooltip for weekly activity
+const ActivityTooltip = ({ active, payload, label }) => {
+  if (!active || !payload || !payload.length) return null;
+  const views = payload.find((p) => p.dataKey === "views")?.value || 0;
+  const messages = payload.find((p) => p.dataKey === "messages")?.value || 0;
+  const bookings = payload.find((p) => p.dataKey === "bookings")?.value || 0;
+
+  return (
+    <div className="bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-200 px-3 py-2 text-xs">
+      <p className="font-semibold text-gray-800 mb-1">{label}</p>
+      <p className="text-purple-600">Views: {views}</p>
+      <p className="text-blue-600">Messages: {messages}</p>
+      <p className="text-green-600 font-semibold">Bookings: {bookings}</p>
+    </div>
+  );
+};
 
 export default function OwnerEarnings() {
   const [loading, setLoading] = useState(true);
@@ -59,19 +81,19 @@ export default function OwnerEarnings() {
   const [summary, setSummary] = useState(null);
   const [wallet, setWallet] = useState(null);
 
-  const [chartData, setChartData] = useState([]);
+  const [fullChartData, setFullChartData] = useState([]); // Store all data
+  const [chartData, setChartData] = useState([]); // Filtered data for display
   const [categories, setCategories] = useState([]);
   const [weeklyActivity, setWeeklyActivity] = useState([]);
   const [recent, setRecent] = useState([]);
   const [topItems, setTopItems] = useState([]);
   const [lowItems, setLowItems] = useState([]);
 
+  const [timeframe, setTimeframe] = useState("12M");
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
 
-  // =====================================================
-  // TODO: Replace mock data with backend API fetch calls 🌐
-  // =====================================================
+  // Mock data setup
   useEffect(() => {
     const mock = {
       wallet: {
@@ -79,14 +101,15 @@ export default function OwnerEarnings() {
         pending: 4200,
         available: 14300,
         payoutMethod: "Bank Account •••• 4321",
+        nextPayout: "Dec 15, 2025",
       },
-
       summary: {
         monthEarnings: 14500,
         lastMonth: 13900,
         totalEarnings: 110400,
+        avgBookingValue: 1250,
+        completedBookings: 88,
       },
-
       chart: [
         { month: "Jan", amount: 8200 },
         { month: "Feb", amount: 9100 },
@@ -101,15 +124,14 @@ export default function OwnerEarnings() {
         { month: "Nov", amount: 15800 },
         { month: "Dec", amount: 17200 },
       ],
-
       categories: [
-        { name: "Electronics", percent: 67 },
-        { name: "Fashion", percent: 22 },
-        { name: "Accessories", percent: 11 },
+        { name: "Electronics", percent: 45, value: 49680 },
+        { name: "Fashion", percent: 28, value: 30912 },
+        { name: "Gaming", percent: 18, value: 19872 },
+        { name: "Others", percent: 9, value: 9936 },
       ],
-
       weeklyActivity: [
-        { day: "Mon", views: 520, messages: 12, bookings: 4 },
+        { day: "Mon", views: 520, messages: 32, bookings: 50 },
         { day: "Tue", views: 480, messages: 10, bookings: 3 },
         { day: "Wed", views: 610, messages: 15, bookings: 5 },
         { day: "Thu", views: 720, messages: 18, bookings: 6 },
@@ -117,28 +139,58 @@ export default function OwnerEarnings() {
         { day: "Sat", views: 1300, messages: 30, bookings: 12 },
         { day: "Sun", views: 900, messages: 14, bookings: 4 },
       ],
-
       recent: [
-        { id: 1, item: "Sony A7IV Camera", net: 2350, date: "Feb 23, 2025" },
-        { id: 2, item: "IPS Monitor", net: 1220, date: "Feb 20, 2025" },
-        { id: 3, item: "Keyboard", net: 860, date: "Feb 18, 2025" },
+        {
+          id: 1,
+          item: "Gucci Duffle Bag",
+          net: 2350,
+          date: "Dec 05, 2025",
+          status: "Completed",
+        },
+        {
+          id: 2,
+          item: "IPS Monitor",
+          net: 1220,
+          date: "Dec 04, 2025",
+          status: "Completed",
+        },
+        {
+          id: 3,
+          item: "Keyboard",
+          net: 860,
+          date: "Dec 03, 2025",
+          status: "Completed",
+        },
+        {
+          id: 4,
+          item: "Laptop",
+          net: 3200,
+          date: "Dec 02, 2025",
+          status: "Completed",
+        },
+        {
+          id: 5,
+          item: "Gaming Headset",
+          net: 750,
+          date: "Dec 01, 2025",
+          status: "Completed",
+        },
       ],
-
       topItems: [
-        { item: "Laptop", amount: 40200 },
-        { item: "Gucci Duffle Bag", amount: 31000 },
-        { item: "Gaming Headset", amount: 20000 },
+        { item: "Laptop", amount: 40200, bookings: 32 },
+        { item: "Gucci Duffle Bag", amount: 31000, bookings: 26 },
+        { item: "Gaming Headset", amount: 20000, bookings: 18 },
       ],
-
       lowItems: [
-        { item: "RGB Liquid CPU Cooler", amount: 6000 },
-        { item: "Keyboard", amount: 4800 },
+        { item: "RGB Liquid CPU Cooler", amount: 6000, bookings: 8 },
+        { item: "Keyboard", amount: 4800, bookings: 6 },
       ],
     };
 
     setWallet(mock.wallet);
     setSummary(mock.summary);
-    setChartData(mock.chart);
+    setFullChartData(mock.chart); // Store full data
+    setChartData(mock.chart); // Initially show all data
     setCategories(mock.categories);
     setWeeklyActivity(mock.weeklyActivity);
     setRecent(mock.recent);
@@ -148,432 +200,568 @@ export default function OwnerEarnings() {
     setLoading(false);
   }, []);
 
+  // Filter chart data when timeframe changes
+  useEffect(() => {
+    if (fullChartData.length === 0) return;
+
+    let filteredData = [];
+
+    switch (timeframe) {
+      case "3M":
+        // Show last 3 months (Oct, Nov, Dec)
+        filteredData = fullChartData.slice(-3);
+        break;
+      case "6M":
+        // Show last 6 months (Jul - Dec)
+        filteredData = fullChartData.slice(-6);
+        break;
+      case "12M":
+        // Show all 12 months (Jan - Dec)
+        filteredData = fullChartData;
+        break;
+      default:
+        filteredData = fullChartData;
+    }
+
+    setChartData(filteredData);
+  }, [timeframe, fullChartData]);
+
   if (loading)
-    return <p className="pt-20 text-center text-gray-600">Loading...</p>;
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <OwnerSidebar />
+        <div className="flex-1 ml-72 flex items-center justify-center">
+          <p className="text-gray-600">Loading earnings data...</p>
+        </div>
+      </div>
+    );
 
   const growth =
     ((summary.monthEarnings - summary.lastMonth) / summary.lastMonth) * 100;
 
-  // =====================================================
-  // WITHDRAW HANDLER (mock)
-  // TODO: Replace with backend POST request
-  // =====================================================
   const handleWithdraw = () => {
     if (!withdrawAmount || withdrawAmount <= 0) return;
-
-    console.log("TODO: Withdraw:", withdrawAmount);
+    console.log("Withdraw:", withdrawAmount);
     setShowWithdrawModal(false);
     setWithdrawAmount("");
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F9F9FB]">
+    <div className="flex min-h-screen bg-gray-50">
       <OwnerSidebar />
 
-      <div className="flex-1 px-12 py-12">
+      <div className="flex-1 p-8 ml-60">
+        {/* Page Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-1">Earnings</h1>
+            <p className="text-gray-500">
+              Track your revenue, performance, and financial insights
+            </p>
+          </div>
+          <button className="flex items-center gap-2 px-4 py-2 bg-[#7A1CA9] text-white rounded-xl text-sm font-medium hover:bg-[#6a1894] transition shadow-md">
+            <Download className="w-4 h-4" />
+            Export Report
+          </button>
+        </div>
 
-        {/* ====================================================
-                PAGE TITLE
-        ===================================================== */}
-        <h1 className="text-3xl font-bold text-purple-900 mb-10">
-          Earnings
-        </h1>
-
-        {/* ====================================================
-                SECTION — WALLET OVERVIEW
-        ===================================================== */}
-        <div className={block}>
-          <SectionHeader title="Wallet Overview" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-
-            {/* Total Wallet */}
-            <div className="p-6 rounded-xl border border-gray-200 bg-white  text-purple-900   shadow-sm">
-              <p className="text-gray-600 text-sm">Total Balance</p>
-              <h2 className="text-3xl font-bold mt-2">
-                ₱{wallet.total.toLocaleString()}
-              </h2>
+        {/* Wallet Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          {/* Total Balance */}
+          <div className={block}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Wallet className="w-8 h-8 text-[#7A1CA9]" />
+              </div>
+              <span className="text-sm ml-3 font-medium text-[#7A1CA9]">
+                Total
+              </span>
             </div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              ₱{wallet.total.toLocaleString()}
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">Total Balance</p>
+          </div>
 
-            {/* Pending */}
-            <div className="p-6 rounded-xl border border-gray-200 bg-white  text-purple-900   shadow-sm">
-              <p className="text-gray-600 text-sm">Pending Earnings</p>
-              <h2 className="text-3xl font-bold mt-2 text-orange-500">
-                ₱{wallet.pending.toLocaleString()}
-              </h2>
-            </div>
-
-            {/* Available */}
-            <div className="p-6 rounded-xl border border-gray-200 bg-white  text-purple-900   shadow-sm">
-              <p className="text-gray-600 text-sm">Available to Withdraw</p>
-              <h2 className="text-3xl font-bold mt-2 text-green-600">
-                ₱{wallet.available.toLocaleString()}
-              </h2>
-            </div>
-
-            {/* Withdraw Button */}
-            <div className="flex items-center lg:justify-end">
+          {/* Available */}
+          <div className={block}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <PiggyBank className="w-8 h-8 text-green-600" />
+              </div>
               <button
                 onClick={() => setShowWithdrawModal(true)}
-                className="px-6 py-3 rounded-full text-white font-semibold transition shadow-md hover:opacity-90"
-                style={{
-                  background: "linear-gradient(90deg, #7A1CA9, #B27CFF)",
-                }}
+                className="text-sm  text-green-600 font-medium hover:underline"
               >
-                Withdraw Funds
+                Withdraw
               </button>
             </div>
-          </div>
-
-          {/* Payout Method */}
-          <p className="mt-6 text-sm text-gray-500">
-            Payout Method:{" "}
-            <span className="font-medium text-gray-700">
-              {wallet.payoutMethod}
-            </span>
-          </p>
-        </div>
-
-        {/* ====================================================
-                SECTION — EARNINGS OVERVIEW
-        ===================================================== */}
-        <div className={`${block} mt-12`}>
-          <SectionHeader title="Earnings Overview" />
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-
-            {/* This Month */}
-            <div className="p-6 rounded-xl bg-white  text-purple-900   border border-gray-200 shadow-sm">
-              <p className="text-gray-600 text-sm">This Month</p>
-              <h1 className="text-3xl font-bold mt-2">
-                ₱{summary.monthEarnings.toLocaleString()}
-              </h1>
-              <p
-                className={`mt-1 text-sm ${
-                  growth >= 0 ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {growth >= 0 ? "+" : ""}
-                {growth.toFixed(1)}% since last month
-              </p>
-            </div>
-
-            {/* Lifetime */}
-            <div className="p-6 rounded-xl bg-white  text-purple-900   border border-gray-200 shadow-sm">
-              <p className="text-gray-600 text-sm">Lifetime Earnings</p>
-              <h1 className="text-3xl font-bold mt-2">
-                ₱{summary.totalEarnings.toLocaleString()}
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">Total revenue earned</p>
-            </div>
-
-            {/* Growth */}
-            <div className="p-6 rounded-xl bg-white  text-purple-900   border border-gray-200 shadow-sm">
-              <p className="text-gray-600 text-sm">Monthly Growth</p>
-              <h1
-                className={`text-3xl font-bold mt-2 ${
-                  growth >= 0 ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {growth.toFixed(1)}%
-              </h1>
-              <p className="mt-1 text-sm text-gray-500">Compared month-to-month</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ====================================================
-                SECTION — ANALYTICS
-        ===================================================== */}
-        <div className={`${block} mt-12`}>
-          <SectionHeader title="Analytics" />
-
-          {/* Line + Pie charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-            {/* Line Chart */}
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-3">
-                Monthly Earnings Trend
-              </h2>
-
-              <div className="w-full h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <collectionesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-
-                    {/* Gradient & red dip markers */}
-                    <defs>
-                      <linearGradient id="lineColor" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#7A1CA9" stopOpacity="1" />
-                        <stop offset="100%" stopColor="#B27CFF" stopOpacity="0.4" />
-                      </linearGradient>
-                    </defs>
-
-                    <Line
-                      type="monotone"
-                      dataKey="amount"
-                      stroke="url(#lineColor)"
-                      strokeWidth={4}
-                      dot={(props) => {
-                        const prev =
-                          props.index > 0 ? chartData[props.index - 1] : null;
-                        const isDip =
-                          prev && props.payload.amount < prev.amount;
-
-                        return (
-                          <circle
-                            cx={props.cx}
-                            cy={props.cy}
-                            r={7}
-                            fill={isDip ? "#EF4444" : "#22C55E"}
-                            stroke="#fff"
-                            strokeWidth={2}
-                          />
-                        );
-                      }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Pie Chart + Custom Legend */}
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-3">
-                Category Breakdown
-              </h2>
-
-              <div className="w-full h-72 flex">
-                {/* Donut */}
-                <ResponsiveContainer width="60%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categories}
-                      dataKey="percent"
-                      outerRadius={100}
-                      innerRadius={60}
-                    >
-                      {categories.map((c, i) => (
-                        <Cell key={i} fill={donutColors[i]} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-
-                {/* Legend */}
-                <div className="ml-6 space-y-3 flex flex-col justify-center">
-                  {categories.map((c, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <span
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: donutColors[i] }}
-                      ></span>
-                      <p className="text-gray-700 text-sm font-medium">
-                        {c.name} — {c.percent}%
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Weekly Activity */}
-          <div className="mt-10">
-            <h2 className="text-lg font-semibold text-gray-700 mb-3">
-              Weekly Activity
+            <h2 className="text-2xl font-bold text-green-600">
+              ₱{wallet.available.toLocaleString()}
             </h2>
+            <p className="text-xs text-gray-500 mt-1">Available to Withdraw</p>
+          </div>
 
-            <div className="w-full h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyActivity}>
-                  <collectionesianGrid strokeDasharray="3 3" opacity={0.2} />
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="views" fill="#A78BFA" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="messages" fill="#C4B5FD" radius={[8, 8, 0, 0]} />
-                  <Bar dataKey="bookings" fill="#DDD6FE" radius={[8, 8, 0, 0]} />
-                </BarChart>
+          {/* Pending */}
+          <div className={block}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <CalendarRange className="w-8 h-8 text-orange-600" />
+              </div>
+              <span className="text-sm font-medium text-orange-600">
+                Processing
+              </span>
+            </div>
+            <h2 className="text-2xl font-bold text-orange-600">
+              ₱{wallet.pending.toLocaleString()}
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">Pending Earnings</p>
+          </div>
+
+          {/* This Month */}
+          <div className={block}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <TrendingUp className="w-8 h-8 text-blue-600" />
+              </div>
+              {growth >= 0 ? (
+                <ArrowUpRight className="w-5 h-5 text-green-600" />
+              ) : (
+                <ArrowDownRight className="w-5 h-5 text-red-600" />
+              )}
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              ₱{summary.monthEarnings.toLocaleString()}
+            </h2>
+            <p
+              className={`text-xs mt-1 font-medium ${
+                growth >= 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {growth >= 0 ? "+" : ""}
+              {growth.toFixed(1)}% from last month
+            </p>
+          </div>
+        </div>
+
+        {/* Payout Info Banner */}
+        <div className="bg-purple-50 border border-purple-100 rounded-xl p-4 mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CreditCard className="w-5 h-5 text-[#7A1CA9]" />
+            <div>
+              <p className="text-sm font-medium text-gray-800">
+                Next payout on {wallet.nextPayout}
+              </p>
+              <p className="text-xs text-gray-600">{wallet.payoutMethod}</p>
+            </div>
+          </div>
+          <button className="text-sm text-[#7A1CA9] font-medium hover:underline">
+            Update Method
+          </button>
+        </div>
+
+        {/* Earnings Trend Chart */}
+        <div className={`${block} mb-6`}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Monthly Earnings Trend
+            </h2>
+            <div className="flex gap-2">
+              {["3M", "6M", "12M"].map((tf) => (
+                <button
+                  key={tf}
+                  onClick={() => setTimeframe(tf)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                    timeframe === tf
+                      ? "bg-[#7A1CA9] text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {tf}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="w-full h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <defs>
+                  <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#7A1CA9" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#7A1CA9" stopOpacity={0.1} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis
+                  dataKey="month"
+                  stroke="#9CA3AF"
+                  style={{ fontSize: "12px" }}
+                />
+                <YAxis stroke="#9CA3AF" style={{ fontSize: "12px" }} />
+                <Tooltip content={<EarningsTooltip />} />
+                <Line
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#7A1CA9"
+                  strokeWidth={3}
+                  fill="url(#lineGradient)"
+                  dot={{ fill: "#7A1CA9", r: 5 }}
+                  activeDot={{ r: 7, fill: "#A855F7" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+          <div className={block}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 bg-purple-100 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-[#7A1CA9]" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                Lifetime Earnings
+              </span>
+            </div>
+            <h3 className="text-3xl font-bold text-gray-800">
+              ₱{summary.totalEarnings.toLocaleString()}
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              From {summary.completedBookings} completed bookings
+            </p>
+          </div>
+
+          <div className={block}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 bg-green-100 rounded-lg">
+                <PiggyBank className="w-5 h-5 text-green-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                Avg Booking Value
+              </span>
+            </div>
+            <h3 className="text-3xl font-bold text-gray-800">
+              ₱{summary.avgBookingValue.toLocaleString()}
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">Per rental transaction</p>
+          </div>
+
+          <div className={block}>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 bg-blue-100 rounded-lg">
+                <ArrowUpRight className="w-5 h-5 text-blue-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                Monthly Growth
+              </span>
+            </div>
+            <h3
+              className={`text-3xl font-bold ${
+                growth >= 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {growth >= 0 ? "+" : ""}
+              {growth.toFixed(1)}%
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Compared to previous month
+            </p>
+          </div>
+        </div>
+
+        {/* Category Breakdown & Weekly Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Category Pie Chart */}
+          <div className={block}>
+            <h2 className="text-lg font-semibold text-gray-800 mb-6">
+              Revenue by Category
+            </h2>
+            <div className="flex items-center justify-center">
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={categories}
+                    dataKey="percent"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={90}
+                    innerRadius={50}
+                    paddingAngle={3}
+                    label={({ name, percent }) => `${name} ${percent}%`}
+                    labelLine={{ stroke: "#7A1CA9", strokeWidth: 1 }}
+                  >
+                    {categories.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={donutColors[index]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={({ payload }) => {
+                      if (!payload || !payload[0]) return null;
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-200 px-3 py-2 text-xs">
+                          <p className="font-semibold text-gray-800">
+                            {data.name}
+                          </p>
+                          <p className="text-[#7A1CA9] font-bold">
+                            ₱{data.value.toLocaleString()}
+                          </p>
+                          <p className="text-gray-600">{data.percent}%</p>
+                        </div>
+                      );
+                    }}
+                  />
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
-        </div>
 
-        {/* ====================================================
-                SECTION — ITEM PERFORMANCE
-        ===================================================== */}
-        <div className={`${block} mt-12`}>
-          <SectionHeader title="Item Performance" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-            {/* Top Items */}
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-3">
-                Top Performing Items
-              </h2>
-
-              <div className="space-y-4">
-                {topItems.map((t, i) => {
-                  const img = imageMap[t.item];
-
-                  return (
-                    <div
-                      key={i}
-                      className="p-4 border border-gray-200 rounded-xl bg-white  text-purple-900   shadow-sm flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-xl bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 border border-gray-200 flex items-center justify-center">
-                          {img ? (
-                            <img
-                              src={img}
-                              alt={t.item}
-                              className="w-14 h-14 object-contain"
-                            />
-                          ) : (
-                            fallbackIcon()
-                          )}
-                        </div>
-
-                        <p className="text-purple-900 font-medium">{t.item}</p>
-                      </div>
-
-                      <p className="text-xl font-bold text-green-600">
-                        ₱{t.amount.toLocaleString()}
-                      </p>
-                    </div>
-                  );
-                })}
+          {/* Weekly Activity Bar Chart */}
+          <div className={block}>
+            <h2 className="text-lg font-semibold text-gray-800 mb-6">
+              Weekly Activity
+            </h2>
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={weeklyActivity}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis
+                  dataKey="day"
+                  stroke="#9CA3AF"
+                  style={{ fontSize: "12px" }}
+                />
+                <YAxis stroke="#9CA3AF" style={{ fontSize: "12px" }} />
+                <Tooltip content={<ActivityTooltip />} />
+                <Bar dataKey="views" fill="#7A1CA9" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="messages" fill="#A855F7" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="bookings" fill="#10B981" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="flex items-center justify-center gap-6 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#7A1CA9]"></div>
+                <span className="text-xs text-gray-600">Views</span>
               </div>
-            </div>
-
-            {/* Low Items */}
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-3">
-                Low Performing Items
-              </h2>
-
-              <div className="space-y-4">
-                {lowItems.map((t, i) => {
-                  const img = imageMap[t.item];
-
-                  return (
-                    <div
-                      key={i}
-                      className="p-4 border border-gray-200 rounded-xl bg-white  text-purple-900   shadow-sm flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-xl bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 border border-gray-200 flex items-center justify-center">
-                          {img ? (
-                            <img
-                              src={img}
-                              alt={t.item}
-                              className="w-14 h-14 object-contain"
-                            />
-                          ) : (
-                            fallbackIcon()
-                          )}
-                        </div>
-
-                        <p className="text-purple-900 font-medium">{t.item}</p>
-                      </div>
-
-                      <p className="text-xl font-bold text-red-600">
-                        ₱{t.amount.toLocaleString()}
-                      </p>
-                    </div>
-                  );
-                })}
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#A855F7]"></div>
+                <span className="text-xs text-gray-600">Messages</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#10B981]"></div>
+                <span className="text-xs text-gray-600">Bookings</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* ====================================================
-                SECTION — RECENT EARNINGS
-        ===================================================== */}
-        <div className={`${block} mt-12`}>
-          <SectionHeader title="Recent Earnings" />
+        {/* Item Performance */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Top Performers */}
+          <div className={block}>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Top Performing Items
+            </h2>
+            <div className="space-y-3">
+              {topItems.map((item, i) => {
+                const img = imageMap[item.item];
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-purple-50 transition"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+                        {img ? (
+                          <img
+                            src={img}
+                            alt={item.item}
+                            className="w-10 h-10 object-contain"
+                          />
+                        ) : (
+                          fallbackIcon()
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">
+                          {item.item}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {item.bookings} bookings
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-bold text-green-600">
+                      ₱{item.amount.toLocaleString()}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="text-gray-600 text-sm">
-                <th className="pb-3">Item</th>
-                <th className="pb-3">Net Earnings</th>
-                <th className="pb-3">Date</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {recent.map((e) => (
-                <tr
-                  key={e.id}
-                  className="border-b border-gray-200/70 hover:bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 transition"
-                >
-                  <td className="py-3 font-medium">{e.item}</td>
-                  <td className="py-3">₱{e.net.toLocaleString()}</td>
-                  <td className="py-3">{e.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Low Performers */}
+          <div className={block}>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Needs Attention
+            </h2>
+            <div className="space-y-3">
+              {lowItems.map((item, i) => {
+                const img = imageMap[item.item];
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-orange-50 transition"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+                        {img ? (
+                          <img
+                            src={img}
+                            alt={item.item}
+                            className="w-10 h-10 object-contain"
+                          />
+                        ) : (
+                          fallbackIcon()
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">
+                          {item.item}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {item.bookings} bookings
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-bold text-orange-600">
+                      ₱{item.amount.toLocaleString()}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
+        {/* Recent Earnings Table */}
+        <div className={block}>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Recent Earnings
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="border-b border-gray-200">
+                <tr className="text-left">
+                  <th className="pb-3 text-xs font-semibold text-gray-500 uppercase">
+                    Item
+                  </th>
+                  <th className="pb-3 text-xs font-semibold text-gray-500 uppercase">
+                    Date
+                  </th>
+                  <th className="pb-3 text-xs font-semibold text-gray-500 uppercase">
+                    Status
+                  </th>
+                  <th className="pb-3 text-xs font-semibold text-gray-500 uppercase text-right">
+                    Net Earnings
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {recent.map((txn) => (
+                  <tr key={txn.id} className="hover:bg-gray-50 transition">
+                    <td className="py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
+                          {imageMap[txn.item] ? (
+                            <img
+                              src={imageMap[txn.item]}
+                              alt={txn.item}
+                              className="w-8 h-8 object-contain"
+                            />
+                          ) : (
+                            <Wallet className="w-5 h-5 text-gray-400" />
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-gray-800">
+                          {txn.item}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3 text-sm text-gray-600">{txn.date}</td>
+                    <td className="py-3">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+                        {txn.status}
+                      </span>
+                    </td>
+                    <td className="py-3 text-right">
+                      <span className="text-sm font-semibold text-gray-800">
+                        ₱{txn.net.toLocaleString()}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-
-      {/* ====================================================
-                WITHDRAW MODAL
-      ===================================================== */}
+      {/* Withdraw Modal */}
       {showWithdrawModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-modalSlideIn">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-green-100 rounded-full">
+                <PiggyBank className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Withdraw Funds
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Transfer to your account
+                </p>
+              </div>
+            </div>
 
-          <div
-            className="bg-white  text-purple-900   rounded-2xl p-8 w-[400px] shadow-xl border border-gray-200 transition-all"
-            style={{
-              transform: "scale(1)",
-              animation: "fadeScale 0.2s ease-out",
-            }}
-          >
-            <h2 className="text-xl font-semibold text-purple-900 mb-4">
-              Withdraw Funds
-            </h2>
-
-            <p className="text-sm text-gray-600 mb-4">
-              Available balance:{" "}
-              <span className="font-semibold text-green-600">
+            <div className="bg-gray-50 p-4 rounded-xl mb-4">
+              <p className="text-sm text-gray-600 mb-1">Available Balance</p>
+              <p className="text-2xl font-bold text-green-600">
                 ₱{wallet.available.toLocaleString()}
-              </span>
-            </p>
+              </p>
+              <p className="text-xs text-gray-500 mt-2">
+                Payout to: {wallet.payoutMethod}
+              </p>
+            </div>
 
-            <input
-              type="number"
-              value={withdrawAmount}
-              onChange={(e) => setWithdrawAmount(e.target.value)}
-              className="w-full p-3 border rounded-xl bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 outline-none focus:ring-2 focus:ring-purple-400"
-              placeholder="Enter amount"
-            />
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Withdrawal Amount
+              </label>
+              <input
+                type="number"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                placeholder="Enter amount"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#7A1CA9] focus:border-transparent"
+              />
+            </div>
 
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex gap-3">
               <button
-                className="px-5 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition"
-                onClick={() => setShowWithdrawModal(false)}
+                onClick={() => {
+                  setShowWithdrawModal(false);
+                  setWithdrawAmount("");
+                }}
+                className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition"
               >
                 Cancel
               </button>
-
               <button
                 onClick={handleWithdraw}
-                className="px-6 py-2 rounded-lg text-white font-semibold shadow-md transition hover:opacity-90"
-                style={{
-                  background: "linear-gradient(90deg, #7A1CA9, #B27CFF)",
-                }}
+                className="flex-1 py-2.5 bg-[#7A1CA9] text-white rounded-xl font-medium hover:bg-[#6a1894] transition"
               >
                 Confirm Withdrawal
               </button>
@@ -582,20 +770,22 @@ export default function OwnerEarnings() {
         </div>
       )}
 
-      {/* Modal animation keyframes */}
+      {/* Modal Animation */}
       <style>{`
-        @keyframes fadeScale {
+        @keyframes modalSlideIn {
           from {
             opacity: 0;
-            transform: scale(0.95);
+            transform: translateY(20px) scale(0.98);
           }
           to {
             opacity: 1;
-            transform: scale(1);
+            transform: translateY(0) scale(1);
           }
         }
+        .animate-modalSlideIn {
+          animation: modalSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
       `}</style>
-
     </div>
   );
 }

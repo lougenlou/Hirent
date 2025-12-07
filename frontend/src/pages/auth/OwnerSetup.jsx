@@ -5,11 +5,15 @@ import bg from "../../assets/auth-owner-bg.jpg";
 import Footer from "../../components/layouts/Footer";
 import Stepper from "../../components/Stepper";
 import { useNavigate } from "react-router-dom";
-import { regions, provinces, cities, barangays } from "select-philippines-address";
+import {
+  regions,
+  provinces,
+  cities,
+  barangays,
+} from "select-philippines-address";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
 const OwnerSetup = () => {
-
   const [agree, setAgree] = useState(false);
   const [contactFocused, setContactFocused] = useState(false);
   const [step, setStep] = useState(1);
@@ -64,7 +68,6 @@ const OwnerSetup = () => {
     setIsSaved(true);
   };
 
-
   const handleNext = () => {
     const form = document.getElementById("ownerForm");
 
@@ -74,10 +77,9 @@ const OwnerSetup = () => {
     setStep(2);
   };
 
-
-
   const updateAutoAddress = (updatedForm) => {
-    const { barangay, cityName, provinceName, regionName, postalCode } = updatedForm;
+    const { barangay, cityName, provinceName, regionName, postalCode } =
+      updatedForm;
 
     // must require only city, province, region
     if (cityName && provinceName && regionName) {
@@ -98,8 +100,6 @@ const OwnerSetup = () => {
       }));
     }
   };
-
-
 
   const handleRegionChange = async (e) => {
     const selected = regionList.find((r) => r.region_code === e.target.value);
@@ -123,10 +123,11 @@ const OwnerSetup = () => {
     updateAutoAddress(updated);
   };
 
-
   // Province change
   const handleProvinceChange = async (e) => {
-    const selected = provinceList.find((p) => p.province_code === e.target.value);
+    const selected = provinceList.find(
+      (p) => p.province_code === e.target.value
+    );
 
     const updated = {
       ...formData,
@@ -143,7 +144,6 @@ const OwnerSetup = () => {
 
     updateAutoAddress(updated);
   };
-
 
   // City change
   const handleCityChange = async (e) => {
@@ -162,7 +162,6 @@ const OwnerSetup = () => {
     updateAutoAddress(updated);
   };
 
-
   // Barangay change
   const handleBarangayChange = (e) => {
     const updated = { ...formData, barangay: e.target.value };
@@ -170,7 +169,6 @@ const OwnerSetup = () => {
 
     updateAutoAddress(updated);
   };
-
 
   // Generic Input Handler
   const handleChange = (e) => {
@@ -180,7 +178,6 @@ const OwnerSetup = () => {
       updateAutoAddress(updated);
     }
   };
-
 
   const isStep1Valid = () => {
     return (
@@ -195,8 +192,6 @@ const OwnerSetup = () => {
       // postal optional
     );
   };
-
-
 
   // --------------------------------------------------
   // PAGE CONTENT SWITCHER
@@ -217,18 +212,13 @@ const OwnerSetup = () => {
           </p>
 
           <div className="flex flex-col items-center gap-2">
-
-
             <button
               className="w-80 bg-[#7A1CA9] text-white rounded-md py-2 hover:bg-purple-600 transition text-[15px] font-medium"
               onClick={() => navigate("/owner/add-item")}
             >
               List Your Item
             </button>
-
-
           </div>
-
         </div>
       );
     }
@@ -237,18 +227,16 @@ const OwnerSetup = () => {
     if (step === 2) {
       return (
         <div className="flex flex-col h-full">
-
           {/* Scrollable Terms Section */}
           <div className="p-10 overflow-y-auto max-h-[400px]">
-
             <h1 className="text-[18px] font-bold  text-gray-900  mb-4">
               Terms & Conditions
             </h1>
 
             <p className="text-gray-700 mb-4 text-[14px] leading-relaxed">
-              Welcome to Hirent! Before becoming a rental item owner, please review
-              the following Terms & Conditions. By agreeing below, you confirm that
-              you understand and accept these policies.
+              Welcome to Hirent! Before becoming a rental item owner, please
+              review the following Terms & Conditions. By agreeing below, you
+              confirm that you understand and accept these policies.
             </p>
 
             {/* Section 1 */}
@@ -256,8 +244,9 @@ const OwnerSetup = () => {
               1. Item Responsibility
             </h2>
             <p className="text-gray-700 text-[14px] mb-3">
-              You are responsible for ensuring each item is in good condition before
-              and after rental. Undisclosed damage or defects may result in penalties.
+              You are responsible for ensuring each item is in good condition
+              before and after rental. Undisclosed damage or defects may result
+              in penalties.
             </p>
 
             {/* Section 2 */}
@@ -265,8 +254,8 @@ const OwnerSetup = () => {
               2. Accurate Listings
             </h2>
             <p className="text-gray-700 text-[14px] mb-3">
-              All listing details must be accurate, including condition, pricing,
-              availability, and pickup instructions.
+              All listing details must be accurate, including condition,
+              pricing, availability, and pickup instructions.
             </p>
 
             {/* Section 3 */}
@@ -274,8 +263,8 @@ const OwnerSetup = () => {
               3. Security Deposits
             </h2>
             <p className="text-gray-700 text-[14px] mb-3">
-              Owners may require security deposits. Deposit rules must be clearly
-              stated and returned unless damage is proven.
+              Owners may require security deposits. Deposit rules must be
+              clearly stated and returned unless damage is proven.
             </p>
 
             {/* Section 4 */}
@@ -283,7 +272,8 @@ const OwnerSetup = () => {
               4. Damage Disputes
             </h2>
             <p className="text-gray-700 text-[14px] mb-3">
-              Hirent may review photos, pickup notes, and chat logs to resolve disputes.
+              Hirent may review photos, pickup notes, and chat logs to resolve
+              disputes.
             </p>
 
             {/* Section 5 */}
@@ -291,8 +281,8 @@ const OwnerSetup = () => {
               5. Platform Compliance
             </h2>
             <p className="text-gray-700 text-[14px] mb-8">
-              Owners must follow all platform policies. Listings violating rules may
-              be removed without notice.
+              Owners must follow all platform policies. Listings violating rules
+              may be removed without notice.
             </p>
 
             {/* Checkbox */}
@@ -311,13 +301,10 @@ const OwnerSetup = () => {
                 I have read and agree to the Terms & Conditions.
               </label>
             </div>
-
           </div>
 
           {/* Sticky Actions */}
-          <div className="mt-auto px-10 py-6 bg-white  text-purple-900   flex justify-end gap-3">
-
-
+          <div className="mt-auto px-10 py-6 bg-white  flex justify-end gap-3">
             <button
               onClick={() => setStep(1)}
               className="border border-gray-400 text-gray-700 rounded-md px-8 py-2 text-[14px]"
@@ -328,20 +315,18 @@ const OwnerSetup = () => {
             <button
               disabled={!agree}
               onClick={() => setStep(3)}
-              className={`px-8 py-2 rounded-md text-[14px] transition ${agree
-                ? "bg-[#7A1CA9] text-white hover:bg-purple-600"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+              className={`px-8 py-2 rounded-md text-[14px] transition ${
+                agree
+                  ? "bg-[#7A1CA9] text-white hover:bg-purple-600"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
             >
               Continue
             </button>
-
           </div>
-
         </div>
       );
     }
-
 
     // ------------------- SETUP PAGE -------------------
     return (
@@ -350,8 +335,6 @@ const OwnerSetup = () => {
         className="space-y-3 max-w-[700px] mx-auto"
         onSubmit={handleNext}
       >
-
-
         {/* Seller Type */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -386,7 +369,6 @@ const OwnerSetup = () => {
 
         {/* Name + Contact Number in one line */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -431,12 +413,14 @@ const OwnerSetup = () => {
                   setFormData({ ...formData, contact: val });
                 }}
                 placeholder="9XXXXXXXXX"
-                className={`w-full bg-gray-100 rounded-md py-2 text-[14px] focus:outline-none focus:ring-2 focus:ring-[#7A1CA9] ${contactFocused || formData.contact.length > 0 ? "pl-14" : "pl-3"
-                  }`}
+                className={`w-full bg-gray-100 rounded-md py-2 text-[14px] focus:outline-none focus:ring-2 focus:ring-[#7A1CA9] ${
+                  contactFocused || formData.contact.length > 0
+                    ? "pl-14"
+                    : "pl-3"
+                }`}
               />
             </div>
           </div>
-
         </div>
 
         {/* Owner Address (Completely Separate) */}
@@ -455,8 +439,9 @@ const OwnerSetup = () => {
               <select
                 value={formData.region}
                 onChange={handleRegionChange}
-                className={`w-full bg-gray-100 rounded-md px-2 py-2 text-[14px] focus:outline-[#7A1CA9] ${formData.region === "" ? "text-gray-400" : "text-black"
-                  }`}
+                className={`w-full bg-gray-100 rounded-md px-2 py-2 text-[14px] focus:outline-[#7A1CA9] ${
+                  formData.region === "" ? "text-gray-400" : "text-black"
+                }`}
               >
                 <option value="" disabled hidden>
                   Select Region
@@ -477,8 +462,9 @@ const OwnerSetup = () => {
               <select
                 value={formData.province}
                 onChange={handleProvinceChange}
-                className={`w-full bg-gray-100 rounded-md px-2 py-2 text-[14px] focus:outline-[#7A1CA9] ${formData.province === "" ? "text-gray-400" : "text-black"
-                  }`}
+                className={`w-full bg-gray-100 rounded-md px-2 py-2 text-[14px] focus:outline-[#7A1CA9] ${
+                  formData.province === "" ? "text-gray-400" : "text-black"
+                }`}
               >
                 <option value="" disabled hidden>
                   Select Province
@@ -499,8 +485,9 @@ const OwnerSetup = () => {
               <select
                 value={formData.city}
                 onChange={handleCityChange}
-                className={`w-full bg-gray-100 rounded-md px-2 py-2 text-[14px] focus:outline-[#7A1CA9] ${formData.city === "" ? "text-gray-400" : "text-black"
-                  }`}
+                className={`w-full bg-gray-100 rounded-md px-2 py-2 text-[14px] focus:outline-[#7A1CA9] ${
+                  formData.city === "" ? "text-gray-400" : "text-black"
+                }`}
               >
                 <option value="" disabled hidden>
                   Select City
@@ -519,8 +506,9 @@ const OwnerSetup = () => {
               <select
                 value={formData.barangay}
                 onChange={handleBarangayChange}
-                className={`w-full bg-gray-100 rounded-md px-2 py-2 text-[14px] leading-normal focus:outline-[#7A1CA9] ${formData.barangay === "" ? "text-gray-400" : "text-black"
-                  }`}
+                className={`w-full bg-gray-100 rounded-md px-2 py-2 text-[14px] leading-normal focus:outline-[#7A1CA9] ${
+                  formData.barangay === "" ? "text-gray-400" : "text-black"
+                }`}
               >
                 <option value="" disabled hidden>
                   Select Brgy.
@@ -563,7 +551,9 @@ const OwnerSetup = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Pickup Address <span className="text-red-500">*</span>
           </label>
-          <p className="text-gray-500 text-[12px] mb-1 -mt-1">You can change this later.</p>
+          <p className="text-gray-500 text-[12px] mb-1 -mt-1">
+            You can change this later.
+          </p>
           <input
             name="pickupAddress"
             required
@@ -575,17 +565,16 @@ const OwnerSetup = () => {
           />
         </div>
 
-
         {/* Save & Next Buttons */}
         <div className="flex justify-end gap-2 pt-3">
-
           <button
             type="button"
             onClick={handleSave}
-            className={`border rounded-md px-6 py-2 text-[14px] transition ${isSaved
-              ? "bg-green-100 border-green-500 text-green-600"
-              : "border border-gray-400 text-gray-700 hover:bg-gray-100"
-              }`}
+            className={`border rounded-md px-6 py-2 text-[14px] transition ${
+              isSaved
+                ? "bg-green-100 border-green-500 text-green-600"
+                : "border border-gray-400 text-gray-700 hover:bg-gray-100"
+            }`}
           >
             {isSaved ? (
               <span className="flex items-center gap-2">
@@ -596,23 +585,19 @@ const OwnerSetup = () => {
             )}
           </button>
 
-
           <button
             type="button"
             onClick={handleNext}
-            className={`rounded-md px-10 py-2 text-[14px] transition ${isStep1Valid()
-              ? "bg-[#7A1CA9] text-white hover:bg-purple-600"
-              : "bg-[#7A1CA9] text-white hover:bg-purple-600"
-              }`}
+            className={`rounded-md px-10 py-2 text-[14px] transition ${
+              isStep1Valid()
+                ? "bg-[#7A1CA9] text-white hover:bg-purple-600"
+                : "bg-[#7A1CA9] text-white hover:bg-purple-600"
+            }`}
           >
             Next
           </button>
-
-
         </div>
-
       </form>
-
     );
   };
 
@@ -633,16 +618,13 @@ const OwnerSetup = () => {
           <img src={logo} alt="Hirent Logo" className="w-8 h-auto" />
         </div>
 
-        <div className=" relative z-10 bg-white  text-purple-900   w-100 md:w-[600px] lg:w-[800px] min-h-[500px] rounded-lg shadow-lg p-15 flex flex-col">
-
+        <div className=" relative z-10 bg-white  w-100 md:w-[600px] lg:w-[800px] min-h-[500px] rounded-lg shadow-lg p-15 flex flex-col">
           <div
             className={`w-full flex flex-col items-center justify-center 
     ${step === 2 ? "mb-0" : "mb-8"}`}
           >
             <Stepper currentStep={step} />
           </div>
-
-
 
           {renderContent()}
         </div>

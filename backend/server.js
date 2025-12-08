@@ -44,6 +44,7 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/earnings', require('./routes/earnings'));
 app.use('/api/payouts', require('./routes/payouts'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/reviews', require('./routes/reviewRoutes'));
 
 // Simple health check
 app.get('/', (req, res) => res.send('API is running...'));

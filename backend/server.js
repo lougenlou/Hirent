@@ -2,13 +2,13 @@ const dotenv = require('dotenv');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const errorHandler = require('./backend/middleware/errorHandler');
+const errorHandler = require('./middleware/errorHandler');
 const passport = require("passport");
-require("./backend/config/passport");
+require("./config/passport");
 
 // Load environment variables
 require ("dotenv").config();
-const authRoutes = require('./backend/routes/authRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // Initialize Express app
 const app = express();
@@ -36,19 +36,19 @@ app.use(express.json());
 app.use(passport.initialize());
 
 // ====== ROUTES ======
-app.use('/api/auth', require('./backend/routes/authRoutes')); //auth Routes
-app.use('/api/users', require('./backend/routes/userRoutes')); //user Routes
-app.use('/api/items', require('./backend/routes/itemsRoutes')); //item Routes
-app.use("/api/wishlist", require("./backend/routes/wishlistRoutes")); //wishlist Routes
-app.use("/api/locations", require("./backend/routes/locationRoutes")); //location Routes
-app.use('/api/home', require('./backend/routes/homeRoutes')); //home Routes
-app.use('/api/cart', require('./backend/routes/cartRoutes')); //cart Routes
-app.use('/api/bookings', require('./backend/routes/bookingRoutes')); //booking Routes
-app.use('/api/calendar', require('./backend/routes/calendarRoutes')); //calendar Routes
-app.use('/api/notifications', require('./backend/routes/notificationRoutes')); //notification Routes
-app.use('/api/earnings', require('./backend/routes/earnings')); //earning routes
-app.use('/api/payouts', require('./backend/routes/payouts')); //payout routes
-app.use('/api/payments', require('./backend/routes/paymentRoutes')); //payment Routes
+app.use('/api/auth', require('./routes/authRoutes')); //auth Routes
+app.use('/api/users', require('./routes/userRoutes')); //user Routes
+app.use('/api/items', require('./routes/itemsRoutes')); //item Routes
+app.use("/api/wishlist", require("./routes/wishlistRoutes")); //wishlist Routes
+app.use("/api/locations", require("./routes/locationRoutes")); //location Routes
+app.use('/api/home', require('./routes/homeRoutes')); //home Routes
+app.use('/api/cart', require('./routes/cartRoutes')); //cart Routes
+app.use('/api/bookings', require('./routes/bookingRoutes')); //booking Routes
+app.use('/api/calendar', require('./routes/calendarRoutes')); //calendar Routes
+app.use('/api/notifications', require('./routes/notificationRoutes')); //notification Routes
+app.use('/api/earnings', require('./routes/earnings')); //earning routes
+app.use('/api/payouts', require('./routes/payouts')); //payout routes
+app.use('/api/payments', require('./routes/paymentRoutes')); //payment Routes
 
 
 app.get('/', (req, res) => {

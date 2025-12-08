@@ -40,6 +40,11 @@ const BookingSchema = new mongoose.Schema({
     default: 'pending' 
   },
 
+    notificationSent: { 
+    type: Boolean, 
+    default: false 
+  },
+
   paymentStatus: {
     type: String,
     enum: ['unpaid', 'paid', 'refunded'],

@@ -18,8 +18,6 @@ app.use(cors());
 app.use(express.json()); // Parse JSON request bodies
 
 // ⭐ OPTIONAL BUT HIGHLY RECOMMENDED
-// This will catch malformed JSON before your routes run,
-// and pass it to errorHandler properly.
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
     return next({
@@ -61,10 +59,11 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected ✅");
 
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch(err => console.error("MongoDB connection error:", err.message));
+// Booking routes
+app.use('/api/bookings', require('./routes/bookingRoutes'));
+
+// ⭐ GOOGLE CALENDAR SYNC ROUTES (NEW)
+app.use('/api/calendar', require('./routes/calendarRoutes'));  // ⬅️ ADD THIS
 
 // ====== ERROR HANDLING MIDDLEWARE ======
 app.use(errorHandler); // ⬅ MUST be last

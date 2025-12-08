@@ -1,54 +1,64 @@
+// server.js
+const dotenv = require('dotenv');
+dotenv.config(); // Load .env variables
+
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const cors = require('cors');
-const errorHandler = require('./middleware/errorHandler'); // ✅ Global error handler
+const passport = require('passport');
 
-// Load environment variables
-dotenv.config();
+require('./config/passport'); // Passport strategies
+const initSentry = require('./utils/sentry');
+const errorHandler = require('./middleware/errorHandler');
 
-// Initialize Express app
+// ====== EXPRESS APP ======
 const app = express();
+
+// ====== SENTRY ======
+initSentry(app); // Must be before routes
 
 // ====== MIDDLEWARE ======
 app.use(cors());
 app.use(express.json()); // Parse JSON request bodies
+app.use(passport.initialize());
 
-// ⭐ OPTIONAL BUT HIGHLY RECOMMENDED
-// This will catch malformed JSON before your routes run,
-// and pass it to errorHandler properly.
+// Optional: handle invalid JSON
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-    return next({
-      statusCode: 400,
-      message: 'Invalid JSON format',
-    });
+    return res.status(400).json({ message: 'Invalid JSON format' });
   }
   next();
 });
 
-// ====== DATABASE CONNECTION ======
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err.message));
-
 // ====== ROUTES ======
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
-
-// Auth routes (now includes validation)
-app.use('/api/auth', require('./routes/auth'));
-
-// Item search & filtering routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/items', require('./routes/itemsRoutes'));
-
-// Cart routes
+app.use('/api/wishlist', require('./routes/wishlistRoutes'));
+app.use('/api/locations', require('./routes/locationRoutes'));
+app.use('/api/home', require('./routes/homeRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
+app.use('/api/bookings', require('./routes/bookingRoutes'));
+app.use('/api/calendar', require('./routes/calendarRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/earnings', require('./routes/earnings'));
+app.use('/api/payouts', require('./routes/payouts'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
 
-// ====== ERROR HANDLING MIDDLEWARE ======
-app.use(errorHandler); // ⬅ MUST be last
+// Simple health check
+app.get('/', (req, res) => res.send('API is running...'));
 
-// ====== START SERVER ======
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ====== ERROR HANDLER ======
+app.use(errorHandler); // After all routes
+
+// ====== DATABASE & SERVER ======
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('MongoDB connected ✅');
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch(err => {
+    console.error('MongoDB connection error:', err.message);
+    process.exit(1);
+  });

@@ -1,24 +1,29 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProductDetails from './pages/ProductDetails';
+import './App.css';
 import "leaflet/dist/leaflet.css";
 
 // Public Components
-import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
+import Navbar from "./components/MainNav";
+import Footer from "./components/Footer";
 import HeroSection from "./components/home/HeroSection";
 import FeaturedCategories from "./components/home/FeaturedCategories";
 import BrowseItems from "./components/items/BrowseItems";
 import HowItWorks from "./components/home/HowItWorks";
 import WhyChoose from "./components/home/WhyChoose";
 import Testimonials from "./components/home/Testimonials";
+// Layout components
+import Navbar from './components/layout/MainNav';
+import Footer from './components/layout/Footer';
 
 // Auth Pages
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 
 // Owner Registration Pages
-import OwnerInformation from "./pages/owners/Owner_Information";
-import OwnerSubmission from "./pages/owners/Owner_Submission";
+import OwnerInformation from "./pages/auth/Owner_Information";
+import OwnerSubmission from "./pages/auth/Owner_Submission";
 
 // Owner Dashboard Pages
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
@@ -52,6 +57,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Product Details Route */}
+        <Route path="/product/:id" element={<ProductDetails />} />
+        
 
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />

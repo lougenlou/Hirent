@@ -1,5 +1,6 @@
 const axios = require("axios");
 const Payment = require("../models/Payment");
+const { sendEmail } = require('../utils/emailService');
 
 // Load secret key from environment
 const PAYMONGO_SECRET = process.env.PAYMONGO_SECRET_KEY;
@@ -59,7 +60,6 @@ exports.createPaymentIntent = async (req, res) => {
   }
 };
 
-
 // ATTACH PAYMENT METHOD
 exports.attachPaymentMethod = async (req, res) => {
   try {
@@ -89,17 +89,33 @@ exports.paymongoWebhook = async (req, res) => {
       const paymentData = event.attributes.data;
       const intentId = paymentData.attributes.payment_intent_id;
 
-      await Payment.findOneAndUpdate(
+      // Update payment and return the updated document
+      const payment = await Payment.findOneAndUpdate(
         { intentId },
         {
           status: "paid",
           paymentId: paymentData.id,
-        }
+        },
+        { new: true } // <--- returns the updated document
       );
+
+      // Send email if payment exists
+      if (payment) {
+        const user = await User.findById(payment.userId);
+        if (user) {
+          await sendEmail(
+            user.email,
+            "Payment Successful",
+            `<p>Your payment of ₱${payment.amount} for <strong>${payment.description}</strong> was successful!</p>
+             <p>Payment ID: ${payment.intentId}</p>`
+          );
+        }
+      }
     }
 
     res.sendStatus(200);
   } catch (error) {
+    console.error("PayMongo Webhook Error:", error);
     res.status(400).send("Webhook Error");
   }
 };

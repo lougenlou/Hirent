@@ -1,23 +1,27 @@
+require("./instrument.js"); // Sentry auto-instrumentation
 const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const errorHandler = require('./middleware/errorHandler');
 const passport = require("passport");
+
+const errorHandler = require('./middleware/errorHandler');
 require("./config/passport");
 
-// Load environment variables
-require ("dotenv").config();
-const authRoutes = require('./routes/authRoutes');
-
-// Initialize Express app
+// ----- INIT APP -----
 const app = express();
 
-// ====== MIDDLEWARE ======
-app.use(cors());
-app.use(express.json()); // Parse JSON request bodies
+// manual Sentry init for extra control
+const initSentry = require("./utils/sentry");
+initSentry(app);
 
-// ⭐ OPTIONAL BUT HIGHLY RECOMMENDED
+// ----- MIDDLEWARE -----
+app.use(cors());
+app.use(express.json()); // Parse JSON
+
+// Handle invalid JSON
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
     return next({
@@ -28,34 +32,26 @@ app.use((err, req, res, next) => {
   next();
 });
 
-// ====== DATABASE CONNECTION ======
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err.message));
-app.use(express.json());
 app.use(passport.initialize());
 
-// ====== ROUTES ======
-app.use('/api/auth', require('./routes/authRoutes')); //auth Routes
-app.use('/api/users', require('./routes/userRoutes')); //user Routes
-app.use('/api/items', require('./routes/itemsRoutes')); //item Routes
-app.use("/api/wishlist", require("./routes/wishlistRoutes")); //wishlist Routes
-app.use("/api/locations", require("./routes/locationRoutes")); //location Routes
-app.use('/api/home', require('./routes/homeRoutes')); //home Routes
-app.use('/api/cart', require('./routes/cartRoutes')); //cart Routes
-app.use('/api/bookings', require('./routes/bookingRoutes')); //booking Routes
-app.use('/api/calendar', require('./routes/calendarRoutes')); //calendar Routes
-app.use('/api/notifications', require('./routes/notificationRoutes')); //notification Routes
-app.use('/api/earnings', require('./routes/earnings')); //earning routes
-app.use('/api/payouts', require('./routes/payouts')); //payout routes
-app.use('/api/payments', require('./routes/paymentRoutes')); //payment Routes
+// ----- ROUTES -----
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/items', require('./routes/itemsRoutes'));
+app.use("/api/wishlist", require("./routes/wishlistRoutes"));
+app.use("/api/locations", require("./routes/locationRoutes"));
+app.use('/api/home', require('./routes/homeRoutes'));
+app.use('/api/cart', require('./routes/cartRoutes'));
+app.use('/api/bookings', require('./routes/bookingRoutes'));
+app.use('/api/calendar', require('./routes/calendarRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/earnings', require('./routes/earnings'));
+app.use('/api/payouts', require('./routes/payouts'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
 
+app.get('/', (req, res) => res.send('API is running...'));
 
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});   
-
-// ===== DATABASE & SERVER =====
+// ----- DATABASE & SERVER -----
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected ✅");
@@ -64,5 +60,9 @@ mongoose.connect(process.env.MONGO_URI)
   })
   .catch(err => console.error('MongoDB connection error:', err.message));
 
-// ===== ERROR HANDLER =====
+// ----- ERROR HANDLING -----
 app.use(errorHandler);
+
+// Sentry error handler
+const Sentry = require("@sentry/node");
+app.use(Sentry.Handlers.errorHandler());

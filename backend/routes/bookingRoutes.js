@@ -25,7 +25,7 @@ const {
 // Create booking
 router.post(
   '/',
-  auth,
+  auth.protect,
   createBookingValidator,
   createBooking
 );
@@ -33,14 +33,14 @@ router.post(
 // Get my bookings (renter)
 router.get(
   '/me',
-  auth,
+  auth.protect,
   getMyBookings
 );
 
 // Cancel booking
 router.put(
   '/:id/cancel',
-  auth,
+  auth.protect,
   cancelBookingValidator,
   cancelBooking
 );
@@ -52,14 +52,14 @@ router.put(
 // Get bookings for items I own
 router.get(
   '/owner',
-  auth,
+  auth.protect,
   getBookingsForMyItems
 );
 
 // Owner approve/reject booking
 router.put(
   '/:id/status',
-  auth,
+  auth.protect,
   updateBookingStatusValidator,
   updateBookingStatus
 );
@@ -71,7 +71,7 @@ router.put(
 // Single booking details
 router.get(
   '/:id',
-  auth,
+  auth.protect,
   getBookingById
 );
 

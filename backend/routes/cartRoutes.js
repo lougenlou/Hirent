@@ -9,15 +9,15 @@ const {
 } = require('../controllers/cartController');
 
 // /api/cart/add
-router.post('/add', auth, addToCart);
+router.post('/add', auth.protect, addToCart);
 
 // /api/cart/remove/:itemId
-router.delete('/remove/:itemId', auth, removeFromCart);
+router.delete('/remove/:itemId', auth.protect, removeFromCart);
 
 // /api/cart/update
-router.put('/update', auth, updateCartItem);
+router.put('/update', auth.protect, updateCartItem);
 
 // /api/cart
-router.get('/', auth, getCart);
+router.get('/', auth.protect, getCart);
 
 module.exports = router;

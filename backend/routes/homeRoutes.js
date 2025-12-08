@@ -3,6 +3,6 @@ const router = express.Router();
 const { getPersonalizedHome } = require('../controllers/homeController');
 const auth = require('../middleware/authMiddleware');
 
-router.get('/personalized', auth, getPersonalizedHome);
+router.get('/personalized', auth.protect, getPersonalizedHome);
 
 module.exports = router;

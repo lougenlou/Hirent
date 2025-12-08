@@ -102,6 +102,7 @@ exports.cancelBooking = async (req, res, next) => {
     }
 
     booking.status = 'cancelled';
+    booking.notificationSent = false;
     await booking.save();
 
     res.json({ message: 'Booking cancelled', booking });
@@ -154,6 +155,8 @@ exports.updateBookingStatus = async (req, res, next) => {
 
     // Update booking status
     booking.status = status;
+    //Notification flag reset
+    booking.notificationSent = false;
     await booking.save();
 
     // Availability Logic

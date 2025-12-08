@@ -44,27 +44,20 @@ app.use("/api/locations", require("./routes/locationRoutes"));
 app.use('/api/home', require('./routes/homeRoutes'));
 app.use('/api/cart', require('./routes/cartRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
+app.use('/api/calendar', require('./routes/calendarRoutes')); 
 
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Auth routes (now includes validation)
-app.use('/api/auth', require('./routes/auth'));
-// ====== ERROR HANDLING MIDDLEWARE ======
-app.use(errorHandler);
-
-// ====== DATABASE CONNECTION + START SERVER ======
+// ===== DATABASE & SERVER =====
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected ✅");
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch(err => console.error('MongoDB connection error:', err.message));
 
-// Booking routes
-app.use('/api/bookings', require('./routes/bookingRoutes'));
-
-// ⭐ GOOGLE CALENDAR SYNC ROUTES (NEW)
-app.use('/api/calendar', require('./routes/calendarRoutes'));  // ⬅️ ADD THIS
-
-// ====== ERROR HANDLING MIDDLEWARE ======
-app.use(errorHandler); // ⬅ MUST be last
-
+// ===== ERROR HANDLER =====
+app.use(errorHandler);

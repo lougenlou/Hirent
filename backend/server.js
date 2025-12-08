@@ -10,6 +10,7 @@ const passport = require('passport');
 require('./config/passport'); // Passport strategies
 const initSentry = require('./utils/sentry');
 const errorHandler = require('./middleware/errorHandler');
+const parser = require('./utils/cloudinary');
 
 // ====== EXPRESS APP ======
 const app = express();
@@ -21,6 +22,9 @@ initSentry(app); // Must be before routes
 app.use(cors());
 app.use(express.json()); // Parse JSON request bodies
 app.use(passport.initialize());
+app.post('/test-upload', parser.single('image'), (req, res) => {
+  res.json({ url: req.file.path }); // Cloudinary URL of uploaded image
+});
 
 // Optional: handle invalid JSON
 app.use((err, req, res, next) => {

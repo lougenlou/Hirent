@@ -152,8 +152,20 @@ exports.updateBookingStatus = async (req, res, next) => {
       return res.status(400).json({ message: 'Cannot update a cancelled booking' });
     }
 
+    // Update booking status
     booking.status = status;
     await booking.save();
+
+    // Availability Logic
+    const hasActiveBookings = await Booking.exists({
+    item: booking.item,
+    status: { $in: ['approved', 'pending'] }
+    });
+
+    // If ANY active booking exists → unavailable, else → available
+    await Item.findByIdAndUpdate(booking.item, {
+    available: !hasActiveBookings
+    });
 
     res.json({ message: `Booking ${status}`, booking });
   } catch (error) {

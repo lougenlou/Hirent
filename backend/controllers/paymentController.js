@@ -13,9 +13,8 @@ const api = axios.create({
   },
 });
 
-// ========================================================
+
 // Create Payment Intent
-// ========================================================
 exports.createPaymentIntent = async (req, res) => {
   try {
     const { amount, description, userId } = req.body;
@@ -54,9 +53,7 @@ exports.createPaymentIntent = async (req, res) => {
 };
 
 
-// ========================================================
 // Attach Payment Method
-// ========================================================
 exports.attachPaymentMethod = async (req, res) => {
   try {
     const { intentId, paymentMethodId } = req.body;
@@ -77,9 +74,7 @@ exports.attachPaymentMethod = async (req, res) => {
 };
 
 
-// ========================================================
 // Webhook Handler
-// ========================================================
 exports.paymongoWebhook = async (req, res) => {
   try {
     const event = req.body.data;

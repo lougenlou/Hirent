@@ -1,5 +1,5 @@
-const Booking = require('../models/Booking');
-const Item = require('../models/Item');
+const Booking = require('../models/Bookings');
+const Item = require('../models/Items');
 
 // ===============================
 // RENTER: CREATE BOOKING

@@ -1,6 +1,6 @@
 const Earning = require('../models/Earning');
 const PayoutRequest = require('../models/PayoutRequest');
-const User = require('../models/User'); // existing model
+const User = require('../models/Users'); // existing model
 
 // utility: compute user available balance on the fly
 async function computeBalance(userId) {

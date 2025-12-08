@@ -1,4 +1,4 @@
-const Booking = require('../models/Booking');
+const Booking = require('../models/Bookings');
 const nodemailer = require('nodemailer');
 
 // Example email sender setup

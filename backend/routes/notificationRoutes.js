@@ -4,9 +4,9 @@ const auth = require('../middleware/authMiddleware');
 const { getPendingNotifications, sendNotification } = require('../controllers/notificationController');
 
 // Get all bookings with pending notifications (admin)
-router.get('/pending', auth, getPendingNotifications);
+router.get('/pending', auth.protect, getPendingNotifications);
 
 // Send notification for a booking
-router.post('/:id/send', auth, sendNotification);
+router.post('/:id/send', auth.protect, sendNotification);
 
 module.exports = router;

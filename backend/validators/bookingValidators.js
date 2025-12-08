@@ -13,24 +13,16 @@ const validate = (req, res, next) => {
 // CREATE BOOKING VALIDATOR
 const createBookingValidator = [
   body('item')
-    .notEmpty()
-    .withMessage('Item ID is required')
-    .isMongoId()
-    .withMessage('Invalid Item ID'),
+    .notEmpty().withMessage('Item ID is required')
+    .isMongoId().withMessage('Invalid Item ID'),
 
   body('startDate')
-    .notEmpty()
-    .withMessage('Start date is required')
-    .isISO8601()
-    .toDate()
-    .withMessage('Start date must be a valid date'),
+    .notEmpty().withMessage('Start date is required')
+    .isISO8601().toDate().withMessage('Start date must be a valid date'),
 
   body('endDate')
-    .notEmpty()
-    .withMessage('End date is required')
-    .isISO8601()
-    .toDate()
-    .withMessage('End date must be a valid date')
+    .notEmpty().withMessage('End date is required')
+    .isISO8601().toDate().withMessage('End date must be a valid date')
     .custom((value, { req }) => {
       if (new Date(value) <= new Date(req.body.startDate)) {
         throw new Error('End date must be after start date');
@@ -45,10 +37,8 @@ const createBookingValidator = [
 // CANCEL BOOKING VALIDATOR
 const cancelBookingValidator = [
   param('id')
-    .notEmpty()
-    .withMessage('Booking ID is required')
-    .isMongoId()
-    .withMessage('Invalid Booking ID'),
+    .notEmpty().withMessage('Booking ID is required')
+    .isMongoId().withMessage('Invalid Booking ID'),
 
   validate,
 ];
@@ -57,14 +47,11 @@ const cancelBookingValidator = [
 // UPDATE BOOKING STATUS VALIDATOR
 const updateBookingStatusValidator = [
   param('id')
-    .notEmpty()
-    .withMessage('Booking ID is required')
-    .isMongoId()
-    .withMessage('Invalid Booking ID'),
+    .notEmpty().withMessage('Booking ID is required')
+    .isMongoId().withMessage('Invalid Booking ID'),
 
   body('status')
-    .notEmpty()
-    .withMessage('Status is required')
+    .notEmpty().withMessage('Status is required')
     .isIn(['pending', 'approved', 'rejected', 'cancelled'])
     .withMessage('Status must be one of: pending, approved, rejected, cancelled'),
 

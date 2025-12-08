@@ -1,9 +1,17 @@
 const axios = require("axios");
 const Payment = require("../models/Payment");
 
+// Load secret key from environment
 const PAYMONGO_SECRET = process.env.PAYMONGO_SECRET_KEY;
+
+if (!PAYMONGO_SECRET) {
+  throw new Error("PAYMONGO_SECRET_KEY is not defined in your .env file");
+}
+
+// Encode key for Basic Auth
 const authHeader = `Basic ${Buffer.from(PAYMONGO_SECRET).toString("base64")}`;
 
+// Axios instance for PayMongo API
 const api = axios.create({
   baseURL: "https://api.paymongo.com/v1",
   headers: {
@@ -14,7 +22,7 @@ const api = axios.create({
 });
 
 
-// Create Payment Intent
+// CREATE PAYMENT INTENT
 exports.createPaymentIntent = async (req, res) => {
   try {
     const { amount, description, userId } = req.body;
@@ -22,12 +30,12 @@ exports.createPaymentIntent = async (req, res) => {
     const response = await api.post("/payment_intents", {
       data: {
         attributes: {
-          amount: amount * 100, // centavos
+          amount: amount * 100, // convert to centavos
           currency: "PHP",
           description,
           payment_method_allowed: ["gcash", "card"],
-        }
-      }
+        },
+      },
     });
 
     const intent = response.data.data;
@@ -45,15 +53,14 @@ exports.createPaymentIntent = async (req, res) => {
       intentId: intent.id,
       clientKey: intent.attributes.client_key,
     });
-
   } catch (err) {
-    console.log(err?.response?.data);
+    console.log(err?.response?.data || err);
     res.status(500).json({ error: err?.response?.data || err });
   }
 };
 
 
-// Attach Payment Method
+// ATTACH PAYMENT METHOD
 exports.attachPaymentMethod = async (req, res) => {
   try {
     const { intentId, paymentMethodId } = req.body;
@@ -62,19 +69,18 @@ exports.attachPaymentMethod = async (req, res) => {
       data: {
         attributes: {
           payment_method: paymentMethodId,
-        }
-      }
+        },
+      },
     });
 
     res.json({ success: true, ...response.data });
-
   } catch (err) {
     res.status(500).json({ error: err?.response?.data || err });
   }
 };
 
 
-// Webhook Handler
+// PAYMONGO WEBHOOK
 exports.paymongoWebhook = async (req, res) => {
   try {
     const event = req.body.data;
@@ -87,7 +93,7 @@ exports.paymongoWebhook = async (req, res) => {
         { intentId },
         {
           status: "paid",
-          paymentId: paymentData.id
+          paymentId: paymentData.id,
         }
       );
     }

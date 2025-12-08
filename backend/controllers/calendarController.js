@@ -1,7 +1,7 @@
 // controllers/calendarController.js
-const Booking = require('../models/Booking');
-const Item = require('../models/Item');
-const User = require('../models/User');
+const Booking = require('../models/Bookings');
+const Item = require('../models/Items');
+const User = require('../models/Users');
 
 // Convert Booking → Calendar Event format
 function bookingToEvent(booking) {

@@ -1,6 +1,6 @@
 const PayoutRequest = require('../models/PayoutRequest');
 const Earning = require('../models/Earning');
-const User = require('../models/User');
+const User = require('../models/Users');
 
 const MIN_PAYOUT = process.env.PAYOUT_MINIMUM ? Number(process.env.PAYOUT_MINIMUM) : 10; // default 10
 

@@ -7,7 +7,7 @@ const {
   createBookingValidator,
   cancelBookingValidator,
   updateBookingStatusValidator,
-} = require('../validators/bookingValidator');
+} = require('../validators/bookingValidators');
 
 const {
   createBooking,
@@ -18,15 +18,13 @@ const {
   getBookingById,
 } = require('../controllers/bookingController');
 
-// ============================
-// RENTER ROUTES
-// ============================
 
+// RENTER ROUTES
 // Create booking
 router.post(
   '/',
   auth.protect,
-  createBookingValidator,
+  ...createBookingValidator,
   createBooking
 );
 
@@ -41,14 +39,11 @@ router.get(
 router.put(
   '/:id/cancel',
   auth.protect,
-  cancelBookingValidator,
+  ...cancelBookingValidator,
   cancelBooking
 );
 
-// ============================
 // OWNER ROUTES
-// ============================
-
 // Get bookings for items I own
 router.get(
   '/owner',
@@ -60,14 +55,12 @@ router.get(
 router.put(
   '/:id/status',
   auth.protect,
-  updateBookingStatusValidator,
+  ...updateBookingStatusValidator,
   updateBookingStatus
 );
 
-// ============================
-// GENERAL ROUTE
-// ============================
 
+// GENERAL ROUTE
 // Single booking details
 router.get(
   '/:id',

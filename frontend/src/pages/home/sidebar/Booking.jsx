@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { makeAPICall, ENDPOINTS } from "../../../config/api";
 import ApplyCoupon from "../../../components/booking/ApplyCoupon";
 import DeliveryMethod from "../../../components/booking/DeliveryMethod";
 import ItemSummary from "../../../components/booking/ItemSummary";
@@ -14,35 +15,58 @@ import { ArrowLeft, CalendarCheck } from "lucide-react";
 
 const Booking = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  // Fetch item details from backend
+  const [productData, setProductData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [rentalData, setRentalData] = useState({
     startDate: "",
     endDate: "",
-    days: 4,
+    days: 1,
   });
 
   const [couponData, setCouponData] = useState({
-    applied: true,
-    discount: 10,
+    applied: false,
+    discount: 0,
   });
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
 
-  const productData = {
-    name: "Professional DSLR Camera Kit",
-    owner: "Sarah Johnson",
-    location: "Naga City, Camarines Sur",
-    pricePerDay: 800,
-    image: "/assets/products/Canon.png",
-  };
+  // Fetch item details from backend
+  useEffect(() => {
+    const fetchItemDetails = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await makeAPICall(ENDPOINTS.ITEMS.GET_ONE(id));
+        setProductData(data);
+      } catch (err) {
+        console.error("Error fetching item details:", err);
+        setError("Failed to load item details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchItemDetails();
+    }
+  }, [id]);
 
   const calculatePricing = () => {
-    const subtotal = productData.pricePerDay * rentalData.days;
-    const discountAmount = couponData.applied
-      ? (subtotal * couponData.discount) / 100
+    if (!productData) return { subtotal: 0, discount: 0, shippingFee: 0, securityDeposit: 0, total: 0 };
+    
+    const price = productData.price || productData.pricePerDay || 0;
+    const subtotal = price * (rentalData.days || 1);
+    const discountAmount = couponData?.applied
+      ? (subtotal * (couponData?.discount || 0)) / 100
       : 0;
     const shippingFee = deliveryMethod === "delivery" ? 20 : 0;
-    const securityDeposit = 700;
+    const securityDeposit = productData.securityDeposit || 0;
     const total = subtotal - discountAmount + shippingFee + securityDeposit;
 
     return {
@@ -55,6 +79,10 @@ const Booking = () => {
   };
 
   const pricing = calculatePricing();
+
+  if (loading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  if (error) return <div className="flex items-center justify-center min-h-screen text-red-500">{error}</div>;
+  if (!productData) return <div className="flex items-center justify-center min-h-screen">Item not found</div>;
 
   return (
     <div className="flex min-h-screen px-4 pl-24 bg-[#fbfbfb] pt-10 pb-20">

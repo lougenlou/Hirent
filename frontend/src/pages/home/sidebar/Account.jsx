@@ -1,5 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
-import { User, MapPin, CreditCard, Settings, LogOut, UserCircle } from "lucide-react";
+import {
+  User,
+  MapPin,
+  CreditCard,
+  Settings,
+  LogOut,
+  UserCircle,
+} from "lucide-react";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -7,8 +14,6 @@ import PersonalInformation from "../../../components/profilepage/Personal";
 import { AddressesComponent } from "../../../components/profilepage/Addresses";
 import { PaymentMethodsComponent } from "../../../components/profilepage/PaymentMethods";
 import SettingsComponent from "../../../components/profilepage/Settings";
-
-import profPic from "../../../assets/profile/prof_pic.jpg";
 
 export default function RenterProfilePage() {
   const { logout, user, isLoggedIn, updateUser } = useContext(AuthContext);
@@ -21,12 +26,6 @@ export default function RenterProfilePage() {
     }
   }, [isLoggedIn, user, navigate]);
 
-  const handleSignOut = () => {
-    if (window.confirm("Are you sure you want to sign out?")) {
-      logout(); 
-      navigate("/login");
-    }
-  };
   const [activeItem, setActiveItem] = useState("personal");
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
@@ -39,9 +38,9 @@ export default function RenterProfilePage() {
     { id: "signout", label: "Sign Out", icon: <LogOut size={20} /> },
   ];
 
-  // Initialize form with real user data from AuthContext
+  // Initialize form from real user data (no defaults)
   const [form, setForm] = useState({
-    firstName: user?.name?.split(" ")[0] || "User",
+    firstName: user?.name?.split(" ")[0] || "",
     lastName: user?.name?.split(" ").slice(1).join(" ") || "",
     email: user?.email || "",
     phone: user?.phone || "",
@@ -51,11 +50,11 @@ export default function RenterProfilePage() {
     bio: user?.bio || "",
   });
 
-  // Update form when user data changes
+  // Update form when user changes
   useEffect(() => {
     if (user) {
       setForm({
-        firstName: user?.name?.split(" ")[0] || "User",
+        firstName: user?.name?.split(" ")[0] || "",
         lastName: user?.name?.split(" ").slice(1).join(" ") || "",
         email: user?.email || "",
         phone: user?.phone || "",
@@ -67,108 +66,98 @@ export default function RenterProfilePage() {
     }
   }, [user]);
 
-  const [paymentMethods, setPaymentMethods] = useState([
-    {
-      id: 1,
-      type: "Card",
-      cardNumber: "1234567890123456",
-      cardName: user?.name || "User",
-    },
-    {
-      id: 2,
-      type: "Online",
-      provider: "GCash",
-      accountNumber: "0995363411",
-    },
-  ]);
+  // -----------------------------
+  // REAL API DATA STATES
+  // -----------------------------
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [addresses, setAddresses] = useState([]);
 
-  const [addresses, setAddresses] = React.useState([
-    {
-      id: 1,
-      label: "Home",
-      phone: "917 123 4567",
-      details: `123 Mango Street
-Unit 4B
-Poblacion, Makati City
-Metro Manila, 1210`,
-      isDefault: true,
-    },
-    {
-      id: 2,
-      label: "Work",
-      phone: "912 345 6789",
-      details: `456 Pine Avenue
-5th Floor
-Ortigas Center, Pasig City
-Metro Manila, 1600`,
-      isDefault: false,
-    },
-  ]);
+  // -----------------------------
+  // FETCH ADDRESSES + PAYMENTS FROM API
+  // -----------------------------
+  useEffect(() => {
+    async function fetchProfileExtras() {
+      try {
+        const token = localStorage.getItem("token");
 
-  // Save profile changes
+        // Fetch Addresses
+        const addrRes = await fetch("http://localhost:5000/api/users/addresses", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (addrRes.ok) {
+          const addrData = await addrRes.json();
+          setAddresses(addrData?.addresses || []);
+        }
+
+        // Fetch Payment Methods
+        const payRes = await fetch("http://localhost:5000/api/users/payment-methods", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (payRes.ok) {
+          const payData = await payRes.json();
+          setPaymentMethods(payData?.paymentMethods || []);
+        }
+      } catch (err) {
+        console.error("Error fetching profile extras:", err);
+      }
+    }
+
+    fetchProfileExtras();
+  }, []);
+
+  // -----------------------------
+  // SIGN OUT HANDLER
+  // -----------------------------
+  const handleSignOut = () => {
+    if (window.confirm("Are you sure you want to sign out?")) {
+      logout();
+      navigate("/login");
+    }
+  };
+
+  // -----------------------------
+  // SAVE PROFILE CHANGES (KEEP ORIGINAL)
+  // -----------------------------
   async function handleSave(updatedForm) {
     setIsSaving(true);
     setSaveMessage("");
+
     try {
-      const response = await fetch("http://localhost:5000/api/auth/profile", {
+      const response = await fetch("http://localhost:5000/api/users/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           name: `${updatedForm.firstName} ${updatedForm.lastName}`,
           phone: updatedForm.phone,
           address: updatedForm.address,
-          gender: updatedForm.gender,
-          birthday: updatedForm.birthday,
-          bio: updatedForm.bio,
-        })
+          gender: updatedForm.gender
+        }),
       });
 
       const data = await response.json();
+
       if (data.success && data.user) {
-        // Update AuthContext with new user data to keep user logged in and update navbar
-        updateUser({
-          id: data.user.id,
-          name: data.user.name,
-          email: data.user.email,
-          phone: data.user.phone,
-          address: data.user.address,
-          gender: data.user.gender,
-          birthday: data.user.birthday,
-          bio: data.user.bio,
-          avatar: data.user.avatar,
-          role: data.user.role,
-          authProvider: data.user.authProvider
-        });
+        updateUser(data.user);
         setSaveMessage("Profile updated successfully!");
-        setForm(updatedForm);
         setTimeout(() => setSaveMessage(""), 3000);
       } else {
-        setSaveMessage("Error updating profile: " + data.message);
+        setSaveMessage("Error: " + data.message);
       }
     } catch (err) {
       console.error("Save error:", err);
-      setSaveMessage("Error saving profile. Please try again.");
+      setSaveMessage("Error saving profile.");
     }
+
     setIsSaving(false);
   }
 
   return (
     <div className="min-h-screen bg-gray-50 font-inter flex justify-center">
       <div className="flex flex-1 ml-5">
-        <main
-          className="
-                    w-full 
-                    max-w-[1800px] 
-                    mx-auto 
-                    pl-24 
-                    py-10 
-                    grid grid-cols-1 
-                    lg:grid-cols-[290px_minmax(0,1fr)]
-                "
-        >
+        <main className="w-full max-w-[1800px] mx-auto pl-24 py-10 grid grid-cols-1 lg:grid-cols-[290px_minmax(0,1fr)]">
           {/* LEFT SIDEBAR */}
           <aside className="hidden lg:block">
             <div className="bg-white collection-scale rounded-2xl shadow-sm overflow-hidden">
@@ -184,17 +173,12 @@ Metro Manila, 1600`,
                     <UserCircle size={80} className="text-purple-600" />
                   </div>
                 )}
-                <h3 className="text-[20px] font-semibold">
-                  {user?.name || "User"}
-                </h3>
-                <div className="text-[15px] text-gray-500 mt-0.5">
-                  {user?.email || "user@email.com"}
+
+                <h3 className="text-[20px] font-semibold">{user?.name || ""}</h3>
+                <div className="text-[15px] text-gray-500">
+                  {user?.email || ""}
                 </div>
-                {user?.role && (
-                  <div className="text-[12px] text-gray-400 mt-1 uppercase font-medium">
-                    {user.role}
-                  </div>
-                )}
+                {user?.role && ( <div className="text-[12px] text-purple-500 mt-2 uppercase font-medium"> {user.role} </div> )}
               </div>
 
               <nav className="p-4">
@@ -202,24 +186,19 @@ Metro Manila, 1600`,
                   {navItems.map((item) => (
                     <li
                       key={item.id}
-                      onClick={() => {
-                        if (item.id === "signout") {
-                          handleSignOut();
-                        } else {
-                          setActiveItem(item.id);
-                        }
-                      }}
-                      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer
-            ${
-              activeItem === item.id
-                ? "bg-purple-50 border-l-4 border-[#7A1CA9] text-[#7A1CA9]"
-                : "hover:bg-purple-100"
-            }`}
+                      onClick={() =>
+                        item.id === "signout"
+                          ? handleSignOut()
+                          : setActiveItem(item.id)
+                      }
+                      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer ${
+                        activeItem === item.id
+                          ? "bg-purple-50 border-l-4 border-[#7A1CA9] text-[#7A1CA9]"
+                          : "hover:bg-purple-100"
+                      }`}
                     >
                       {item.icon}
-                      <span className="text-[15px] font-medium">
-                        {item.label}
-                      </span>
+                      <span className="text-[15px] font-medium">{item.label}</span>
                     </li>
                   ))}
                 </ul>
@@ -227,21 +206,14 @@ Metro Manila, 1600`,
             </div>
           </aside>
 
-          {/* CENTER CONTENT */}
+          {/* MAIN CONTENT */}
           <section className="col-span-1">
             {activeItem === "personal" && (
-              <PersonalInformation
-                form={form}
-                setForm={setForm}
-                handleSave={handleSave}
-              />
+              <PersonalInformation form={form} setForm={setForm} handleSave={handleSave} />
             )}
 
             {activeItem === "addresses" && (
-              <AddressesComponent
-                addresses={addresses}
-                setAddresses={setAddresses}
-              />
+              <AddressesComponent addresses={addresses} setAddresses={setAddresses} />
             )}
 
             {activeItem === "payment" && (
@@ -252,15 +224,6 @@ Metro Manila, 1600`,
             )}
 
             {activeItem === "settings" && <SettingsComponent />}
-
-            {activeItem === "signout" && (
-              <div className="bg-white  text-purple-900   rounded-2xl shadow-lg p-8">
-                <h2 className="text-xl font-semibold">Sign Out</h2>
-                <p className="text-gray-500">
-                  Are you sure you want to sign out?
-                </p>
-              </div>
-            )}
           </section>
         </main>
       </div>

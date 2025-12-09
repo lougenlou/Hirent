@@ -1,244 +1,148 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { makeAPICall, ENDPOINTS } from "../../config/api";
 import Sidebar from "../../components/layouts/OwnerSidebar";
 import {
-  ArrowLeft,
   Plus,
   Send,
-  MessageCircle,
   Search,
   Ban,
   Flag,
   ShieldCheck,
 } from "lucide-react";
-import profPic from "../../assets/profile/prof_pic.jpg";
 import ReportModal from "../../components/modals/ReportRenterModal";
 
 const OwnerMessages = () => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showLeftScrollbar, setShowLeftScrollbar] = useState(false);
   const [showRightScrollbar, setShowRightScrollbar] = useState(false);
 
+  // Fetch owner messages from backend
   const [inboxList, setInboxList] = useState([]);
   const [messagesData, setMessagesData] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
 
   const leftRef = useRef(null);
   const rightRef = useRef(null);
-
-  const avatarPNGs = [
-    "https://randomuser.me/api/portraits/men/1.jpg",
-    "https://randomuser.me/api/portraits/women/2.jpg",
-    "https://randomuser.me/api/portraits/men/3.jpg",
-    "https://randomuser.me/api/portraits/women/4.jpg",
-    "https://randomuser.me/api/portraits/men/5.jpg",
-    "https://randomuser.me/api/portraits/women/6.jpg",
-    "https://randomuser.me/api/portraits/men/7.jpg",
-    "https://randomuser.me/api/portraits/women/8.jpg",
-    "https://randomuser.me/api/portraits/men/9.jpg",
-  ];
+  const fileInputRef = useRef(null);
 
   const [showBlockedUsers, setShowBlockedUsers] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [submittedReport, setSubmittedReport] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [allMessages, setAllMessages] = useState([]);
 
-  const handleBlockRenter = (chatId) => {
+  // Fetch owner messages from backend
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const data = await makeAPICall(ENDPOINTS.MESSAGES?.GET_ALL || "/messages");
+        if (Array.isArray(data)) {
+          setAllMessages(data);
+          const uniqueChats = [...new Map(data.map(msg => [msg.chatId, msg])).values()];
+          setInboxList(uniqueChats);
+          if (uniqueChats.length > 0) {
+            setActiveChatId(uniqueChats[0].chatId);
+            setMessagesData(data.filter(msg => msg.chatId === uniqueChats[0].chatId));
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching messages:", err);
+      }
+    };
+
+    fetchMessages();
+  }, []);
+
+  const handleBlockRenter = async (chatId) => {
     if (!chatId) return;
-    setInboxList((prev) =>
-      prev.map((chat) =>
-        chat.id === chatId ? { ...chat, blocked: true } : chat
-      )
-    );
-    alert("Renter has been blocked.");
+    try {
+      await makeAPICall(ENDPOINTS.MESSAGES?.BLOCK || `/messages/${chatId}/block`, {
+        method: "POST",
+      });
+      setInboxList((prev) =>
+        prev.map((chat) =>
+          chat.chatId === chatId ? { ...chat, blocked: true } : chat
+        )
+      );
+    } catch (err) {
+      console.error("Error blocking renter:", err);
+    }
   };
 
-  const handleReportRenter = (chatId, reason) => {
+  const handleReportRenter = async (chatId, reason) => {
     setReportModalOpen(false);
-    console.log(`Reported renter ${chatId} for reason: ${reason}`);
-    alert(`You reported this renter for: ${reason}`);
-    setSubmittedReport(true);
-    setTimeout(() => setSubmittedReport(false), 5000);
+    try {
+      await makeAPICall(ENDPOINTS.MESSAGES?.REPORT || `/messages/${chatId}/report`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      });
+      setSubmittedReport(true);
+      setTimeout(() => setSubmittedReport(false), 5000);
+    } catch (err) {
+      console.error("Error reporting renter:", err);
+    }
   };
-
-  const fileInputRef = useRef(null);
 
   const handleFileButtonClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file || !activeChat) return;
 
-    const message = {
-      id: Date.now(),
-      chatId: activeChat.id,
-      sender: "owner",
-      text: file.name,
-      file: file,
-      fileType: file.type,
-      time: new Date()
-        .toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
-        .toUpperCase(),
-    };
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("chatId", activeChat.chatId);
 
-    setAllMessages((prev) => [...prev, message]);
-    setMessagesData((prev) => [...prev, message]);
+      const response = await makeAPICall(ENDPOINTS.MESSAGES?.SEND_FILE || "/messages/send-file", {
+        method: "POST",
+        body: formData,
+      });
 
-    let lastMsgText;
-    if (file.type.startsWith("image/")) lastMsgText = "You sent a photo.";
-    else if (file.type === "application/pdf")
-      lastMsgText = "You sent a PDF file.";
-    else lastMsgText = `You sent a file: ${file.name}`;
-
-    setInboxList((prev) =>
-      prev.map((chat) =>
-        chat.id === activeChat.id ? { ...chat, lastMessage: lastMsgText } : chat
-      )
-    );
+      if (response) {
+        setAllMessages((prev) => [...prev, response]);
+        setMessagesData((prev) => [...prev, response]);
+      }
+    } catch (err) {
+      console.error("Error uploading file:", err);
+    }
   };
 
-  const [allMessages, setAllMessages] = useState([]);
-
-  // Mock data for owner view
-  const mockInboxList = [
-    {
-      id: 1,
-      name: "John Doe",
-      lastMessage: "Looking forward to renting your item.",
-      lastMessageTime: "5 min ago",
-      unreadCount: 0,
-      avatar: avatarPNGs[0],
-      activeStatus: "Online",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      lastMessage: "Thanks! I’ll pick it up tomorrow.",
-      lastMessageTime: "20 min ago",
-      unreadCount: 1,
-      avatar: avatarPNGs[1],
-      activeStatus: "Active 10 min ago",
-    },
-    {
-      id: 3,
-      name: "Genlou Bandin",
-      lastMessage: "Can you share your location?",
-      lastMessageTime: "Yesterday",
-      unreadCount: 0,
-      avatar: profPic,
-      activeStatus: "Offline 1h ago",
-    },
-  ];
-
-  const mockMessagesData = [
-    {
-      id: 1,
-      chatId: 1,
-      sender: "owner",
-      text: "Hello! Your item is confirmed for pickup.",
-      time: "10:00 AM",
-    },
-    {
-      id: 2,
-      chatId: 1,
-      sender: "renter",
-      text: "Thanks! See you then.",
-      time: "10:05 AM",
-    },
-
-    {
-      id: 3,
-      chatId: 2,
-      sender: "renter",
-      text: "Hi! Is the projector available?",
-      time: "09:00 AM",
-    },
-    {
-      id: 4,
-      chatId: 2,
-      sender: "owner",
-      text: "Yes, it is!",
-      time: "09:05 AM",
-    },
-    {
-      id: 5,
-      chatId: 2,
-      sender: "renter",
-      text: "Great! I’ll pick it up on Saturday.",
-      time: "09:10 AM",
-    },
-
-    {
-      id: 6,
-      chatId: 3,
-      sender: "owner",
-      text: "Can you share your location?",
-      time: "11:10 AM",
-    },
-  ];
-
-  useEffect(() => {
-    setAllMessages(mockMessagesData);
-
-    const updatedInbox = mockInboxList.map((chat) => {
-      const chatMessages = mockMessagesData.filter(
-        (msg) => msg.chatId === chat.id
-      );
-      const lastMsg = chatMessages[chatMessages.length - 1];
-      const lastMessageText =
-        lastMsg?.sender === "owner" ? `You: ${lastMsg.text}` : lastMsg?.text;
-      return { ...chat, lastMessage: lastMessageText };
-    });
-
-    setInboxList(updatedInbox);
-
-    if (updatedInbox.length > 0) {
-      const firstChatId = updatedInbox[0].id;
-      setActiveChatId(firstChatId);
-      setMessagesData(
-        mockMessagesData.filter((msg) => msg.chatId === firstChatId)
-      );
-    }
-  }, []);
-
-  const [newMessage, setNewMessage] = useState("");
-
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim() || !activeChat) return;
 
-    const message = {
-      id: Date.now(),
-      chatId: activeChat.id,
-      sender: "owner",
-      text: newMessage,
-      time: new Date()
-        .toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
-        .toUpperCase(),
-    };
+    try {
+      const response = await makeAPICall(ENDPOINTS.MESSAGES?.SEND || "/messages/send", {
+        method: "POST",
+        body: JSON.stringify({
+          chatId: activeChat.chatId,
+          text: newMessage,
+        }),
+      });
 
-    setAllMessages((prev) => [...prev, message]);
-    setMessagesData((prev) => [...prev, message]);
+      if (response) {
+        setAllMessages((prev) => [...prev, response]);
+        setMessagesData((prev) => [...prev, response]);
+        setNewMessage("");
+      }
+    } catch (err) {
+      console.error("Error sending message:", err);
+    }
+  };
 
+  const handleSelectChat = (chatId) => {
+    setActiveChatId(chatId);
+    setMessagesData(allMessages.filter((msg) => msg.chatId === chatId));
     setInboxList((prev) =>
       prev.map((chat) =>
-        chat.id === activeChat.id
-          ? { ...chat, lastMessage: `You: ${message.text}` }
-          : chat
+        chat.chatId === chatId ? { ...chat, unreadCount: 0 } : chat
       )
     );
-
-    setNewMessage("");
   };
+
+  const activeChat = inboxList.find((chat) => chat.chatId === activeChatId);
 
   useEffect(() => {
     if (rightRef.current) {
@@ -273,18 +177,6 @@ const OwnerMessages = () => {
       3000
     );
   };
-
-  const handleSelectChat = (chatId) => {
-    setActiveChatId(chatId);
-    setMessagesData(allMessages.filter((msg) => msg.chatId === chatId));
-    setInboxList((prev) =>
-      prev.map((chat) =>
-        chat.id === chatId ? { ...chat, unreadCount: 0 } : chat
-      )
-    );
-  };
-
-  const activeChat = inboxList.find((chat) => chat.id === activeChatId);
 
   return (
     <div className="flex min-h-screen px-4 ml-48 overflow-hidden">

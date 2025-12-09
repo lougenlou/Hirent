@@ -15,10 +15,10 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
       <div className="space-y-4 mb-6">
         {/* Product Info */}
         <div className="flex items-center justify-between text-[15px]">
-          <h3 className=" text-gray-900">{product.name}</h3>
+          <h3 className=" text-gray-900">{product.name || 'Item'}</h3>
 
           <p className="text-[#7A1CA9] font-bold">
-            ₱{product.pricePerDay}
+            ₱{product.pricePerDay || product.price || 0}
             <span className="font-normal text-gray-600"> per day</span>
           </p>
         </div>
@@ -40,7 +40,7 @@ const OrderSummary = ({ product, pricing, rentalData }) => {
             <p className="text-sm text-[#7A1CA9] mb-2 ml-1">
               ({rentalData.days} {rentalData.days === 1 ? "day" : "days"}
               {" × "}
-              {formatCurrency(product.pricePerDay)}
+              {formatCurrency(product.pricePerDay || product.price || 0)}
               /day)
             </p>
           )}

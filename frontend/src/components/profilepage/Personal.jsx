@@ -11,18 +11,22 @@ import {
   Package,
   MessageCircle,
 } from "lucide-react";
-export default function PersonalInformation({ form, setForm, handleSave }) {
+
+export default function PersonalInformation({ form, setForm, handleSave, userSummary }) {
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((s) => ({ ...s, [name]: value }));
   }
+
   function handleGender(g) {
     setForm((s) => ({ ...s, gender: g }));
   }
+
   function handleFormSubmit(e) {
     e.preventDefault();
     handleSave(form);
   }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] mr-16 ml-4 gap-8">
       {/* LEFT: Form container */}
@@ -32,7 +36,7 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
             <User className="w-10 h-10 text-[#7A1CA9]" />
           </div>
           <div>
-            <h1 className="text-[26px] font-bold text-purple-900  mt-1">
+            <h1 className="text-[26px] font-bold text-purple-900 mt-1">
               Personal Information
             </h1>
             <p className="text-[16px] text-gray-500">
@@ -40,18 +44,14 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
             </p>
           </div>
         </div>
+
         <form className="mt-6 space-y-4" onSubmit={handleFormSubmit}>
           {/* First & Last Name */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
-              <label className="block text-sm font-medium mb-1">
-                First Name
-              </label>
+              <label className="block text-sm font-medium mb-1">First Name</label>
               <div className="relative">
-                <User
-                  size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                />
+                <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input
                   name="firstName"
                   value={form.firstName}
@@ -60,15 +60,11 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
                 />
               </div>
             </div>
+
             <div className="relative">
-              <label className="block text-sm font-medium mb-1">
-                Last Name
-              </label>
+              <label className="block text-sm font-medium mb-1">Last Name</label>
               <div className="relative">
-                <User
-                  size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                />
+                <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input
                   name="lastName"
                   value={form.lastName}
@@ -78,31 +74,28 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
               </div>
             </div>
           </div>
+
           {/* Email */}
           <div className="relative">
             <label className="block text-sm font-medium mb-1">Email</label>
             <div className="relative">
-              <Mail
-                size={20}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-              />
+              <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
               <input
                 name="email"
                 value={form.email}
                 onChange={handleChange}
                 className="w-full border bg-gray-50 rounded-lg px-10 py-2"
+                readOnly
               />
             </div>
           </div>
+
           {/* Phone & Address */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               <label className="block text-sm font-medium mb-1">Phone</label>
               <div className="relative">
-                <Phone
-                  size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                />
+                <Phone size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input
                   name="phone"
                   value={form.phone}
@@ -111,13 +104,11 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
                 />
               </div>
             </div>
+
             <div className="relative">
               <label className="block text-sm font-medium mb-1">Address</label>
               <div className="relative">
-                <MapPin
-                  size={20}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-                />
+                <MapPin size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input
                   name="address"
                   value={form.address}
@@ -127,6 +118,7 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
               </div>
             </div>
           </div>
+
           {/* Gender */}
           <div>
             <div className="text-sm font-medium mb-1">Gender</div>
@@ -143,17 +135,16 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
                   className={`flex-1 p-6 rounded-xl border shadow-sm flex items-center justify-center gap-2 ${
                     form.gender === g.id
                       ? "bg-gradient-to-r from-[#a052db] to-[#7A1CA9] text-white"
-                      : "bg-white  text-purple-900  "
+                      : "bg-white text-purple-900"
                   }`}
                 >
                   <g.icon size={22} />{" "}
-                  {g.id === "na"
-                    ? "Prefer not to say"
-                    : g.id.charAt(0).toUpperCase() + g.id.slice(1)}
+                  {g.id === "na" ? "Prefer not to say" : g.id.charAt(0).toUpperCase() + g.id.slice(1)}
                 </button>
               ))}
             </div>
           </div>
+
           {/* Buttons */}
           <div className="flex gap-2 justify-end pt-5">
             <button
@@ -172,6 +163,7 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
           </div>
         </form>
       </div>
+
       {/* RIGHT: Account Summary sidebar */}
       <aside className="bg-white collection-scale rounded-2xl shadow-sm p-6 sticky h-fit">
         <h3 className="font-semibold text-[18px] mb-4">Account Summary</h3>
@@ -181,30 +173,24 @@ export default function PersonalInformation({ form, setForm, handleSave }) {
               <Package className="text-green-500" size={18} />
               <span>Active rentals</span>
             </span>
-            <span className="font-medium">5</span>
+            <span className="font-medium">{userSummary?.activeRentals || 0}</span>
           </div>
           <div className="flex justify-between items-center text-[15px]">
             <span className="flex items-center space-x-2.5">
               <Wallet className="text-yellow-500" size={16} />
               <span>Total expense</span>
             </span>
-            <span className="font-medium">₱3,100.00</span>
+            <span className="font-medium">
+              ₱{userSummary?.totalExpense?.toLocaleString() || "0.00"}
+            </span>
           </div>
           <div className="flex justify-between items-center text-[15px]">
             <span className="flex items-center space-x-2.5">
               <MessageCircle className="text-blue-500" size={16} />
               <span>Pending messages</span>
             </span>
-            <span className="font-medium">3</span>
+            <span className="font-medium">{userSummary?.pendingMessages || 0}</span>
           </div>
-        </div>
-        <div className="mt-6 flex flex-col gap-3">
-          <button className="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#a052db] to-[#7A1CA9] text-white font-medium">
-            Go to My Rentals
-          </button>
-          <button className="w-full py-2.5 rounded-lg border">
-            Contact Support
-          </button>
         </div>
       </aside>
     </div>

@@ -38,17 +38,16 @@ const GoogleCallback = () => {
             }
           }
 
-          // Update auth context immediately
           login(token, userData);
 
-          // Redirect based on user role
-          setTimeout(() => {
-            if (userData && userData.role === 'owner') {
-              navigate('/owner/dashboard', { replace: true });
-            } else {
-              navigate('/', { replace: true });
-            }
-          }, 100);
+        setTimeout(() => {
+          const userRole = userData?.role || 'renter';
+          if (userRole === 'owner') {
+            navigate('/owner/dashboard', { replace: true });
+          } else {
+            navigate('/', { replace: true });
+          }
+        }, 100);
         } else {
           throw new Error("Missing authentication token");
         }

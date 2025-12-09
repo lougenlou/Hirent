@@ -1,6 +1,7 @@
 // src/pages/owner/OwnerBookings.jsx
 import React, { useState, useEffect } from "react";
 import OwnerSidebar from "../../components/layouts/OwnerSidebar";
+import { makeAPICall, ENDPOINTS } from "../../config/api";
 import {
   Search,
   Filter,
@@ -8,7 +9,6 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle,
   ClockFading,
   BadgeCheck,
   ChevronDown,
@@ -18,7 +18,6 @@ import {
   Mail,
   MapPin,
   Star,
-  ShieldCheck,
   X,
   Check,
   Package,
@@ -30,191 +29,8 @@ import {
   Shield,
 } from "lucide-react";
 
-const MOCK_BOOKINGS = [
-  {
-    id: 1,
-    productId: "PRD-2024-001",
-    item: "Gucci Duffle Bag",
-    category: "Fashion",
-    itemImage: "/assets/items/gucci_duffle_bag.png",
-    securityDeposit: "₱2,000",
-    renter: {
-      name: "Maria Santos",
-      email: "maria.santos@gmail.com",
-      phone: "+63 912 345 6789",
-      avatar: "",
-      address: "123 Bonifacio St, Makati City, Metro Manila 1200",
-      verified: true,
-      joined: "2022-04-01",
-      rating: 4.5,
-    },
-    price: "₱1,200/day",
-    discount: "with 15% discount",
-    bookedDates: "2025-12-10",
-    bookedDateEnd: "2025-12-14",
-    duration: "5 days",
-    paymentMethod: "GCash",
-    subtotal: "₱6,000",
-    shipping: "Free",
-    discountPercent: "15%",
-    total: "₱5,100.00",
-    status: "Pending",
-    createdAt: "2025-12-08",
-  },
-  {
-    id: 2,
-    productId: "PRD-2024-002",
-    item: "HAVIT HV Gaming Headset",
-    category: "Gaming",
-    itemImage: "/assets/items/havit_hv.png",
-    securityDeposit: "₱500",
-    renter: {
-      name: "Juan Dela Cruz",
-      email: "juan.delacruz@gmail.com",
-      phone: "+63 917 123 4567",
-      avatar: "",
-      address: "456 Rizal Ave, Quezon City, Metro Manila 1100",
-      verified: true,
-      joined: "2023-01-15",
-      rating: 4.8,
-    },
-    price: "₱150/day",
-    discount: "",
-    bookedDates: "2025-12-12",
-    bookedDateEnd: "2025-12-16",
-    duration: "5 days",
-    paymentMethod: "GCash",
-    subtotal: "₱750",
-    shipping: "Free",
-    discountPercent: "",
-    total: "₱750.00",
-    status: "Approved",
-    createdAt: "2025-12-09",
-  },
-  {
-    id: 3,
-    productId: "PRD-2024-003",
-    item: "IPS LCD Gaming Monitor",
-    category: "Electronics",
-    itemImage: "/assets/items/IPS_lcd.png",
-    securityDeposit: "₱3,000",
-    renter: {
-      name: "Ana Reyes",
-      email: "ana.reyes@gmail.com",
-      phone: "+63 918 765 4321",
-      avatar: "",
-      address: "789 Ayala Blvd, Pasay City, Metro Manila 1300",
-      verified: false,
-      joined: "2024-06-20",
-      rating: 4.2,
-    },
-    price: "₱500/day",
-    discount: "with 20% discount",
-    bookedDates: "2025-12-15",
-    bookedDateEnd: "2025-12-19",
-    duration: "5 days",
-    paymentMethod: "Maya",
-    subtotal: "₱2,500",
-    shipping: "Free",
-    discountPercent: "20%",
-    total: "₱2,000.00",
-    status: "Pending",
-    createdAt: "2025-12-10",
-  },
-  {
-    id: 4,
-    productId: "PRD-2024-004",
-    item: "AK-900 Wired Keyboard",
-    category: "Electronics",
-    itemImage: "/assets/items/Keyboard.png",
-    securityDeposit: "₱800",
-    renter: {
-      name: "Pedro Garcia",
-      email: "pedro.garcia@gmail.com",
-      phone: "+63 919 234 5678",
-      avatar: "",
-      address: "321 Taft Ave, Manila City 1000",
-      verified: true,
-      joined: "2021-11-05",
-      rating: 4.9,
-    },
-    price: "₱200/day",
-    discount: "with 10% discount",
-    bookedDates: "2025-12-20",
-    bookedDateEnd: "2025-12-22",
-    duration: "3 days",
-    paymentMethod: "Bank Transfer",
-    subtotal: "₱600",
-    shipping: "Free",
-    discountPercent: "10%",
-    total: "₱540.00",
-    status: "Approved",
-    createdAt: "2025-12-11",
-  },
-  {
-    id: 5,
-    productId: "PRD-2024-005",
-    item: "RGB Liquid CPU Cooler",
-    category: "Computer Parts",
-    itemImage: "/assets/items/RGB_liquid_CPU.png",
-    securityDeposit: "₱1,500",
-    renter: {
-      name: "Lisa Mendoza",
-      email: "lisa.mendoza@gmail.com",
-      phone: "+63 920 345 6789",
-      avatar: "",
-      address: "567 EDSA, Mandaluyong City 1550",
-      verified: true,
-      joined: "2023-08-12",
-      rating: 4.7,
-    },
-    price: "₱350/day",
-    discount: "",
-    bookedDates: "2025-12-25",
-    bookedDateEnd: "2025-12-28",
-    duration: "4 days",
-    paymentMethod: "GCash",
-    subtotal: "₱1,400",
-    shipping: "Free",
-    discountPercent: "",
-    total: "₱1,400.00",
-    status: "Pending",
-    createdAt: "2025-12-12",
-  },
-  {
-    id: 6,
-    productId: "PRD-2024-006",
-    item: "ASUS Vivobook Laptop",
-    category: "Electronics",
-    itemImage: "/assets/items/laptop.png",
-    securityDeposit: "₱5,000",
-    renter: {
-      name: "Carlos Tan",
-      email: "carlos.tan@gmail.com",
-      phone: "+63 921 456 7890",
-      avatar: "",
-      address: "890 Shaw Blvd, Pasig City 1600",
-      verified: true,
-      joined: "2022-03-18",
-      rating: 4.6,
-    },
-    price: "₱800/day",
-    discount: "with 25% discount",
-    bookedDates: "2025-12-05",
-    bookedDateEnd: "2025-12-07",
-    duration: "3 days",
-    paymentMethod: "Maya",
-    subtotal: "₱2,400",
-    shipping: "Free",
-    discountPercent: "25%",
-    total: "₱1,800.00",
-    status: "Completed",
-    createdAt: "2025-12-01",
-  },
-];
-
 export default function OwnerBookings() {
-  const [bookings, setBookings] = useState([...MOCK_BOOKINGS]);
+  const [bookings, setBookings] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -223,14 +39,35 @@ export default function OwnerBookings() {
   const [showRejectModal, setShowRejectModal] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Calculate stats dynamically
+  // Fetch owner bookings from backend
+  useEffect(() => {
+    const fetchBookings = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS);
+        setBookings(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Error fetching bookings:", err);
+        setError("Failed to load bookings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, []);
+
+  // Calculate stats dynamically from bookings
   const stats = {
     total: bookings.length,
-    pending: bookings.filter((b) => b.status === "Pending").length,
-    approved: bookings.filter((b) => b.status === "Approved").length,
-    completed: bookings.filter((b) => b.status === "Completed").length,
-    rejected: bookings.filter((b) => b.status === "Rejected").length,
+    pending: bookings.filter((b) => b.status === "pending").length,
+    approved: bookings.filter((b) => b.status === "approved").length,
+    completed: bookings.filter((b) => b.status === "completed").length,
+    rejected: bookings.filter((b) => b.status === "rejected").length,
   };
 
   // Debounced search
@@ -239,78 +76,119 @@ export default function OwnerBookings() {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // Filter bookings
+  // Filter and search bookings from backend data
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    let filtered = [...MOCK_BOOKINGS];
+    let filtered = [...bookings];
 
     // Search filter
     if (debouncedSearch.trim()) {
       const q = debouncedSearch.toLowerCase();
       filtered = filtered.filter(
         (b) =>
-          b.item.toLowerCase().includes(q) ||
-          b.renter.name.toLowerCase().includes(q) ||
-          b.category.toLowerCase().includes(q) ||
-          b.productId.toLowerCase().includes(q)
+          (b.item?.name || "").toLowerCase().includes(q) ||
+          (b.renter?.name || "").toLowerCase().includes(q) ||
+          (b.item?.category || "").toLowerCase().includes(q) ||
+          (b._id || "").toLowerCase().includes(q)
       );
     }
 
     // Status filter
     if (statusFilter !== "All") {
-      filtered = filtered.filter((b) => b.status === statusFilter);
+      filtered = filtered.filter(
+        (b) => b.status === statusFilter.toLowerCase()
+      );
     }
 
     setBookings(filtered);
   }, [debouncedSearch, statusFilter]);
 
-  const handleApprove = (booking) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === booking.id ? { ...b, status: "Approved" } : b
-      )
-    );
-    setShowApprovalModal(null);
+  // Update booking status on backend
+  const handleApprove = async (booking) => {
+    try {
+      await makeAPICall(ENDPOINTS.BOOKINGS.UPDATE_STATUS(booking._id), {
+        method: "PUT",
+        body: JSON.stringify({ status: "approved" }),
+      });
+      setBookings((prev) =>
+        prev.map((b) =>
+          b._id === booking._id ? { ...b, status: "approved" } : b
+        )
+      );
+      setShowApprovalModal(null);
+    } catch (err) {
+      console.error("Error approving booking:", err);
+      setError("Failed to approve booking");
+    }
   };
 
-  const handleReject = (booking) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === booking.id ? { ...b, status: "Rejected" } : b
-      )
-    );
-    setShowRejectModal(null);
-    setRejectReason("");
+  // Reject booking on backend
+  const handleReject = async (booking) => {
+    try {
+      await makeAPICall(ENDPOINTS.BOOKINGS.UPDATE_STATUS(booking._id), {
+        method: "PUT",
+        body: JSON.stringify({ status: "rejected", reason: rejectReason }),
+      });
+      setBookings((prev) =>
+        prev.map((b) =>
+          b._id === booking._id ? { ...b, status: "rejected" } : b
+        )
+      );
+      setShowRejectModal(null);
+      setRejectReason("");
+    } catch (err) {
+      console.error("Error rejecting booking:", err);
+      setError("Failed to reject booking");
+    }
   };
 
-  const handleRefresh = () => {
+  // Refresh bookings from backend
+  const handleRefresh = async () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setBookings([...MOCK_BOOKINGS]);
+    try {
+      const data = await makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS);
+      setBookings(Array.isArray(data) ? data : []);
       setSearchQuery("");
       setStatusFilter("All");
+    } catch (err) {
+      console.error("Error refreshing bookings:", err);
+      setError("Failed to refresh bookings");
+    } finally {
       setIsRefreshing(false);
-    }, 1000);
+    }
   };
 
   const getStatusBadge = (status) => {
-    const styles = {
-      Pending: "bg-yellow-100 text-yellow-700",
-      Approved: "bg-green-100 text-green-700",
-      Rejected: "bg-red-100 text-red-700",
-      Completed: "bg-blue-100 text-blue-700",
+    const statusMap = {
+      pending: {
+        label: "Pending",
+        style: "bg-yellow-100 text-yellow-700",
+        icon: Clock,
+      },
+      approved: {
+        label: "Approved",
+        style: "bg-green-100 text-green-700",
+        icon: CheckCircle2,
+      },
+      rejected: {
+        label: "Rejected",
+        style: "bg-red-100 text-red-700",
+        icon: XCircle,
+      },
+      completed: {
+        label: "Completed",
+        style: "bg-blue-100 text-blue-700",
+        icon: Check,
+      },
     };
-    const icons = {
-      Pending: <Clock className="w-3 h-3" />,
-      Approved: <CheckCircle2 className="w-3 h-3" />,
-      Rejected: <XCircle className="w-3 h-3" />,
-      Completed: <Check className="w-3 h-3" />,
-    };
+    const config = statusMap[status?.toLowerCase()] || statusMap.pending;
+    const IconComponent = config.icon;
     return (
       <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${styles[status]}`}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.style}`}
       >
-        {icons[status]}
-        {status}
+        <IconComponent className="w-3 h-3" />
+        {config.label}
       </span>
     );
   };
@@ -487,33 +365,49 @@ export default function OwnerBookings() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {bookings.length === 0 ? (
+              {loading ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <Package className="w-12 h-12 text-gray-300" />
-                      <p className="text-gray-500 text-sm">No bookings found</p>
+                    <p className="text-gray-500">Loading bookings...</p>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center">
+                    <p className="text-red-500">{error}</p>
+                  </td>
+                </tr>
+              ) : bookings.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-32 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <Package className="w-16 h-16 text-gray-300" />
+                      <p className="text-gray-500 text-md">No bookings yet.</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 bookings.map((booking) => (
-                  <React.Fragment key={booking.id}>
+                  <React.Fragment key={booking._id}>
                     <tr
                       className={`hover:bg-gray-50 cursor-pointer transition ${
-                        expandedRow === booking.id ? "bg-white" : ""
+                        expandedRow === booking._id ? "bg-white" : ""
                       }`}
                       onClick={() =>
                         setExpandedRow(
-                          expandedRow === booking.id ? null : booking.id
+                          expandedRow === booking._id ? null : booking._id
                         )
                       }
                     >
+                      {/* Item column */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <img
-                            src={booking.itemImage}
-                            alt={booking.item}
+                            src={
+                              booking.item?.image ||
+                              "https://via.placeholder.com/48"
+                            }
+                            alt={booking.item?.name || "Item"}
                             className="w-12 h-12 rounded-lg object-cover bg-gray-100"
                             onError={(e) => {
                               e.target.src = "https://via.placeholder.com/48";
@@ -521,72 +415,71 @@ export default function OwnerBookings() {
                           />
                           <div>
                             <p className="font-medium text-gray-800 text-sm">
-                              {booking.item}
+                              {booking.item?.name || "Unknown Item"}
                             </p>
                             <p className="text-xs text-gray-500 flex items-center gap-1">
                               <Hash className="w-3 h-3" />
-                              {booking.productId}
+                              {booking._id?.substring(0, 8) || "N/A"}
                             </p>
                           </div>
                         </div>
                       </td>
+
+                      {/* Renter column */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
                             <span className="text-xs font-medium text-[#7A1CA9]">
-                              {booking.renter.name.charAt(0)}
+                              {(booking.renter?.name || "U").charAt(0)}
                             </span>
                           </div>
                           <div>
-                            <p className="font-medium text-gray-800 text-sm flex items-center gap-1">
-                              {booking.renter.name}
-                              {booking.renter.verified && (
-                                <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-                              )}
+                            <p className="font-medium text-gray-800 text-sm">
+                              {booking.renter?.name || "Unknown"}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {booking.renter.email}
+                              {booking.renter?.email || "N/A"}
                             </p>
                           </div>
                         </div>
                       </td>
+
+                      {/* Duration column */}
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-1">
-                          {/* Duration with Clock Icon */}
                           <div className="flex items-center gap-1">
                             <ClockFading className="w-4 h-4 text-yellow-600" />
                             <p className="text-sm text-yellow-600">
-                              {booking.duration}
+                              {booking.days || 1} day
+                              {booking.days !== 1 ? "s" : ""}
                             </p>
                           </div>
-
-                          {/* Booked Dates with Calendar Icon */}
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4 text-gray-400" />
                             <p className="text-[13px] text-gray-500">
-                              {formatDate(booking.bookedDates)} –{" "}
-                              {formatDate(booking.bookedDateEnd)}
+                              {formatDate(booking.bookedFrom)} –{" "}
+                              {formatDate(booking.bookedTo)}
                             </p>
                           </div>
                         </div>
                       </td>
 
+                      {/* Total column */}
                       <td className="py-4 px-6">
                         <p className="font-semibold text-gray-800">
-                          {booking.total}
+                          ₱{(booking.totalPrice || 0).toLocaleString()}
                         </p>
-                        {booking.discountPercent && (
-                          <p className="text-xs text-green-600">
-                            {booking.discountPercent} off
-                          </p>
-                        )}
                       </td>
+
+                      {/* Status column */}
                       <td className="py-4 px-6">
                         {getStatusBadge(booking.status)}
                       </td>
+
+                      {/* Actions column */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
-                          {booking.status === "Pending" && (
+                          {booking.status === "pending" && (
                             <>
                               <button
                                 onClick={(e) => {
@@ -594,6 +487,7 @@ export default function OwnerBookings() {
                                   setShowApprovalModal(booking);
                                 }}
                                 className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition"
+                                title="Approve booking"
                               >
                                 <Check className="w-4 h-4" />
                               </button>
@@ -603,6 +497,7 @@ export default function OwnerBookings() {
                                   setShowRejectModal(booking);
                                 }}
                                 className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+                                title="Reject booking"
                               >
                                 <X className="w-4 h-4" />
                               </button>
@@ -612,12 +507,13 @@ export default function OwnerBookings() {
                             onClick={(e) => {
                               e.stopPropagation();
                               setExpandedRow(
-                                expandedRow === booking.id ? null : booking.id
+                                expandedRow === booking._id ? null : booking._id
                               );
                             }}
                             className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition"
+                            title="View details"
                           >
-                            {expandedRow === booking.id ? (
+                            {expandedRow === booking._id ? (
                               <ChevronUp className="w-4 h-4" />
                             ) : (
                               <ChevronDown className="w-4 h-4" />
@@ -627,8 +523,8 @@ export default function OwnerBookings() {
                       </td>
                     </tr>
 
-                    {/* Expanded Row */}
-                    {expandedRow === booking.id && (
+                    {/* Expanded Row with booking details */}
+                    {expandedRow === booking._id && (
                       <tr className="bg-gray-50">
                         <td colSpan={6} className="px-5 py-6">
                           <div className="grid grid-cols-3 gap-6">
@@ -639,13 +535,14 @@ export default function OwnerBookings() {
                                 Product Information
                               </h4>
                               <div className="space-y-2">
-                                <div className="flex just gap-2 text-sm">
+                                <div className="flex items-center gap-2 text-sm">
                                   <Hash className="w-4 h-4 text-gray-400" />
                                   <span className="text-gray-500">
-                                    Product ID:
+                                    Item ID:
                                   </span>
                                   <span className="text-gray-800 font-medium">
-                                    {booking.productId}
+                                    {booking.item?._id?.substring(0, 8) ||
+                                      "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
@@ -654,7 +551,7 @@ export default function OwnerBookings() {
                                     Category:
                                   </span>
                                   <span className="text-gray-800">
-                                    {booking.category}
+                                    {booking.item?.category || "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
@@ -663,7 +560,10 @@ export default function OwnerBookings() {
                                     Security Deposit:
                                   </span>
                                   <span className="text-gray-800 font-semibold">
-                                    {booking.securityDeposit}
+                                    ₱
+                                    {(
+                                      booking.securityDeposit || 0
+                                    ).toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
@@ -672,7 +572,10 @@ export default function OwnerBookings() {
                                     Daily Rate:
                                   </span>
                                   <span className="text-gray-800">
-                                    {booking.price}
+                                    ₱
+                                    {(
+                                      booking.item?.price || 0
+                                    ).toLocaleString()}
                                   </span>
                                 </div>
                               </div>
@@ -688,25 +591,25 @@ export default function OwnerBookings() {
                                 <div className="flex items-center gap-2 text-sm">
                                   <Mail className="w-4 h-4 text-gray-400" />
                                   <span className="text-gray-600">
-                                    {booking.renter.email}
+                                    {booking.renter?.email || "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                   <Phone className="w-4 h-4 text-gray-400" />
                                   <span className="text-gray-600">
-                                    {booking.renter.phone}
+                                    {booking.renter?.phone || "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                   <MapPin className="w-4 h-4 text-gray-400" />
                                   <span className="text-gray-600">
-                                    {booking.renter.address}
+                                    {booking.renter?.address || "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                   <Star className="w-4 h-4 text-yellow-500" />
                                   <span className="text-gray-600">
-                                    {booking.renter.rating} rating
+                                    {booking.renter?.rating || "N/A"} rating
                                   </span>
                                 </div>
                               </div>
@@ -720,9 +623,20 @@ export default function OwnerBookings() {
                               </h4>
                               <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
-                                  <span className="text-gray-500">Price</span>
+                                  <span className="text-gray-500">
+                                    Daily Rate
+                                  </span>
                                   <span className="text-gray-800">
-                                    {booking.price}
+                                    ₱
+                                    {(
+                                      booking.item?.price || 0
+                                    ).toLocaleString()}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Days</span>
+                                  <span className="text-gray-800">
+                                    {booking.days || 1}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
@@ -730,25 +644,22 @@ export default function OwnerBookings() {
                                     Subtotal
                                   </span>
                                   <span className="text-gray-800">
-                                    {booking.subtotal}
+                                    ₱
+                                    {(
+                                      (booking.item?.price || 0) *
+                                      (booking.days || 1)
+                                    ).toLocaleString()}
                                   </span>
                                 </div>
-                                {booking.discountPercent && (
-                                  <div className="flex justify-between">
-                                    <span className="text-gray-500">
-                                      Discount
-                                    </span>
-                                    <span className="text-green-600">
-                                      -{booking.discountPercent}
-                                    </span>
-                                  </div>
-                                )}
                                 <div className="flex justify-between">
                                   <span className="text-gray-500">
                                     Shipping
                                   </span>
                                   <span className="text-gray-800">
-                                    {booking.shipping}
+                                    ₱
+                                    {(
+                                      booking.shippingFee || 0
+                                    ).toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
@@ -756,14 +667,18 @@ export default function OwnerBookings() {
                                     Security Deposit
                                   </span>
                                   <span className="text-orange-600 font-medium">
-                                    {booking.securityDeposit}
+                                    ₱
+                                    {(
+                                      booking.securityDeposit || 0
+                                    ).toLocaleString()}
                                   </span>
                                 </div>
                                 <hr className="my-2" />
                                 <div className="flex justify-between font-semibold">
                                   <span className="text-gray-800">Total</span>
                                   <span className="text-[#7A1CA9]">
-                                    {booking.total}
+                                    ₱
+                                    {(booking.totalPrice || 0).toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
@@ -771,7 +686,7 @@ export default function OwnerBookings() {
                                     Payment Method
                                   </span>
                                   <span className="text-gray-800">
-                                    {booking.paymentMethod}
+                                    {booking.paymentMethod || "N/A"}
                                   </span>
                                 </div>
                               </div>
@@ -805,11 +720,15 @@ export default function OwnerBookings() {
                 </div>
               </div>
 
+              {/* Booking summary from backend data */}
               <div className="bg-gray-50 p-4 rounded-xl mb-4">
                 <div className="flex items-center gap-3 mb-3">
                   <img
-                    src={showApprovalModal.itemImage}
-                    alt={showApprovalModal.item}
+                    src={
+                      showApprovalModal.item?.image ||
+                      "https://via.placeholder.com/56"
+                    }
+                    alt={showApprovalModal.item?.name || "Item"}
                     className="w-14 h-14 rounded-lg object-cover"
                     onError={(e) => {
                       e.target.src = "https://via.placeholder.com/56";
@@ -817,27 +736,27 @@ export default function OwnerBookings() {
                   />
                   <div>
                     <p className="font-medium text-gray-800">
-                      {showApprovalModal.item}
+                      {showApprovalModal.item?.name || "Unknown"}
                     </p>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <Hash className="w-3 h-3" />
-                      {showApprovalModal.productId}
+                      {showApprovalModal._id?.substring(0, 8) || "N/A"}
                     </p>
                     <p className="text-sm font-semibold text-[#7A1CA9]">
-                      {showApprovalModal.total}
+                      ₱{(showApprovalModal.totalPrice || 0).toLocaleString()}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-xs border-t border-gray-200 pt-2">
                   <span className="text-gray-500">Security Deposit:</span>
                   <span className="text-orange-600 font-semibold">
-                    {showApprovalModal.securityDeposit}
+                    ₱{(showApprovalModal.securityDeposit || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs mt-1">
                   <span className="text-gray-500">Renter:</span>
                   <span className="text-gray-800">
-                    {showApprovalModal.renter.name}
+                    {showApprovalModal.renter?.name || "Unknown"}
                   </span>
                 </div>
               </div>
@@ -878,11 +797,15 @@ export default function OwnerBookings() {
                 </div>
               </div>
 
+              {/* Booking summary from backend data */}
               <div className="bg-gray-50 p-4 rounded-xl mb-4">
                 <div className="flex items-center gap-3">
                   <img
-                    src={showRejectModal.itemImage}
-                    alt={showRejectModal.item}
+                    src={
+                      showRejectModal.item?.image ||
+                      "https://via.placeholder.com/56"
+                    }
+                    alt={showRejectModal.item?.name || "Item"}
                     className="w-14 h-14 rounded-lg object-cover"
                     onError={(e) => {
                       e.target.src = "https://via.placeholder.com/56";
@@ -890,19 +813,20 @@ export default function OwnerBookings() {
                   />
                   <div>
                     <p className="font-medium text-gray-800">
-                      {showRejectModal.item}
+                      {showRejectModal.item?.name || "Unknown"}
                     </p>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <Hash className="w-3 h-3" />
-                      {showRejectModal.productId}
+                      {showRejectModal._id?.substring(0, 8) || "N/A"}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Renter: {showRejectModal.renter.name}
+                      Renter: {showRejectModal.renter?.name || "Unknown"}
                     </p>
                   </div>
                 </div>
               </div>
 
+              {/* Rejection reason input */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Reason for Rejection

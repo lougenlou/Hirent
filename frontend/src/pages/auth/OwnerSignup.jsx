@@ -7,6 +7,7 @@ import Footer from "../../components/layouts/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { makeAPICall, ENDPOINTS } from "../../config/api"; // ✓ Use centralized API
 
 const OwnerSignup = () => {
   const navigate = useNavigate();
@@ -21,10 +22,11 @@ const OwnerSignup = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Email validator
+  // -------------------------------
+  // Validation Helpers
+  // -------------------------------
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  // Password validator (simple, typical rules)
   const validatePassword = (password) => {
     if (password.length < 6) return "Password must be at least 6 characters.";
     if (!/[0-9]/.test(password))
@@ -34,6 +36,9 @@ const OwnerSignup = () => {
     return "";
   };
 
+  // -------------------------------
+  // ON SUBMIT → Register Owner
+  // -------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -63,43 +68,41 @@ const OwnerSignup = () => {
     setError("");
 
     try {
-      // Register as owner with role: "owner"
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      // ✓ Call backend through centralized API config
+      const data = await makeAPICall(ENDPOINTS.AUTH.REGISTER, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          role: "owner", // Set role to owner during registration
+          role: "owner",
         }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.msg || data.message || "Registration failed");
+      if (!data || !data.token) {
+        setError(data?.msg || data?.message || "Registration failed.");
         return;
       }
 
-      if (data.token) {
-        // Store token and user data
-        const user = data.user || { email: formData.email, role: "owner" };
-        login(data.token, user);
-        
-        // Redirect to owner dashboard
-        setTimeout(() => {
-          navigate('/owner/dashboard', { replace: true });
-        }, 300);
-      } else {
-        setError("No token received from server");
-      }
+      // Save Auth
+      const user = data.user || { email: formData.email, role: "owner" };
+      login(data.token, user);
+
+      // ✓ Redirect owners to setup flow
+      navigate("/ownersetup", { replace: true });
+
     } catch (err) {
       console.error("Owner signup error:", err);
       setError("Network error. Please try again.");
     }
+  };
+
+  // -------------------------------
+  // GOOGLE SIGNUP → Owner
+  // -------------------------------
+  const handleGoogleSignup = () => {
+    window.location.href =
+      "http://localhost:5000/api/auth/google?role=owner";
   };
 
   return (
@@ -133,7 +136,7 @@ const OwnerSignup = () => {
             </div>
 
             <form className="space-y-2 w-[90%]" onSubmit={handleSubmit}>
-              {/* Name */}
+              {/* NAME */}
               <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type="text"
@@ -153,7 +156,7 @@ const OwnerSignup = () => {
                 </label>
               </div>
 
-              {/* Email */}
+              {/* EMAIL */}
               <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type="email"
@@ -173,7 +176,7 @@ const OwnerSignup = () => {
                 </label>
               </div>
 
-              {/* Password */}
+              {/* PASSWORD */}
               <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -205,7 +208,7 @@ const OwnerSignup = () => {
 
               {error && <p className="text-red-500 text-xs text-center">{error}</p>}
 
-              {/* Buttons */}
+              {/* BUTTONS */}
               <div className="flex flex-col gap-2">
                 <button
                   type="submit"
@@ -216,9 +219,7 @@ const OwnerSignup = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    window.location.href = 'http://localhost:5000/api/auth/google/owner';
-                  }}
+                  onClick={handleGoogleSignup}
                   className="w-full border border-gray-400 flex items-center justify-center gap-2 py-3 text-[14px] rounded-md text-gray-700 hover:text-[#9935cb] hover:border-[#9935cb] transition-all"
                 >
                   <img
@@ -231,32 +232,12 @@ const OwnerSignup = () => {
               </div>
             </form>
 
-            {/* Footer Text */}
             <p className="text-[12.5px] text-gray-600 text-center mt-5 mb-8">
               Already have an account?{" "}
               <Link to="/login" className="text-[#862bb3] hover:underline font-medium">
                 Login ➔
               </Link>
             </p>
-
-            <div className="w-full flex flex-col items-start ml-12">
-              <p className="text-[12px] font-light text-gray-600 mb-3">
-                By creating an owner account, you agree to the{" "}
-                <span className="text-blue-600 hover:underline cursor-pointer">
-                  Terms and Conditions
-                </span>{" "}
-                and{" "}
-                <span className="text-blue-600 hover:underline cursor-pointer">
-                  Privacy Policy
-                </span>
-              </p>
-            </div>
-
-            <div className="w-full flex gap-3 text-[12px] text-gray-500 mt-4 justify-start ml-12">
-              <span className="hover:underline cursor-pointer">Help</span>
-              <span className="hover:underline cursor-pointer">Privacy</span>
-              <span className="hover:underline cursor-pointer">Terms</span>
-            </div>
           </div>
         </div>
       </div>

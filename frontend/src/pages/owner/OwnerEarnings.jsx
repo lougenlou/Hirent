@@ -1,5 +1,5 @@
-// src/pages/owner/OwnerEarnings.jsx
 import React, { useState, useEffect } from "react";
+import { makeAPICall, ENDPOINTS } from "../../config/api";
 import OwnerSidebar from "../../components/layouts/OwnerSidebar";
 import {
   Wallet,
@@ -26,7 +26,7 @@ import {
   Cell,
 } from "recharts";
 
-// Item image map (public/assets/items)
+// Item image map
 const imageMap = {
   "Gucci Duffle Bag": "/assets/items/gucci_duffle_bag.png",
   "Gaming Headset": "/assets/items/havit_hv.png",
@@ -40,13 +40,9 @@ const fallbackIcon = () => (
   <Wallet className="w-10 h-10 text-purple-700 opacity-60" />
 );
 
-// Donut colors
 const donutColors = ["#7A1CA9", "#A855F7", "#C4B5FD", "#DDD6FE"];
-
-// Soft block shell
 const block = "bg-white rounded-2xl border border-gray-100 shadow-sm p-5";
 
-// Custom tooltip for line chart
 const EarningsTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
   const value = payload[0].value || 0;
@@ -58,7 +54,6 @@ const EarningsTooltip = ({ active, payload, label }) => {
   );
 };
 
-// Custom tooltip for weekly activity
 const ActivityTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
   const views = payload.find((p) => p.dataKey === "views")?.value || 0;
@@ -78,11 +73,25 @@ const ActivityTooltip = ({ active, payload, label }) => {
 export default function OwnerEarnings() {
   const [loading, setLoading] = useState(true);
 
-  const [summary, setSummary] = useState(null);
-  const [wallet, setWallet] = useState(null);
+  // Initialize with default values to prevent null errors
+  const [summary, setSummary] = useState({
+    monthEarnings: 0,
+    lastMonth: 0,
+    totalEarnings: 0,
+    avgBookingValue: 0,
+    completedBookings: 0,
+  });
 
-  const [fullChartData, setFullChartData] = useState([]); // Store all data
-  const [chartData, setChartData] = useState([]); // Filtered data for display
+  const [wallet, setWallet] = useState({
+    total: 0,
+    available: 0,
+    pending: 0,
+    nextPayout: "-",
+    payoutMethod: "-",
+  });
+
+  const [fullChartData, setFullChartData] = useState([]);
+  const [chartData, setChartData] = useState([]);
   const [categories, setCategories] = useState([]);
   const [weeklyActivity, setWeeklyActivity] = useState([]);
   const [recent, setRecent] = useState([]);
@@ -93,136 +102,50 @@ export default function OwnerEarnings() {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
 
-  // Mock data setup
+  // Fetch data
   useEffect(() => {
-    const mock = {
-      wallet: {
-        total: 18500,
-        pending: 4200,
-        available: 14300,
-        payoutMethod: "Bank Account •••• 4321",
-        nextPayout: "Dec 15, 2025",
-      },
-      summary: {
-        monthEarnings: 14500,
-        lastMonth: 13900,
-        totalEarnings: 110400,
-        avgBookingValue: 1250,
-        completedBookings: 88,
-      },
-      chart: [
-        { month: "Jan", amount: 8200 },
-        { month: "Feb", amount: 9100 },
-        { month: "Mar", amount: 8600 },
-        { month: "Apr", amount: 10400 },
-        { month: "May", amount: 11200 },
-        { month: "Jun", amount: 13700 },
-        { month: "Jul", amount: 12800 },
-        { month: "Aug", amount: 14200 },
-        { month: "Sep", amount: 15000 },
-        { month: "Oct", amount: 13900 },
-        { month: "Nov", amount: 15800 },
-        { month: "Dec", amount: 17200 },
-      ],
-      categories: [
-        { name: "Electronics", percent: 45, value: 49680 },
-        { name: "Fashion", percent: 28, value: 30912 },
-        { name: "Gaming", percent: 18, value: 19872 },
-        { name: "Others", percent: 9, value: 9936 },
-      ],
-      weeklyActivity: [
-        { day: "Mon", views: 520, messages: 32, bookings: 50 },
-        { day: "Tue", views: 480, messages: 10, bookings: 3 },
-        { day: "Wed", views: 610, messages: 15, bookings: 5 },
-        { day: "Thu", views: 720, messages: 18, bookings: 6 },
-        { day: "Fri", views: 910, messages: 22, bookings: 7 },
-        { day: "Sat", views: 1300, messages: 30, bookings: 12 },
-        { day: "Sun", views: 900, messages: 14, bookings: 4 },
-      ],
-      recent: [
-        {
-          id: 1,
-          item: "Gucci Duffle Bag",
-          net: 2350,
-          date: "Dec 05, 2025",
-          status: "Completed",
-        },
-        {
-          id: 2,
-          item: "IPS Monitor",
-          net: 1220,
-          date: "Dec 04, 2025",
-          status: "Completed",
-        },
-        {
-          id: 3,
-          item: "Keyboard",
-          net: 860,
-          date: "Dec 03, 2025",
-          status: "Completed",
-        },
-        {
-          id: 4,
-          item: "Laptop",
-          net: 3200,
-          date: "Dec 02, 2025",
-          status: "Completed",
-        },
-        {
-          id: 5,
-          item: "Gaming Headset",
-          net: 750,
-          date: "Dec 01, 2025",
-          status: "Completed",
-        },
-      ],
-      topItems: [
-        { item: "Laptop", amount: 40200, bookings: 32 },
-        { item: "Gucci Duffle Bag", amount: 31000, bookings: 26 },
-        { item: "Gaming Headset", amount: 20000, bookings: 18 },
-      ],
-      lowItems: [
-        { item: "RGB Liquid CPU Cooler", amount: 6000, bookings: 8 },
-        { item: "Keyboard", amount: 4800, bookings: 6 },
-      ],
+    const fetchEarnings = async () => {
+      setLoading(true);
+      try {
+        const data = await makeAPICall(
+          ENDPOINTS.EARNINGS?.GET_ALL || "/earnings"
+        );
+        if (data) {
+          setWallet(data.wallet || wallet);
+          setSummary(data.summary || summary);
+          setFullChartData(data.chartData || []);
+          setChartData(data.chartData || []);
+          setCategories(data.categories || []);
+          setWeeklyActivity(data.weeklyActivity || []);
+          setRecent(data.recent || []);
+          setTopItems(data.topItems || []);
+          setLowItems(data.lowItems || []);
+        }
+      } catch (err) {
+        console.error("Error fetching earnings:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setWallet(mock.wallet);
-    setSummary(mock.summary);
-    setFullChartData(mock.chart); // Store full data
-    setChartData(mock.chart); // Initially show all data
-    setCategories(mock.categories);
-    setWeeklyActivity(mock.weeklyActivity);
-    setRecent(mock.recent);
-    setTopItems(mock.topItems);
-    setLowItems(mock.lowItems);
-
-    setLoading(false);
+    fetchEarnings();
   }, []);
 
-  // Filter chart data when timeframe changes
   useEffect(() => {
     if (fullChartData.length === 0) return;
 
     let filteredData = [];
-
     switch (timeframe) {
       case "3M":
-        // Show last 3 months (Oct, Nov, Dec)
         filteredData = fullChartData.slice(-3);
         break;
       case "6M":
-        // Show last 6 months (Jul - Dec)
         filteredData = fullChartData.slice(-6);
         break;
       case "12M":
-        // Show all 12 months (Jan - Dec)
-        filteredData = fullChartData;
-        break;
       default:
         filteredData = fullChartData;
     }
-
     setChartData(filteredData);
   }, [timeframe, fullChartData]);
 
@@ -237,7 +160,9 @@ export default function OwnerEarnings() {
     );
 
   const growth =
-    ((summary.monthEarnings - summary.lastMonth) / summary.lastMonth) * 100;
+    summary.lastMonth > 0
+      ? ((summary.monthEarnings - summary.lastMonth) / summary.lastMonth) * 100
+      : 0;
 
   const handleWithdraw = () => {
     if (!withdrawAmount || withdrawAmount <= 0) return;

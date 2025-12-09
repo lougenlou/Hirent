@@ -1,28 +1,9 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Search,
-  Bell,
-  Calendar,
-  Download,
-  ChevronDown,
-  Eye,
-} from "lucide-react";
+import React, { useState, useEffect, useContext } from "react";
+import { makeAPICall, ENDPOINTS } from "../../config/api";
+import { Search, Bell, Download, ChevronDown, Eye } from "lucide-react";
 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
-import cameraImg from "../../assets/items/camera.png";
-import droneImg from "../../assets/items/drone.png";
-import laptopImg from "../../assets/items/laptop.png";
-import camera1Img from "../../assets/items/camera1.png";
-import gimbalImg from "../../assets/items/gimbal.png";
-
-import gcashIcon from "../../assets/payment/GCash.png";
-import paypalIcon from "../../assets/payment/paypal.png";
-import mayaIcon from "../../assets/payment/maya.png";
-import bankIcon from "../../assets/payment/bank.png";
-import cashIcon from "../../assets/payment/cash.png";
 
 import totalBookingsIcon from "../../assets/icons/total.svg";
 import activeRentalsIcon from "../../assets/icons/active.svg";
@@ -32,75 +13,161 @@ import totalEarningsIcon from "../../assets/icons/earnings.svg";
 import AnimatedWelcome from "../../components/AnimatedWelcome";
 
 import Sidebar from "../../components/layouts/OwnerSidebar";
-import profPic from "../../assets/profile/prof_pic.jpg";
-import sampleBookings from "../../data/sampleBookings";
 import DropdownPortal from "../../components/button/DropdownPortal";
 
-// dashboard section
 import Stats from "../../components/ownerdashboard/Stats";
 import RevenueStats from "../../components/ownerdashboard/RevenueStats";
 import Booking from "../../components/ownerdashboard/Booking";
 import BookingTable from "../../components/ownerdashboard/BookingTable";
 
-// Compute stats dynamically
-const totalBookings = sampleBookings.length;
-const activeRentals = sampleBookings.filter(
-  (b) => b.status === "Pending" || b.status === "Active"
-).length;
-const totalListings = [...new Set(sampleBookings.map((b) => b.item))].length;
-const totalEarnings = sampleBookings.reduce(
-  (sum, b) => sum + Number(b.pricePerDay),
-  0
-);
-
-const stats = [
-  {
-    label: "Total Listings",
-    value: totalBookings,
-    sublabel: "+2 this month",
-    sublabelColor: "text-green-500",
-    date: "Updated just now",
-    icon: totalBookingsIcon, // icon added here
-  },
-  {
-    label: "Active Rentals",
-    value: activeRentals,
-    sublabel: "3 ending soon",
-    sublabelColor: "text-red-500",
-    date: "Updated just now",
-    icon: activeRentalsIcon,
-  },
-  {
-    label: "Pending Bookings",
-    value: totalListings,
-    sublabel: "Awaiting approval",
-    sublabelColor: "text-yellow-500",
-    date: "Updated just now",
-    icon: pendingBookingsIcon,
-  },
-  {
-    label: "Earnings This Month",
-    value: `₱ ${totalEarnings.toLocaleString()}`,
-    sublabel: "+18% from last month",
-    sublabelColor: "text-green-500",
-    date: "Updated just now",
-    icon: totalEarningsIcon,
-  },
-];
+import { AuthContext } from "../../context/AuthContext"; // ⭐ NEW — to use real user data
 
 export default function OwnerDashboard() {
-  const navigate = useNavigate();
+  const { user } = useContext(AuthContext); // ⭐ get logged-in owner
+  const ownerId = user?.id;
 
-  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  // --------------------------------------------
+  // ⚠️ Fallback avatar if the user has none
+  // --------------------------------------------
+  const avatar =
+    user?.avatar || "https://ui-avatars.com/api/?name=" + user?.name;
+
+  // Dashboard State
+  const [bookings, setBookings] = useState([]);
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const downloadButtonRef = React.useRef(null);
   const dashboardRef = React.useRef(null);
+  const [revenuePeriod, setRevenuePeriod] = useState("week");
 
-  const [revenuePeriod, setRevenuePeriod] = React.useState("week"); // default
+  // ==================================================
+  // FETCH REAL OWNER DATA (NO MOCK DATA ANYWHERE)
+  // ==================================================
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!ownerId) return; // wait for user load
 
+      setLoading(true);
+      setError(null);
+
+      try {
+        // TODO: Confirm backend endpoint returns only items where ownerId matches user.id
+        const [bookingsData, listingsData] = await Promise.all([
+          makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS),
+          makeAPICall(ENDPOINTS.ITEMS.BY_OWNER(ownerId)), // ⭐ REAL OWNER LISTINGS
+        ]);
+
+        setBookings(Array.isArray(bookingsData) ? bookingsData : []);
+        setListings(Array.isArray(listingsData) ? listingsData : []);
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+        setError("Failed to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [ownerId]);
+
+  // ==================================================
+  // REAL STATS — based on backend data
+  // ==================================================
+  const now = new Date();
+
+  // Total Listings — count items created in the last month
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  const recentListingsCount = listings.filter(
+    (item) => new Date(item.createdAt) >= oneMonthAgo
+  ).length;
+
+  // Active Rentals — count bookings ending in the next 2 days
+  const activeRentals = bookings.filter((b) =>
+    ["approved", "completed"].includes(b.status)
+  );
+  const endingSoonCount = activeRentals.filter((b) => {
+    if (!b.endDate) return false;
+    const end = new Date(b.endDate);
+    const diffDays = (end - now) / (1000 * 60 * 60 * 24);
+    return diffDays <= 2 && diffDays >= 0;
+  }).length;
+
+  // Pending Bookings
+  const pendingBookings = bookings.filter((b) => b.status === "pending");
+
+  // Earnings This Month
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const earningsThisMonth = bookings
+    .filter((b) => new Date(b.createdAt) >= firstDayOfMonth)
+    .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+
+  // Earnings last month for percentage
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+  const earningsLastMonth = bookings
+    .filter(
+      (b) =>
+        new Date(b.createdAt) >= lastMonthStart &&
+        new Date(b.createdAt) <= lastMonthEnd
+    )
+    .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+
+  const earningsChange = earningsLastMonth
+    ? ((earningsThisMonth - earningsLastMonth) / earningsLastMonth) * 100
+    : 0;
+
+  const stats = [
+    {
+      label: "Total Listings",
+      value: listings.length,
+      sublabel: `+${recentListingsCount} this month`,
+      sublabelColor: "text-green-500",
+      icon: totalBookingsIcon,
+    },
+    {
+      label: "Active Rentals",
+      value: activeRentals.length,
+      sublabel: endingSoonCount
+        ? `${endingSoonCount} ending soon`
+        : "No rentals ending soon",
+      sublabelColor: endingSoonCount > 0 ? "text-red-500" : "text-gray-500",
+      icon: activeRentalsIcon,
+    },
+    {
+      label: "Pending Bookings",
+      value: pendingBookings.length,
+      sublabel:
+        pendingBookings.length > 0
+          ? `+${pendingBookings.length} pending`
+          : "No pending bookings",
+      sublabelColor:
+        pendingBookings.length > 0 ? "text-yellow-500" : "text-gray-500",
+      icon: pendingBookingsIcon,
+    },
+    {
+      label: "Earnings This Month",
+      value: `₱ ${earningsThisMonth.toLocaleString()}`,
+      sublabel: earningsChange
+        ? `${earningsChange > 0 ? "+" : ""}${earningsChange.toFixed(
+            0
+          )}% from last month`
+        : "No change from last month",
+      sublabelColor: earningsChange >= 0 ? "text-green-500" : "text-red-500",
+      icon: totalEarningsIcon,
+    },
+  ];
+
+  // --------------------------------------------
+  // ACTION DROPDOWN
+  // --------------------------------------------
   const ActionsDropdown = ({ booking }) => {
     return (
       <button
-        onClick={() => console.log("View booking", booking.id)}
+        onClick={() => console.log("View booking", booking._id)}
         className="w-8 h-8 flex items-center justify-center rounded-lg border hover:bg-gray-100 transition"
       >
         <Eye className="w-4 h-4 text-gray-600" />
@@ -108,172 +175,92 @@ export default function OwnerDashboard() {
     );
   };
 
-  const paymentIcons = {
-    gcash: gcashIcon,
-    maya: mayaIcon,
-    paypal: paypalIcon,
-    "bank transfer": bankIcon,
-    cash: cashIcon,
-  };
-
-  const itemImages = {
-    camera: cameraImg,
-    drone: droneImg,
-    laptop: laptopImg,
-    camera1: camera1Img,
-    gimbal: gimbalImg,
-  };
-
-  const avatarPNGs = [
-    "https://randomuser.me/api/portraits/men/1.jpg",
-    "https://randomuser.me/api/portraits/women/2.jpg",
-    "https://randomuser.me/api/portraits/men/3.jpg",
-    "https://randomuser.me/api/portraits/women/4.jpg",
-  ];
-
-  const getRenterAvatar = (renter, index) => {
-    // Pick avatar based on index for simplicity
-    return avatarPNGs[index % avatarPNGs.length];
-  };
-
+  // --------------------------------------------
+  // CSV EXPORT
+  // --------------------------------------------
   const exportToCSV = () => {
-    // --- STATS ---
     const statsHeader = ["Stat", "Value"];
     const statsRows = stats.map((s) => [s.label, s.value]);
 
-    // --- REVENUE STATS ---
-    const revenueHeader = ["Revenue Period", "Amount"];
     const revenueRows = [
-      [
-        "This Month",
-        sampleBookings.reduce((sum, b) => sum + Number(b.pricePerDay), 0),
-      ],
-      // You can add more periods if you have historical revenue
+      ["This Month", bookings.reduce((s, b) => s + (b.totalPrice || 0), 0)],
     ];
 
-    // --- BOOKINGS TABLE ---
-    const bookingsHeader = [
-      "Booking ID",
-      "Item",
-      "Price",
-      "Renter",
-      "Booked Date",
-      "Payment Method",
-      "Status",
-    ];
-    const bookingsRows = sampleBookings.map((b) => [
-      b.id,
-      b.item,
-      `₱ ${b.pricePerDay}`,
-      b.renter,
-      b.bookedDate,
-      b.paymentMethod,
+    const bookingsRows = bookings.map((b) => [
+      b._id?.slice(0, 8),
+      b.item?.name || "Unknown",
+      b.renter?.name || "Unknown",
+      "₱ " + (b.totalPrice || 0).toLocaleString(),
       b.status,
     ]);
 
-    // Combine all sections with empty row in between
-    const csvContent = [
+    const csv = [
       ["DASHBOARD STATS"],
       statsHeader,
       ...statsRows,
       [],
       ["REVENUE STATS"],
-      revenueHeader,
+      ["Period", "Amount"],
       ...revenueRows,
       [],
-      ["BOOKINGS TABLE"],
-      bookingsHeader,
+      ["BOOKINGS"],
+      ["ID", "Item", "Renter", "Total", "Status"],
       ...bookingsRows,
     ]
       .map((row) => row.join(","))
       .join("\n");
 
-    // Download CSV
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([csv], { type: "text/csv" });
     const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "dashboard-data.csv");
+    link.href = URL.createObjectURL(blob);
+    link.download = "dashboard.csv";
     link.click();
   };
 
+  // --------------------------------------------
+  // PDF EXPORT
+  // --------------------------------------------
   const exportDashboardToPDF = () => {
     const doc = new jsPDF();
+    let y = 15;
 
-    let yPos = 15;
-
-    // --- STATS ---
-    doc.setFontSize(14);
-    doc.text("Dashboard Stats", 14, yPos);
-    yPos += 10;
-    stats.forEach((stat) => {
-      doc.setFontSize(12);
-      doc.text(`${stat.label}: ${stat.value}`, 14, yPos);
-      yPos += 8;
+    doc.text("Dashboard Stats", 14, y);
+    y += 10;
+    stats.forEach((s) => {
+      doc.text(`${s.label}: ${s.value}`, 14, y);
+      y += 7;
     });
 
-    yPos += 5;
+    y += 5;
+    doc.text("Bookings", 14, y);
+    y += 5;
 
-    // --- REVENUE STATS ---
-    doc.setFontSize(14);
-    doc.text("Revenue Stats", 14, yPos);
-    yPos += 10;
-
-    const revenueRows = [
-      [
-        "This Month",
-        sampleBookings.reduce((sum, b) => sum + Number(b.pricePerDay), 0),
-      ],
-      // Add more periods if needed
-    ];
-
-    revenueRows.forEach((row) => {
-      doc.setFontSize(12);
-      doc.text(`${row[0]}: ₱ ${row[1]}`, 14, yPos);
-      yPos += 8;
-    });
-
-    yPos += 5;
-
-    // --- BOOKINGS TABLE ---
-    const tableColumn = [
-      "Booking ID",
-      "Item",
-      "Price",
-      "Renter",
-      "Booked Date",
-      "Payment",
-      "Status",
-    ];
-    const tableRows = sampleBookings.map((b) => [
-      b.id,
-      b.item,
-      `₱ ${b.pricePerDay}`,
-      b.renter,
-      b.bookedDate,
-      b.paymentMethod,
+    const tableRows = bookings.map((b) => [
+      b._id?.slice(0, 8),
+      b.item?.name,
+      b.renter?.name,
+      "₱ " + (b.totalPrice || 0).toLocaleString(),
       b.status,
     ]);
 
     autoTable(doc, {
-      startY: yPos,
-      head: [tableColumn],
+      startY: y + 5,
+      head: [["ID", "Item", "Renter", "Total", "Status"]],
       body: tableRows,
       styles: { fontSize: 10 },
     });
 
-    doc.save("dashboard-data.pdf");
+    doc.save("dashboard.pdf");
   };
 
   return (
     <div className="pl-60 flex min-h-screen bg-gray-50">
       <Sidebar />
 
-      {/* Main Content */}
+      {/* MAIN CONTENT */}
       <main ref={dashboardRef} className="collection-scale flex-1 py-6">
-        {/* TOP NAV */}
+        {/* HEADER */}
         <div className="flex justify-between items-center mb-5">
-          {/* Search */}
           <div className="flex items-center bg-white text-purple-900 px-4 py-2 rounded-xl shadow-sm border max-w-sm w-full">
             <Search className="w-5 h-5 text-gray-500" />
             <input
@@ -282,28 +269,31 @@ export default function OwnerDashboard() {
             />
           </div>
 
-          {/* PROFILE */}
           <div className="flex items-center gap-5">
             <Bell className="w-5 h-5 text-gray-600" />
+
+            {/* REAL USER DATA - NO MOCK */}
             <div className="flex items-center gap-2">
               <img
-                src={profPic}
+                src={avatar}
                 alt="profile"
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <p className="font-semibold  text-gray-900 ">Genlord</p>
+                <p className="font-semibold text-gray-900">
+                  {user?.name || "Owner"}
+                </p>
                 <p className="text-xs text-gray-500">Owner</p>
               </div>
             </div>
           </div>
         </div>
 
-        <hr className="borde-gray-200 mb-5"></hr>
+        <hr className="border-gray-200 mb-5" />
 
         {/* TITLE + DOWNLOAD */}
         <div className="flex justify-between items-center mb-4">
-          <AnimatedWelcome />
+          <AnimatedWelcome name={user?.name || "Owner"} />
 
           <div className="relative inline-block text-left">
             <button
@@ -319,15 +309,15 @@ export default function OwnerDashboard() {
             <DropdownPortal open={dropdownOpen} buttonRef={downloadButtonRef}>
               <button
                 onClick={exportToCSV}
-                className="block text-sm w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"
               >
-                Download as CSV
+                Download CSV
               </button>
               <button
                 onClick={exportDashboardToPDF}
-                className="block text-sm w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm"
               >
-                Download as PDF
+                Download PDF
               </button>
             </DropdownPortal>
           </div>
@@ -336,24 +326,29 @@ export default function OwnerDashboard() {
         {/* STATS */}
         <Stats stats={stats} />
 
-        {/* REVENUE + SCHEDULE */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+          {/* Left column - Revenue chart */}
           <RevenueStats
             revenuePeriod={revenuePeriod}
             setRevenuePeriod={setRevenuePeriod}
           />
 
-          <Booking sampleBookings={sampleBookings} />
+          {/* Right column - Booking schedule */}
+          <Booking bookings={bookings} />
         </div>
 
         {/* BOOKINGS TABLE */}
-        <BookingTable
-          sampleBookings={sampleBookings}
-          getRenterAvatar={getRenterAvatar}
-          itemImages={itemImages}
-          paymentIcons={paymentIcons}
-          ActionsDropdown={ActionsDropdown}
-        />
+        {loading ? (
+          <div className="bg-white p-8 rounded-xl text-center">
+            <p className="text-gray-500">Loading bookings...</p>
+          </div>
+        ) : error ? (
+          <div className="bg-white p-8 rounded-xl text-center">
+            <p className="text-red-500">{error}</p>
+          </div>
+        ) : (
+          <BookingTable bookings={bookings} ActionsDropdown={ActionsDropdown} />
+        )}
       </main>
     </div>
   );

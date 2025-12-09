@@ -6,6 +6,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
+import { makeAPICall, ENDPOINTS } from "../../../config/api";
 import {
   Clock,
   Check,
@@ -19,13 +20,10 @@ import {
   Trash2,
   RefreshCw,
   AlertCircle,
-  PackageX,
   Calendar,
   Star,
   Info,
   Edit3,
-  Hourglass,
-  PackageOpen,
   Search,
   TriangleAlert,
 } from "lucide-react";
@@ -98,7 +96,6 @@ const formatDate = (dateString) => {
 
 const daysDiff = (dateString) => {
   if (!dateString) return 0;
-  const today = new Date();
   const d = new Date(dateString);
   // difference in days (positive if due date in future)
   const diff = Math.ceil(
@@ -300,7 +297,7 @@ const StatsCards = ({ items }) => {
     {
       label: "Awaiting Review",
       value: items.filter((i) => i.status === "proof-submitted").length,
-      icon: Hourglass,
+      icon: Clock,
       bg: "from-violet-400 to-violet-500",
     },
     {
@@ -424,11 +421,6 @@ const FiltersBar = ({ filters, setFilters, counts, search, setSearch }) => {
     </div>
   );
 };
-
-/* Minimal SearchIcon substitute */
-function SearchIcon(props) {
-  return <Clock {...props} />;
-}
 
 /* ----------------------------
    ItemCard component (renter view)
@@ -678,77 +670,24 @@ const ItemCard = ({ item, onAction }) => {
    Main Page Component
    ---------------------------- */
 export default function RenterReturns() {
-  /* Seeded sample data - adjust image paths to your app structure */
-  const initialItems = [
-    {
-      id: 1,
-      name: "Canon EOS R5 Camera",
-      img: "/assets/items/camera.png",
-      owner: "Sarah Johnson",
-      dueDate: "2025-12-10",
-      status: "pending-return",
-      deposit: 500,
-      proof: [],
-    },
-    {
-      id: 2,
-      name: "Studio Lighting Kit",
-      img: "/assets/items/studio_lighting.png",
-      owner: "Mike Chen",
-      dueDate: "2025-12-05",
-      status: "proof-submitted",
-      deposit: 300,
-      proof: ["/assets/items/sample1.png", "/assets/items/sample2.png"],
-      submittedAt: "2025-11-30",
-    },
-    {
-      id: 3,
-      name: "Mountain Bike Pro",
-      img: "/assets/items/mountain_bike.png",
-      owner: "Alex Rivera",
-      dueDate: "2025-12-02",
-      status: "overdue",
-      deposit: 200,
-      proof: [],
-    },
-    {
-      id: 4,
-      name: "DJI Mavic Air Drone",
-      img: "/assets/items/drone.png",
-      owner: "Lisa Park",
-      dueDate: "2025-11-28",
-      status: "issue-found",
-      deposit: 800,
-      proof: [],
-      issue: {
-        note: "Scratched propeller guard - ₱150 repair cost",
-        deduction: 150,
-      },
-    },
-    {
-      id: 5,
-      name: "Audio Recording Kit",
-      img: "/assets/items/audio_kit.png",
-      owner: "David Kim",
-      dueDate: "2025-11-25",
-      status: "deposit-released",
-      deposit: 400,
-      proof: ["/assets/returnitems/audio1.png"],
-      releasedAt: "2025-12-01",
-    },
-    {
-      id: 6,
-      name: "Gaming Console Bundle",
-      img: "/assets/items/console.png",
-      owner: "Emma Wilson",
-      dueDate: "2025-12-15",
-      status: "pending-return",
-      deposit: 350,
-      proof: [],
-    },
-  ];
+  // Fetch renter returns from backend
+  const [items, setItems] = useState([]);
 
-  const [items, setItems] = useState(initialItems);
+  useEffect(() => {
+    const fetchReturns = async () => {
+      try {
+        const data = await makeAPICall(ENDPOINTS.RETURNS?.GET_ALL || "/returns");
+        if (Array.isArray(data)) {
+          setItems(data);
+        }
+      } catch (err) {
+        console.error("Error fetching returns:", err);
+      }
+    };
+
+    fetchReturns();
+  }, []);
+
   const [filters, setFilters] = useState("All");
   const [search, setSearch] = useState("");
   const [notification, setNotification] = useState(null);
@@ -764,14 +703,15 @@ export default function RenterReturns() {
   const [review, setReview] = useState("");
 
   const counts = useMemo(() => {
+    const safeItems = Array.isArray(items) ? items : [];
     return {
-      all: items.length,
-      pending: items.filter((i) => i.status === "pending-return").length,
-      submitted: items.filter((i) => i.status === "proof-submitted").length,
-      overdue: items.filter((i) => i.status === "overdue").length,
-      approved: items.filter((i) => i.status === "approved").length,
-      released: items.filter((i) => i.status === "deposit-released").length,
-      issue: items.filter((i) => i.status === "issue-found").length,
+      all: safeItems.length,
+      pending: safeItems.filter((i) => i.status === "pending-return").length,
+      submitted: safeItems.filter((i) => i.status === "proof-submitted").length,
+      overdue: safeItems.filter((i) => i.status === "overdue").length,
+      approved: safeItems.filter((i) => i.status === "approved").length,
+      released: safeItems.filter((i) => i.status === "deposit-released").length,
+      issue: safeItems.filter((i) => i.status === "issue-found").length,
     };
   }, [items]);
 
@@ -795,10 +735,11 @@ export default function RenterReturns() {
   }, []);
 
   const filtered = useMemo(() => {
-    return items.filter((it) => {
+    const safeItems = Array.isArray(items) ? items : [];
+    return safeItems.filter((it) => {
       const matchesSearch =
-        it.name.toLowerCase().includes(search.toLowerCase()) ||
-        it.owner.toLowerCase().includes(search.toLowerCase());
+        (it?.name || '').toLowerCase().includes((search || '').toLowerCase()) ||
+        (it?.owner || '').toLowerCase().includes((search || '').toLowerCase());
       if (!matchesSearch) return false;
       if (filters === "All") return true;
       return it.status === filters;
@@ -1104,7 +1045,7 @@ export default function RenterReturns() {
 
       <div className="flex items-start gap-5 mb-4 mt-2">
         <div className="p-3 rounded-xl bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200">
-          <PackageOpen className="w-10 h-10 text-[#a12fda]" />
+          <Calendar className="w-10 h-10 text-[#a12fda]" />
         </div>
         <div className="flex items-start gap-4">
           <div>
@@ -1132,10 +1073,10 @@ export default function RenterReturns() {
         {filtered.length === 0 ? (
           <div className="text-center py-20">
             <div className="mx-auto inline-flex items-center text-purple-700 justify-center w-20 h-20 bg-purple-100 rounded-full mb-4">
-              <PackageX size={32} />
+              <AlertCircle size={32} />
             </div>
             <h3 className="text-xl font-semibold text-gray-700">
-              No items found
+              No return requests yet
             </h3>
             <p className="text-gray-500 mt-1">
               {search

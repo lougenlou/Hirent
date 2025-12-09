@@ -36,8 +36,6 @@ const HeroSection = ({ user }) => {
             </p>
 
             <div className="flex flex-wrap gap-3 mb-12">
-              {isLoggedIn ? (
-                <>
                   <button
                     className="px-3 py-1.5 text-white rounded-md font-medium flex items-center gap-2 text-[13px]"
                     style={{ backgroundColor: '#7A1CA9' }}
@@ -47,28 +45,10 @@ const HeroSection = ({ user }) => {
                   </button>
                   <button
                     className="px-3 py-1.5 bg-white text-black border border-black rounded-md font-medium text-[13px]"
-                    onClick={() => navigate('/owner/dashboard')}
+                    onClick={() => navigate('/how-it-works')}
                   >
-                    My Dashboard
+                    Learn More
                   </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="px-3 py-1.5 text-white rounded-md font-medium flex items-center gap-2 text-[13px]"
-                    style={{ backgroundColor: '#7A1CA9' }}
-                    onClick={() => navigate('/signup')}
-                  >
-                    Get Started <MoveRight size={12} />
-                  </button>
-                  <button
-                    className="px-3 py-1.5 bg-white text-black border border-black rounded-md font-medium text-[13px]"
-                    onClick={() => navigate('/login')}
-                  >
-                    Login
-                  </button>
-                </>
-              )}
             </div>
 
             <div className="flex flex-wrap gap-8 md:gap-12">

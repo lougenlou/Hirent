@@ -11,9 +11,10 @@ const ItemSummary = ({ product, days, coupon }) => {
         {/* Product Image */}
         <div className="w-40 h-40 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
           <img
-            src={product.image}
+            src={product.image || product.img || 'https://via.placeholder.com/160'}
             alt={product.name}
             className="w-full h-full object-contain"
+            onError={(e) => { e.target.src = 'https://via.placeholder.com/160'; }}
           />
         </div>
 
@@ -23,28 +24,32 @@ const ItemSummary = ({ product, days, coupon }) => {
           <h3 className="font-semibold text-lg mb-3">{product.name}</h3>
 
           {/* Owner */}
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 bg-[#7A1CA9] rounded-full flex items-center justify-center text-white text-[15px] font-semibold">
-              {product.owner.charAt(0)}
+          {product.owner && (
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-9 h-9 bg-[#7A1CA9] rounded-full flex items-center justify-center text-white text-[15px] font-semibold">
+                {product.owner.charAt(0)}
+              </div>
+              <div className="text-sm text-gray-600">
+                <span className="font-light text-gray-500 mb-2">Listed by</span>
+                <br />
+                <span className=" text-purple-900 ">{product.owner}</span>
+              </div>
             </div>
-            <div className="text-sm text-gray-600">
-              <span className="font-light text-gray-500 mb-2">Listed by</span>
-              <br />
-              <span className=" text-purple-900 ">{product.owner}</span>
-            </div>
-          </div>
+          )}
 
           {/* Price + Location in same row */}
           <div className="flex items-center justify-start border-b pb-4">
             <div className="flex items-baseline gap-1">
-              <span className="text-[#7A1CA9] font-bold text-lg">₱{product.pricePerDay}</span>
+              <span className="text-[#7A1CA9] font-bold text-lg">₱{product.pricePerDay || product.price || 0}</span>
               <span className="text-gray-500 text-sm">per day</span>
             </div>
 
-            <div className="flex items-center gap-1 ml-5 text-purple-900 text-sm">
-              <MapPin className="w-4 h-4" />
-              {product.location}
-            </div>
+            {product.location && (
+              <div className="flex items-center gap-1 ml-5 text-purple-900 text-sm">
+                <MapPin className="w-4 h-4" />
+                {product.location}
+              </div>
+            )}
           </div>
 
           {/* Coupon */}

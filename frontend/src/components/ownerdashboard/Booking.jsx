@@ -3,28 +3,35 @@ import dayjs from "dayjs";
 import GoogleStyleCalendar from "../../components/calendar/GoogleStyleCalendar";
 
 export default function Booking({ sampleBookings }) {
-  
+  // SAFETY: Ensure bookings is always a valid array
+  const bookings = Array.isArray(sampleBookings) ? sampleBookings : [];
+
+  // Extract unique items safely
   const uniqueItems = useMemo(() => {
     const map = {};
-    sampleBookings.forEach((b) => {
-      if (!map[b.itemKey]) {
-        map[b.itemKey] = {
-          item: b.item,
-          itemKey: b.itemKey,
+
+    bookings.forEach((b) => {
+      const key = b?.itemKey;
+      if (!key) return;
+
+      if (!map[key]) {
+        map[key] = {
+          item: b?.item || "Unknown Item",
+          itemKey: key,
         };
       }
     });
-    return Object.values(map);
-  }, [sampleBookings]);
 
-  
+    return Object.values(map);
+  }, [bookings]);
+
   const [selectedItemKey, setSelectedItemKey] = useState("all");
 
-  
+  // Filter current bookings safely
   const currentBookings =
     selectedItemKey === "all"
-      ? sampleBookings
-      : sampleBookings.filter((b) => b.itemKey === selectedItemKey);
+      ? bookings
+      : bookings.filter((b) => b?.itemKey === selectedItemKey);
 
   return (
     <div className="bg-white text-gray-900 p-6 rounded-xl shadow-sm">
@@ -43,6 +50,7 @@ export default function Booking({ sampleBookings }) {
           onChange={(e) => setSelectedItemKey(e.target.value)}
         >
           <option value="all">All Items</option>
+
           {uniqueItems.map((item) => (
             <option key={item.itemKey} value={item.itemKey}>
               {item.item}
@@ -51,11 +59,13 @@ export default function Booking({ sampleBookings }) {
         </select>
       </div>
 
-      {/* Calendar */}
+      {/* Calendar or Empty State */}
       {currentBookings.length > 0 ? (
         <GoogleStyleCalendar bookings={currentBookings} />
       ) : (
-        <p className="text-sm text-gray-500">No booking found.</p>
+        <div className="text-center py-6 text-sm text-gray-500 bg-gray-50 rounded-lg">
+          No bookings yet for this item.
+        </div>
       )}
     </div>
   );

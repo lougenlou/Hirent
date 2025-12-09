@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Lock, Bell, EyeOff, Bolt, UserMinus } from "lucide-react";
 import { useContext } from "react";
-import { ThemeContext } from "../../context/ThemeContext";
+import { makeAPICall, ENDPOINTS } from "../../config/api";
+
 export default function SettingsPage() {
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -23,20 +24,42 @@ export default function SettingsPage() {
     const { name, value } = e.target;
     setPasswordForm((prev) => ({ ...prev, [name]: value }));
   };
-  const savePassword = (e) => {
-    e.preventDefault();
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("New password and confirmation do not match!");
-      return;
-    }
+const savePassword = async (e) => {
+  e.preventDefault();
 
-    alert("Password updated successfully!");
-    setPasswordForm({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-  };
+  if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+    alert("New password and confirmation do not match!");
+    return;
+  }
+
+  try {
+    const data = await makeAPICall(ENDPOINTS.USERS.UPDATE_PROFILE, {
+  method: "PUT",
+  body: JSON.stringify({
+    currentPassword: passwordForm.currentPassword,
+    newPassword: passwordForm.newPassword,
+  }),
+});
+
+
+    if (!data) return; // API wrapper handles 401 redirect
+
+    if (data.success) {
+      alert("Password updated successfully! Use your new password next time you log in.");
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } else {
+      alert(data.message || "Invalid current password!");
+    }
+  } catch (err) {
+    console.error("Password update failed:", err);
+    alert("Error updating password. Please try again later.");
+  }
+};
+
   const toggleNotification = (type) => {
     setNotifications((prev) => ({ ...prev, [type]: !prev[type] }));
   };
@@ -53,33 +76,6 @@ export default function SettingsPage() {
       alert("Account deleted.");
     }
   };
-  function ThemeToggle() {
-    const { darkMode, toggleTheme } = useContext(ThemeContext);
-    return (
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => !darkMode && toggleTheme()}
-          className={`px-4 py-2 rounded-lg border ${
-            !darkMode
-              ? "bg-purple-600 text-white"
-              : "bg-gray-100 text-purple-900 dark:bg-gray-700 dark:text-gray-200"
-          }`}
-        >
-          Light
-        </button>
-        <button
-          onClick={() => darkMode && toggleTheme()}
-          className={`px-4 py-2 rounded-lg border ${
-            darkMode
-              ? "bg-purple-600 text-white"
-              : "bg-gray-100 text-purple-900 dark:bg-gray-700 dark:text-gray-200"
-          }`}
-        >
-          Dark
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr] gap-8 mr-20">

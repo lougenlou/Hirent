@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Calendar, Plus, X } from "lucide-react";
+import { API_URL, ENDPOINTS } from "../../config/api";
 
 /* -------------------------
    SMALL UI COMPONENTS
@@ -116,23 +117,23 @@ export default function AddNewItemForm() {
     zone: "",
     postalCode: "",
     province: "",
-    
+
     // Delivery
     deliveryAvailable: false,
     deliveryFee: "",
-    
+
     // Availability type
     availabilityType: "always", // always, specific-dates
     unavailableDates: [],
     minimumRentalDays: 1,
     maximumRentalDays: 30,
     advanceNoticeDays: 1,
-    
+
     color: "",
     customColor: "",
     itemOptions: [],
     customItem: "",
-    
+
     // Booking preferences
     instantBooking: false,
     requireApproval: true,
@@ -143,7 +144,10 @@ export default function AddNewItemForm() {
 
   const [imagePreviews, setImagePreviews] = useState([]);
   const [errors, setErrors] = useState({});
-  const [unavailableDate, setUnavailableDate] = useState({ start: "", end: "" });
+  const [unavailableDate, setUnavailableDate] = useState({
+    start: "",
+    end: "",
+  });
 
   /* OPTIONAL ITEMS */
   const OPTIONAL_ITEMS = [
@@ -284,7 +288,7 @@ export default function AddNewItemForm() {
     if (!formData.location) temp.location = "Location required";
     if (!formData.zone) temp.zone = "Zone / barangay required";
     if (!formData.postalCode) temp.postalCode = "Postal code required";
-    if (formData.deliveryAvailable && !formData.deliveryFee) 
+    if (formData.deliveryAvailable && !formData.deliveryFee)
       temp.deliveryFee = "Delivery fee required";
     if (imagePreviews.length === 0) temp.photo = "At least 1 photo required";
 
@@ -292,9 +296,55 @@ export default function AddNewItemForm() {
     return Object.keys(temp).length === 0;
   };
 
-  const submitForm = () => {
+  const submitForm = async () => {
+    // 1️⃣ Validate required fields
     if (!validateFields()) return;
-    console.log("SUBMITTED", formData);
+
+    try {
+      // 2️⃣ Prepare FormData for multipart request
+      const form = new FormData();
+
+      // Append all form fields except temporary ones
+      for (const key in formData) {
+        if (key !== "customItem" && key !== "customColor") {
+          const value = formData[key];
+          if (Array.isArray(value) || typeof value === "object") {
+            form.append(key, JSON.stringify(value));
+          } else {
+            form.append(key, value);
+          }
+        }
+      }
+
+      // Append images if any
+      const input = document.getElementById("uploadImg");
+      if (input?.files?.length) {
+        Array.from(input.files).forEach((file) => form.append("images", file));
+      }
+
+      // 3️⃣ Send request to backend
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_URL}${ENDPOINTS.ITEMS.CREATE}`, {
+        method: "POST",
+        body: form,
+        headers: {
+          Authorization: token ? `Bearer ${token}` : undefined,
+        },
+      });
+
+      const data = await response.json();
+
+      // 4️⃣ Handle response
+      if (data.success) {
+        alert("Item added successfully!");
+        clearAllFields();
+      } else {
+        alert(data.message || "Failed to add item.");
+      }
+    } catch (error) {
+      console.error("Error adding item:", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   /* -------------------------
@@ -418,9 +468,7 @@ export default function AddNewItemForm() {
             required
             value={formData.zone}
             error={errors.zone}
-            onChange={(e) =>
-              setFormData({ ...formData, zone: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, zone: e.target.value })}
           />
         </div>
 
@@ -455,7 +503,10 @@ export default function AddNewItemForm() {
             }
             className="w-5 h-5 text-purple-600 accent-purple-700 rounded focus:ring-purple-500"
           />
-          <label htmlFor="deliveryAvailable" className="text-sm font-medium text-gray-800 cursor-pointer">
+          <label
+            htmlFor="deliveryAvailable"
+            className="text-sm font-medium text-gray-800 cursor-pointer"
+          >
             I offer delivery service for this item
           </label>
         </div>
@@ -475,7 +526,8 @@ export default function AddNewItemForm() {
               }
             />
             <p className="text-[13px] text-gray-500 mt-2">
-              💡 You can adjust the delivery charge based on the renter's location during booking.
+              💡 You can adjust the delivery charge based on the renter's
+              location during booking.
             </p>
           </div>
         )}
@@ -502,7 +554,10 @@ export default function AddNewItemForm() {
                   value="always"
                   checked={formData.availabilityType === "always"}
                   onChange={(e) =>
-                    setFormData({ ...formData, availabilityType: e.target.value })
+                    setFormData({
+                      ...formData,
+                      availabilityType: e.target.value,
+                    })
                   }
                   className="text-purple-600 accent-purple-700 focus:ring-purple-500"
                 />
@@ -529,7 +584,10 @@ export default function AddNewItemForm() {
                   value="specific-dates"
                   checked={formData.availabilityType === "specific-dates"}
                   onChange={(e) =>
-                    setFormData({ ...formData, availabilityType: e.target.value })
+                    setFormData({
+                      ...formData,
+                      availabilityType: e.target.value,
+                    })
                   }
                   className="text-purple-600 accent-purple-700 focus:ring-purple-500"
                 />
@@ -607,7 +665,9 @@ export default function AddNewItemForm() {
 
               {formData.unavailableDates.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-gray-600">Blocked periods:</p>
+                  <p className="text-xs font-medium text-gray-600">
+                    Blocked periods:
+                  </p>
                   {formData.unavailableDates.map((d, i) => (
                     <div
                       key={i}
@@ -708,7 +768,11 @@ export default function AddNewItemForm() {
                   setFormData({ ...formData, color: formData.customColor })
                 }
                 className={`h-10 w-10 rounded-full border flex items-center justify-center
-                ${formData.color === formData.customColor ? "ring-2 ring-purple-600" : ""}`}
+                ${
+                  formData.color === formData.customColor
+                    ? "ring-2 ring-purple-600"
+                    : ""
+                }`}
                 style={{
                   backgroundColor: formData.customColor || "#ccc",
                 }}
@@ -819,7 +883,10 @@ export default function AddNewItemForm() {
                     value={p.value}
                     checked={formData.cancellationPolicy === p.value}
                     onChange={(e) =>
-                      setFormData({ ...formData, cancellationPolicy: e.target.value })
+                      setFormData({
+                        ...formData,
+                        cancellationPolicy: e.target.value,
+                      })
                     }
                     className="text-purple-600 accent-purple-700 focus:ring-purple-500"
                   />
@@ -839,7 +906,9 @@ export default function AddNewItemForm() {
               }`}
             >
               <div>
-                <p className="font-medium text-gray-800">Allow instant booking</p>
+                <p className="font-medium text-gray-800">
+                  Allow instant booking
+                </p>
                 <p className="text-xs text-gray-500">
                   Renters can confirm without waiting for your approval.
                 </p>
@@ -862,7 +931,9 @@ export default function AddNewItemForm() {
               }`}
             >
               <div>
-                <p className="font-medium text-gray-800">Require manual approval</p>
+                <p className="font-medium text-gray-800">
+                  Require manual approval
+                </p>
                 <p className="text-xs text-gray-500">
                   Review each booking request before it is confirmed.
                 </p>
@@ -871,7 +942,10 @@ export default function AddNewItemForm() {
                 type="checkbox"
                 checked={formData.requireApproval}
                 onChange={(e) =>
-                  setFormData({ ...formData, requireApproval: e.target.checked })
+                  setFormData({
+                    ...formData,
+                    requireApproval: e.target.checked,
+                  })
                 }
                 className="w-5 h-5 text-purple-600 accent-purple-700 rounded focus:ring-purple-500"
               />
@@ -885,7 +959,9 @@ export default function AddNewItemForm() {
               }`}
             >
               <div>
-                <p className="font-medium text-gray-800">Require government ID</p>
+                <p className="font-medium text-gray-800">
+                  Require government ID
+                </p>
                 <p className="text-xs text-gray-500">
                   Renter must upload valid identification before pickup.
                 </p>
@@ -911,7 +987,9 @@ export default function AddNewItemForm() {
               }`}
             >
               <div>
-                <p className="font-medium text-gray-800">Require rental insurance</p>
+                <p className="font-medium text-gray-800">
+                  Require rental insurance
+                </p>
                 <p className="text-xs text-gray-500">
                   Renter must have insurance that covers this item.
                 </p>
@@ -920,7 +998,10 @@ export default function AddNewItemForm() {
                 type="checkbox"
                 checked={formData.insuranceRequired}
                 onChange={(e) =>
-                  setFormData({ ...formData, insuranceRequired: e.target.checked })
+                  setFormData({
+                    ...formData,
+                    insuranceRequired: e.target.checked,
+                  })
                 }
                 className="w-5 h-5 text-purple-600 accent-purple-700 rounded focus:ring-purple-500"
               />

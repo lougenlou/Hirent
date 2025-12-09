@@ -131,6 +131,7 @@ const AuthForm = ({ mode }) => {
     window.location.href = 'http://localhost:5000/api/auth/google';
   };
 
+
   return (
     <div className="flex flex-col min-h-screen">
       <div
@@ -141,15 +142,6 @@ const AuthForm = ({ mode }) => {
           backgroundPosition: "center",
         }}
       >
-        {/* Admin Link */}
-        <div className="absolute top-4 right-4">
-          <Link
-            to="/admin-login"
-            className="text-purple-400 underline hover:text-purple-300 text-sm font-medium"
-          >
-            Admin View
-          </Link>
-        </div>
 
         {/* AUTH CARD */}
         <div
@@ -184,61 +176,86 @@ const AuthForm = ({ mode }) => {
 
             {/* FORM */}
             <form className="space-y-2 w-[90%]" onSubmit={handleSubmit}>
-              {/* NAME FIELD (signup only) */}
               {mode === "signup" && (
-                <div className="relative w-full">
+                <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                   <input
                     type="text"
+                    id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     placeholder=" "
-                    className="block px-2 pb-2 pt-4 w-full text-[14px] bg-[#f9f9f9] border-b-2 border-gray-200 focus:border-[#bb84d6] focus:outline-none peer"
+                    className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]  text-gray-900  bg-[#f9f9f9] border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                   />
-                  <label className="absolute text-[14px] top-2 left-2 text-gray-500 transition-all peer-focus:text-[#bb84d6] peer-focus:-translate-y-3 peer-focus:scale-90 peer-placeholder-shown:translate-y-1.5 peer-placeholder-shown:scale-100">
+                  <label
+                    htmlFor="name"
+                    className="absolute text-[14px] duration-300 transform -translate-y-3 scale-75 top-2 z-10 origin-[0] left-2
+                    peer-placeholder-shown:translate-y-1.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500
+                    peer-focus:-translate-y-3 peer-focus:scale-90 peer-focus:text-[#bb84d6]"
+                  >
                     Full Name
                   </label>
                 </div>
               )}
 
-              {/* EMAIL FIELD */}
-              <div className="relative w-full">
+              <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type="email"
+                  id="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   placeholder=" "
-                  className="block px-2 pb-2 pt-4 w-full text-[14px] bg-[#f9f9f9] border-b-2 border-gray-200 focus:border-[#bb84d6] focus:outline-none peer"
+                  className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]   text-gray-900  bg-[#f9f9f9]  border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                 />
-                <label className="absolute text-[14px] top-2 left-2 text-gray-500 transition-all peer-focus:text-[#bb84d6] peer-focus:-translate-y-3 peer-focus:scale-90 peer-placeholder-shown:translate-y-1.5 peer-placeholder-shown:scale-100">
+                <label
+                  htmlFor="email"
+                  className="absolute text-[14px] duration-300 transform -translate-y-3 scale-75 top-2 z-10 origin-[0] left-2
+                    peer-placeholder-shown:translate-y-1.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500
+                    peer-focus:-translate-y-3 peer-focus:scale-90 peer-focus:text-[#bb84d6]"
+                >
                   Email
                 </label>
               </div>
 
-              {/* PASSWORD FIELD */}
-              <div className="relative w-full">
+              <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type={showPassword ? "text" : "password"}
+                  id="password"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   placeholder=" "
-                  className="block px-2 pb-2 pt-4 w-full text-[14px] bg-[#f9f9f9] border-b-2 border-gray-200 focus:border-[#bb84d6] focus:outline-none peer"
+                  autoComplete="current-password"
+                  className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]   text-gray-900  bg-[#f9f9f9]  border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                 />
 
-                <label className="absolute text-[14px] top-2 left-2 text-gray-500 transition-all peer-focus:text-[#bb84d6] peer-focus:-translate-y-3 peer-focus:scale-90 peer-placeholder-shown:translate-y-1.5 peer-placeholder-shown:scale-100">
+                <label
+                  htmlFor="password"
+                  className="absolute text-[14px] duration-300 transform -translate-y-3 scale-75 top-2 z-10 origin-[0] left-2
+                    peer-placeholder-shown:translate-y-1.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:text-gray-500
+                    peer-focus:-translate-y-3 peer-focus:scale-90 peer-focus:text-[#bb84d6]"
+                >
                   Password
                 </label>
 
-                {/* Eye Toggle */}
+                {/* Eye toggle */}
                 {formData.password.length > 0 && (
                   <span
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer hover:text-[#7A1CA9]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-[#7A1CA9]"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                    {showPassword ? (
+                      <FiEyeOff size={20} />
+                    ) : (
+                      <FiEye size={20} />
+                    )}
                   </span>
                 )}
               </div>
-
               {/* ERROR MESSAGE */}
               {error && <p className="text-red-500 text-xs text-center">{error}</p>}
 

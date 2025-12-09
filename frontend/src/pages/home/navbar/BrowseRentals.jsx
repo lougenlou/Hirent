@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, MapPin, Bookmark, Eye, Check, ShoppingBag } from "lucide-react";
 import SortDropdown from "../../../components/dropdown/SortDropdown";
 import FilterSidebar from "../../../components/filters/FilterSidebar";
 import Navbar from "../../../components/layouts/MainNav";
 import BannerCarousel from "../../../components/carousels/BannerCarousel";
 import emptyListingsVector from "../../../assets/empty-listings.png";
 import dayjs from "dayjs";
-import mockListings from "../../../data/mockData";
-import { Base64 } from "js-base64";
-import { getFakeUser, generateFakeToken } from "../../../utils/fakeAuth";
 import RentalItemCard from "../../../components/cards/RentalItemCard";
+import { makeAPICall, ENDPOINTS } from "../../../config/api";
 
 const BrowseRentals = () => {
   const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [listings, setListings] = useState([]);
   const [filteredListings, setFilteredListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [filters, setFilters] = useState({
     category: "",
     location: "",
@@ -25,193 +25,143 @@ const BrowseRentals = () => {
     toDate: null,
     rating: null,
   });
+
   const [sortOption, setSortOption] = useState("Popular");
-  const [loading, setLoading] = useState(true);
-  const [collectionItems, setcollectionItems] = useState([]);
-
-  useEffect(() => {
-    document.title = "Hirent — Browse";
-
-    return () => {
-      document.title = "Hirent";
-    };
-  }, []);
-
-  useEffect(() => {
-    let user = getFakeUser();
-    if (!user) {
-      const token = generateFakeToken();
-      localStorage.setItem("fakeToken", token);
-      user = getFakeUser();
-    }
-
-    // Load user's collection from token
-    setcollectionItems(user.collection || []);
-  }, []);
   const [wishlist, setWishlist] = useState([]);
   const [justAdded, setJustAdded] = useState([]);
 
-  const handleAddToCollection = (item) => {
-    const existingcollection = collectionItems || [];
+  useEffect(() => {
+    document.title = "Hirent — Browse";
+    return () => (document.title = "Hirent");
+  }, []);
 
-    if (!existingcollection.find((i) => i.id === item.id)) {
-      const newcollectionItem = {
-        ...item,
-        days: 1,
-        userEnteredCoupon: "",
-        couponMessage: "",
-        adjustedSubtotal: parseFloat(
-          item.price.replace("₱", "").replace("/day", "")
-        ),
-        addedAt: new Date().toISOString(),
-      };
+  // -----------------------------
+  // 🔥 FETCH ITEMS FROM API
+  // -----------------------------
+  useEffect(() => {
+    const fetchItems = async () => {
+      setLoading(true);
+      try {
+        const data = await makeAPICall(ENDPOINTS.ITEMS.GET_ALL);
+        setListings(data.items || []);
+        setFilteredListings(data.items || []);
+      } catch (err) {
+        console.error("Error fetching items:", err);
+      }
+      setLoading(false);
+    };
 
-      const newcollection = [...existingcollection, newcollectionItem];
-      setcollectionItems(newcollection);
+    fetchItems();
+  }, []);
 
-      // Update localStorage
-      localStorage.setItem("collectionItems", JSON.stringify(newcollection));
+  // -----------------------------
+  // 🔥 FETCH USER WISHLIST
+  // -----------------------------
+  useEffect(() => {
+    const loadWishlist = async () => {
+      try {
+        const data = await makeAPICall(ENDPOINTS.WISHLIST.GET);
+        setWishlist(data.wishlist || []);
+      } catch (err) {
+        console.error("Error loading wishlist:", err);
+      }
+    };
 
-      // Update fake user token
-      const user = getFakeUser();
-      const updatedUser = { ...user, collection: newcollection };
-      const base64Payload = Base64.encode(JSON.stringify(updatedUser));
-      const newToken = `fakeHeader.${base64Payload}.fakeSignature`;
-      localStorage.setItem("fakeToken", newToken);
+    loadWishlist();
+  }, []);
 
-      // Show temporary "Added" state
+  // -----------------------------
+  // 🔥 ADD/REMOVE WISHLIST
+  // -----------------------------
+  const toggleWishlist = async (itemId) => {
+    try {
+      if (wishlist.includes(itemId)) {
+        await makeAPICall(ENDPOINTS.WISHLIST.REMOVE(itemId), { method: "DELETE" });
+        setWishlist((prev) => prev.filter((id) => id !== itemId));
+      } else {
+        await makeAPICall(ENDPOINTS.WISHLIST.ADD, {
+          method: "POST",
+          body: JSON.stringify({ itemId }),
+        });
+        setWishlist((prev) => [...prev, itemId]);
+      }
+    } catch (err) {
+      console.error("Wishlist update failed:", err);
+    }
+  };
+
+  // -----------------------------
+  // 🔥 ADD TO COLLECTION (CART)
+  // -----------------------------
+  const handleAddToCollection = async (item) => {
+    try {
+      await makeAPICall(ENDPOINTS.CART.ADD, {
+        method: "POST",
+        body: JSON.stringify({ itemId: item.id, days: 1 }),
+      });
+
+      // Show "added" animation
       setJustAdded((prev) => [...prev, item.id]);
       setTimeout(() => {
         setJustAdded((prev) => prev.filter((id) => id !== item.id));
-      }, 2000); // 2 seconds
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to add to cart:", err);
     }
   };
 
-  // wishlist
-  const toggleWishlist = (id) => {
-    let updatedWishlist = [];
-
-    setWishlist((prev) => {
-      updatedWishlist = prev.includes(id)
-        ? prev.filter((itemId) => itemId !== id)
-        : [...prev, id];
-      return updatedWishlist;
-    });
-
-    const user = getFakeUser();
-    const updatedUser = { ...user, wishlist: updatedWishlist };
-    const base64Payload = Base64.encode(JSON.stringify(updatedUser));
-    const newToken = `fakeHeader.${base64Payload}.fakeSignature`;
-
-    localStorage.setItem("fakeToken", newToken);
-  };
-
-  // fetch rental listings
-  useEffect(() => {
-    setLoading(true);
-    try {
-      setListings(mockListings);
-      setFilteredListings(mockListings);
-    } catch (error) {
-      console.error("Error fetching listings:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const user = getFakeUser();
-    if (user && user.wishlist) {
-      setWishlist(user.wishlist);
-    }
-  }, []);
-
-  // filtering + sorting
+  // -----------------------------
+  // 🔥 FILTER + SORT LOGIC
+  // -----------------------------
   useEffect(() => {
     let filtered = [...listings];
 
-    // category filter
     if (filters.category) {
       filtered = filtered.filter(
         (item) =>
-          item.category.toLowerCase().trim() ===
+          item.category?.toLowerCase().trim() ===
           filters.category.toLowerCase().trim()
       );
     }
 
-    // Location filter
     if (filters.location) {
       filtered = filtered.filter((item) =>
-        item.location.toLowerCase().includes(filters.location.toLowerCase())
+        item.location?.toLowerCase().includes(filters.location.toLowerCase())
       );
     }
 
-    // Price range filter
-    if (filters.priceRange && Array.isArray(filters.priceRange)) {
+    if (filters.priceRange) {
       const [min, max] = filters.priceRange;
       filtered = filtered.filter((item) => {
-        const numericPrice = parseFloat(
-          String(item.price).replace(/[^0-9.]/g, "")
-        );
-        return numericPrice >= min && numericPrice <= max;
+        const price = Number(item.price);
+        return price >= min && price <= max;
       });
     }
 
-    // rating filter
     if (filters.rating) {
       const min = filters.rating;
       const max = filters.rating + 0.9;
-
-      filtered = filtered.filter((item) => {
-        const rating = Number(item.rating);
-        return rating >= min && rating <= max;
-      });
+      filtered = filtered.filter((item) => item.rating >= min && item.rating <= max);
     }
 
-    // availability dates filter
-    if (
-      filters.fromDate &&
-      filters.toDate &&
-      (!dayjs(filters.fromDate).isSame(dayjs(), "day") ||
-        !dayjs(filters.toDate).isSame(dayjs(), "day"))
-    ) {
+    if (filters.fromDate && filters.toDate) {
+      const start = dayjs(filters.fromDate);
+      const end = dayjs(filters.toDate);
+
       filtered = filtered.filter((item) => {
         const availableFrom = dayjs(item.availableFrom);
         const availableTo = dayjs(item.availableTo);
-        const filterStart = dayjs(filters.fromDate).startOf("day");
-        const filterEnd = dayjs(filters.toDate).endOf("day");
-
-        const overlaps =
-          (availableFrom.isSame(filterStart, "day") &&
-            availableTo.isSame(filterEnd, "day")) ||
-          (availableFrom.isBefore(filterEnd, "day") &&
-            availableTo.isAfter(filterStart, "day")) ||
-          (availableFrom.isSame(filterStart, "day") &&
-            availableTo.isAfter(filterStart, "day")) ||
-          (availableFrom.isBefore(filterEnd, "day") &&
-            availableTo.isSame(filterEnd, "day"));
-
-        return overlaps;
+        return availableFrom.isBefore(end) && availableTo.isAfter(start);
       });
     }
 
-    // sorting logic
+    // Sorting
     if (sortOption === "Lowest Price") {
-      filtered.sort(
-        (a, b) =>
-          parseFloat(a.price.replace(/[^0-9.]/g, "")) -
-          parseFloat(b.price.replace(/[^0-9.]/g, ""))
-      );
+      filtered.sort((a, b) => a.price - b.price);
     } else if (sortOption === "Highest Price") {
-      filtered.sort(
-        (a, b) =>
-          parseFloat(b.price.replace(/[^0-9.]/g, "")) -
-          parseFloat(a.price.replace(/[^0-9.]/g, ""))
-      );
+      filtered.sort((a, b) => b.price - a.price);
     } else if (sortOption === "Newest") {
-      filtered.sort(
-        (a, b) => new Date(b.availableFrom) - new Date(a.availableFrom)
-      );
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (sortOption === "Popular") {
       filtered.sort((a, b) => b.rating - a.rating);
     }
@@ -219,62 +169,36 @@ const BrowseRentals = () => {
     setFilteredListings(filtered);
   }, [filters, listings, searchQuery, sortOption]);
 
-  // apply filters
-  const handleApplyFilters = (filterData) => {
-    setFilters(filterData);
-  };
+  const handleApplyFilters = (data) => setFilters(data);
 
   return (
-    <div className="flex flex-col ml-16 min-h-screen bg-white  text-purple-900  ">
-      {/* Navbar */}
-      <Navbar onSearch={(query) => setSearchQuery(query)} />
-
-      {/* Banner */}
+    <div className="flex flex-col ml-16 min-h-screen bg-white text-purple-900">
+      <Navbar onSearch={setSearchQuery} />
       <BannerCarousel />
-
       <div className="mt-36"></div>
 
-      {/* Content */}
-      <div className=" flex flex-1 overflow-hidden px-4 py-8 gap-4 bg-[#fbfbfb]  ">
-        {/* Filter Sidebar */}
+      <div className="flex flex-1 overflow-hidden px-4 py-8 gap-4 bg-[#fbfbfb]">
         <FilterSidebar onApplyFilters={handleApplyFilters} />
 
-        {/* Listings Section */}
         <main className="flex-1 overflow-y-auto p-2 md:p-5 lg:p-2">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[20px] font-semibold text-purple-900 flex items-center gap-1">
+            <h2 className="text-[20px] text-gray-800 font-semibold flex items-center gap-1">
               <span className="inline-block w-3 h-6 bg-[#7A1CA9] rounded mr-2"></span>
-              {filters.category || "All Rentals"}{" "}
-              <span className="text-[#9129c5] font-normal ml-1">
-                ({filteredListings.length})
-              </span>
+              {filters.category || "All Rentals"}
+              <span className="text-[#9129c5] ml-1">({filteredListings.length})</span>
             </h2>
+
             <SortDropdown onSortChange={setSortOption} />
           </div>
 
-          {/* Loading or No Results */}
           {loading ? (
-            <div className="text-center text-gray-500 py-20">
-              Loading listings...
-            </div>
+            <div className="text-center text-gray-500 py-20">Loading listings...</div>
           ) : filteredListings.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10">
-              {/* Empty image */}
-              <img
-                src={emptyListingsVector}
-                alt="No Listings"
-                className="w-72 h-72 mb-4 object-contain"
-              />
-
-              {/* Heading */}
-              <h2 className="text-[20px] font-bold text-gray-600 mb-2">
-                No Rentals Found
-              </h2>
-
-              {/* Description */}
-              <p className="text-[14px] text-gray-400 mb-6 text-center max-w-sm">
-                Sorry! We couldn't find any rentals matching your search or
-                filters. Try adjusting your filters or search query.
+              <img src={emptyListingsVector} alt="No Listings" className="w-52 h-72 mb-4" />
+              <h2 className="text-[24px] font-bold text-gray-600 mb-1">No Rentals Found</h2>
+              <p className="text-[16px] text-gray-400 mb-6 text-center max-w-sm">
+                Try adjusting your search or filters.
               </p>
             </div>
           ) : (

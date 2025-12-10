@@ -10,7 +10,6 @@ import {
     BadgeCheck,
     CircleCheckBig,
     ClockFading,
-    Truck,
 } from "lucide-react";
 
 // TODO: Backend must return:

@@ -212,7 +212,7 @@ const CollectionPage = () => {
       <div className="flex-1 pl-6 pt-8 pb-12">
         {collectionItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[90vh] w-full">
-            <img src={emptycollection} className="w-64 h-64 mb-3" />
+            <img src={emptycollection} alt={item.name} className="w-64 h-64 mb-3" />
             <h2 className="text-[22px] font-bold text-gray-700">No Items in Collection</h2>
             <p className="text-gray-400 text-center max-w-sm mb-4">
               Looks like you haven’t added any items yet.

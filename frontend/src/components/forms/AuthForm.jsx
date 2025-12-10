@@ -82,10 +82,16 @@ const AuthForm = ({ mode }) => {
 
     // CALL BACKEND API
     try {
-      const endpoint = mode === "signup" ? "/api/auth/register" : "/api/auth/login";
-      const payload = mode === "signup" 
-        ? { name: formData.name, email: formData.email, password: formData.password }
-        : { email: formData.email, password: formData.password };
+      const endpoint =
+        mode === "signup" ? "/api/auth/register" : "/api/auth/login";
+      const payload =
+        mode === "signup"
+          ? {
+              name: formData.name,
+              email: formData.email,
+              password: formData.password,
+            }
+          : { email: formData.email, password: formData.password };
 
       const response = await fetch(`http://localhost:5000${endpoint}`, {
         method: "POST",
@@ -103,16 +109,23 @@ const AuthForm = ({ mode }) => {
       }
 
       if (data.token) {
-        // Store token and user data
         const user = data.user || { email: formData.email };
+
+        // Check if current route is renter login and user is owner
+        if (mode === "login" && user.role === "owner") {
+          // Redirect to owner login instead
+          navigate("/ownerlogin", { replace: true });
+          return; // Prevent logging in as renter
+        }
+
         login(data.token, user);
-        
-        // Redirect based on user role
+
+        // Continue with original redirects
         setTimeout(() => {
-          if (user.role === 'owner') {
-            navigate('/owner/dashboard', { replace: true });
+          if (user.role === "owner") {
+            navigate("/owner/dashboard", { replace: true });
           } else {
-            navigate('/', { replace: true });
+            navigate("/", { replace: true });
           }
         }, 300);
       } else {
@@ -124,13 +137,11 @@ const AuthForm = ({ mode }) => {
     }
   };
 
-  // GOOGLE LOGIN HANDLER
   const handleGoogleAuth = () => {
-    // Redirect to backend Google OAuth endpoint
-    // For signup: uses standard /google route (creates renter by default)
-    // For login: uses standard /google route (logs in existing user)
-    window.location.href = 'http://localhost:5000/api/auth/google';
-  };
+  // mode = "login" or "signup"
+  const from = window.location.pathname; // "/login" or "/ownerlogin"
+  window.location.href = `http://localhost:5000/api/auth/google?mode=${mode}&from=${encodeURIComponent(from)}`;
+};
 
 
   return (
@@ -143,7 +154,6 @@ const AuthForm = ({ mode }) => {
           backgroundPosition: "center",
         }}
       >
-
         {/* AUTH CARD */}
         <div
           className={`z-10 cursor-default bg-white ${
@@ -153,7 +163,11 @@ const AuthForm = ({ mode }) => {
           {/* FORM AREA */}
           <div className="flex flex-col justify-center items-center w-full p-5">
             <div className="flex flex-col items-start justify-start ml-12 w-full">
-              <img src={hirentLogo} alt="Hirent Logo" className="w-24 h-auto mb-6" />
+              <img
+                src={hirentLogo}
+                alt="Hirent Logo"
+                className="w-24 h-auto mb-6"
+              />
             </div>
 
             <div className="w-full flex flex-col items-start ml-12">
@@ -162,7 +176,7 @@ const AuthForm = ({ mode }) => {
                   to="/ownersignup"
                   className="text-[13px] font-medium text-[#7a19aa] hover:underline mb-1"
                 >
-                  Be an Owner ➔
+                  Be an Owner →
                 </Link>
               )}
 
@@ -171,7 +185,7 @@ const AuthForm = ({ mode }) => {
                   to="/ownerlogin"
                   className="text-[13px] font-medium text-[#7a19aa] hover:underline mb-1"
                 >
-                  Log In as Owner ➔
+                  Log In as Owner →
                 </Link>
               )}
 
@@ -180,7 +194,9 @@ const AuthForm = ({ mode }) => {
               </h2>
 
               <p className="text-[14.5px] font-medium text-gray-600 mb-4">
-                {mode === "signup" ? "Sign up now and explore the platform" : "Continue to Hirent"}
+                {mode === "signup"
+                  ? "Sign up now and explore the platform"
+                  : "Continue to Hirent"}
               </p>
             </div>
 
@@ -267,7 +283,9 @@ const AuthForm = ({ mode }) => {
                 )}
               </div>
               {/* ERROR MESSAGE */}
-              {error && <p className="text-red-500 text-xs text-center">{error}</p>}
+              {error && (
+                <p className="text-red-500 text-xs text-center">{error}</p>
+              )}
 
               {/* SUBMIT BUTTON */}
               <button
@@ -294,7 +312,9 @@ const AuthForm = ({ mode }) => {
 
             {/* SWITCH LOGIN / SIGNUP */}
             <p className="text-[12.5px] text-gray-600 text-center mt-5 mb-8">
-              {mode === "signup" ? "Already have an account?" : "Don’t have an account?"}{" "}
+              {mode === "signup"
+                ? "Already have an account?"
+                : "Don’t have an account?"}{" "}
               <Link
                 to={mode === "signup" ? "/login" : "/signup"}
                 className="text-[#862bb3] hover:underline font-medium"
@@ -308,7 +328,9 @@ const AuthForm = ({ mode }) => {
               <div className="w-full flex flex-col items-start ml-12">
                 <p className="text-[12px] text-gray-600 mb-3">
                   By proceeding, you agree to the{" "}
-                  <span className="text-blue-600 cursor-pointer hover:underline">Terms and Conditions</span>{" "}
+                  <span className="text-blue-600 cursor-pointer hover:underline">
+                    Terms and Conditions
+                  </span>{" "}
                   and
                   <br />
                   <span className="text-blue-600 cursor-pointer hover:underline">

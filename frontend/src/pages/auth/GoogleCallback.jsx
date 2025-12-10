@@ -2,100 +2,81 @@ import React, { useContext, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
-/**
- * GoogleCallback - Handles the redirect from Google OAuth
- * Extracts token and user data from the URL query parameters
- */
 const GoogleCallback = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
-  const processedRef = useRef(false); // Prevent multiple executions
+  const processedRef = useRef(false);
 
   useEffect(() => {
-    // Prevent running effect multiple times in StrictMode
     if (processedRef.current) return;
     processedRef.current = true;
 
-    const handleCallback = () => {
-      try {
-        const token = searchParams.get("token");
-        const userParam = searchParams.get("user");
-        const error = searchParams.get("error");
+    try {
+      const token = searchParams.get("token");
+      const userParam = searchParams.get("user");
+      const errorParam = searchParams.get("error");
+      const from = searchParams.get("from"); // "/ownersignup", "/ownerlogin", or "/"
 
-        if (error) {
-          throw new Error(decodeURIComponent(error));
+      if (errorParam) throw new Error(decodeURIComponent(errorParam));
+      if (!token || !userParam) throw new Error("Missing token or user data");
+
+      const user = JSON.parse(decodeURIComponent(userParam));
+
+      // ---------- OWNER SIGNUP ----------
+      if (from === "/ownersignup") {
+        if (user.role !== "owner") {
+          // Rule 1: existing renter → block
+          navigate("/ownersignup", {
+            replace: true,
+            state: { error: "This Google account is already registered as a renter. Please use another account." },
+          });
+          return;
         }
 
-        if (token) {
-          let userData = null;
-          
-          if (userParam) {
-            try {
-              userData = JSON.parse(decodeURIComponent(userParam));
-            } catch (parseErr) {
-              console.error("Error parsing user data:", parseErr);
-            }
-          }
-
-          login(token, userData);
-
-          setTimeout(() => {
-            const userRole = userData?.role || 'renter';
-            
-            // If new user (not previously in DB), redirect to appropriate signup
-            if (userData?.isNewUser) {
-              console.log("[GoogleCallback] New user detected, redirecting to signup");
-              if (userRole === 'owner') {
-                // New owner - redirect to OwnerSetup to complete profile
-                navigate('/ownersetup', { 
-                  replace: true,
-                  state: { 
-                    googleData: userData,
-                    message: "Complete your owner profile"
-                  }
-                });
-              } else {
-                navigate('/signup', { 
-                  replace: true,
-                  state: { 
-                    googleData: userData,
-                    message: "Complete your profile"
-                  }
-                });
-              }
-            } else {
-              // Existing user - redirect based on role
-              if (userRole === 'owner') {
-                // Check if owner has completed setup
-                const ownerSetupCompleted = userData?.ownerSetupCompleted;
-                if (!ownerSetupCompleted) {
-                  // Owner hasn't completed setup yet - redirect back to setup
-                  console.log("[GoogleCallback] Owner setup incomplete, redirecting to setup");
-                  navigate('/ownersetup', { replace: true });
-                } else {
-                  navigate('/owner/dashboard', { replace: true });
-                }
-              } else {
-                navigate('/', { replace: true });
-              }
-            }
-          }, 100);
+        login(token, user);
+        if (!user.ownerSetupCompleted) {
+          // Rule 3: new owner → setup
+          navigate("/ownersetup", { replace: true, state: { googleData: user } });
         } else {
-          throw new Error("Missing authentication token");
+          // Rule 2: existing owner → dashboard
+          navigate("/owner/dashboard", { replace: true });
         }
-      } catch (err) {
-        console.error("Google callback error:", err);
-        
-        // Redirect to signup with error message
-        navigate("/signup", {
-          replace: true,
-          state: { error: err.message },
-        });
+        return;
       }
-    };
 
-    handleCallback();
+      // ---------- OWNER LOGIN ----------
+      if (from === "/ownerlogin") {
+        if (user.role !== "owner") {
+          navigate("/ownerlogin", {
+            replace: true,
+            state: { error: "This Google account is registered as a renter. Please use another account." },
+          });
+          return;
+        }
+
+        login(token, user);
+        navigate("/owner/dashboard", { replace: true });
+        return;
+      }
+
+      // ---------- RENTER LOGIN / SIGNUP ----------
+      if (user.role === "renter") {
+        login(token, user);
+        navigate("/", { replace: true });
+        return;
+      }
+
+      // ---------- FALLBACK ----------
+      login(token, user);
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error("Google callback error:", err);
+      navigate("/ownersignup", {
+        replace: true,
+        state: { error: err.message },
+      });
+    }
   }, [searchParams, navigate, login]);
 
   return (
@@ -114,7 +95,9 @@ const GoogleCallback = () => {
         <div className="flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-200 border-t-purple-600"></div>
         </div>
-        <p className="text-sm text-gray-500 mt-4">Please wait while we complete your authentication</p>
+        <p className="text-sm text-gray-500 mt-4">
+          Please wait while we complete your authentication
+        </p>
       </div>
     </div>
   );

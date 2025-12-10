@@ -37,7 +37,7 @@ const OwnerSidebar = () => {
   const handleLogout = () => {
     localStorage.removeItem("userToken");
     localStorage.removeItem("userData");
-    navigate("/login");
+    navigate("/ownerlogin");
   };
 
   return (

@@ -193,66 +193,68 @@ const loginUser = async (req, res) => {
 const googleAuth = async (req, res) => {
   try {
     const { googleId, email, name, avatar } = req.user;
-    const { state } = req.query; // state=owner for owner signup flow
-
-    // Normalize email
+    const { state, from } = req.query; // state = "owner" for owner signup flow
     const normalizedEmail = email?.toLowerCase().trim();
 
-    console.log("[GOOGLE AUTH] Processing:", { email: normalizedEmail, state });
+    let user = await User.findOne({
+      $or: [{ googleId }, { email: normalizedEmail }],
+    });
 
-    // Check if user exists
-    let user = await User.findOne({ $or: [{ googleId }, { email: normalizedEmail }] });
-    let isNewUser = false;
+    // -------------------------------
+    // BLOCK INVALID OWNER LOGIN/SIGNUP
+    // -------------------------------
+    if (state === "owner") {
+      if (user) {
+        if (user.role !== "owner") {
+          // Existing renter → block login/signup
+          return res.redirect(
+            `http://localhost:3000/ownersignup?error=${encodeURIComponent(
+              "This Google account is registered as a renter. Cannot use it as owner."
+            )}`
+          );
+        }
+      } else {
+        // New account → do NOT create new owner
+        return res.redirect(
+          `http://localhost:3000/ownersignup?error=${encodeURIComponent(
+            "Cannot register new owner via Google. Use a pre-approved owner account."
+          )}`
+        );
+      }
+    }
 
+    // -------------------------------
+    // CREATE/UPDATE RENTER ACCOUNT
+    // -------------------------------
     if (!user) {
-      // NEW USER - Determine role based on state parameter
-      const role = state === "owner" ? "owner" : "renter";
-      console.log("[GOOGLE AUTH] Creating new user with role:", role);
-
       user = new User({
         googleId,
         email: normalizedEmail,
         name,
         avatar,
-        role,
+        role: "renter",
         authProvider: "google",
       });
       await user.save();
-      isNewUser = true;
-      console.log("[GOOGLE AUTH] New user created:", user._id, "role:", role);
     } else {
-      // EXISTING USER
-      console.log("[GOOGLE AUTH] User exists:", user._id);
-
-      // Link Google account if not already linked
+      // Existing user → just link Google ID if missing
       if (!user.googleId) {
         user.googleId = googleId;
         user.authProvider = "google";
-        console.log("[GOOGLE AUTH] Linked Google account to existing user");
       }
-
-      // Update avatar if provided
-      if (avatar && !user.avatar) {
-        user.avatar = avatar;
-      }
-
-      // Add owner role if state=owner and user doesn't have it
-      if (state === "owner" && user.role !== "owner") {
-        user.role = "owner";
-        console.log("[GOOGLE AUTH] Upgraded user to owner role");
-      }
-
+      if (avatar && !user.avatar) user.avatar = avatar;
       await user.save();
     }
 
-    // Generate JWT token
+    // -------------------------------
+    // GENERATE JWT & REDIRECT
+    // -------------------------------
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // Build response with all user fields
     const userResponse = {
       id: user._id,
       name: user.name,
@@ -293,17 +295,16 @@ const googleAuth = async (req, res) => {
       ewalletName: user.ewalletName,
     };
 
-    // Redirect to frontend with token in query parameter
-    const redirectUrl = `http://localhost:3000/auth-callback?token=${token}&user=${encodeURIComponent(
-      JSON.stringify(userResponse)
-    )}`;
 
-    console.log("[GOOGLE AUTH] Redirecting to:", redirectUrl);
-    res.redirect(redirectUrl);
+    return res.redirect(
+      `http://localhost:3000/auth-callback?token=${token}&user=${encodeURIComponent(
+        JSON.stringify(userResponse)
+      )}&from=${encodeURIComponent(from)}`
+    );
   } catch (err) {
-    console.error("[GOOGLE AUTH] Error:", err.message);
-    res.redirect(
-      `http://localhost:3000/signup?error=${encodeURIComponent(
+    console.error("[GOOGLE AUTH] Error:", err);
+    return res.redirect(
+      `http://localhost:3000/ownersignup?error=${encodeURIComponent(
         "Google authentication failed: " + err.message
       )}`
     );
@@ -378,8 +379,10 @@ const updateProfile = async (req, res) => {
     // --- Handle avatar upload ---
     if (req.file) {
       // Convert file buffer to base64
-      user.avatar = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-    } else if (req.body.avatar && req.body.avatar.startsWith('data:')) {
+      user.avatar = `data:${
+        req.file.mimetype
+      };base64,${req.file.buffer.toString("base64")}`;
+    } else if (req.body.avatar && req.body.avatar.startsWith("data:")) {
       // Handle base64 avatar from FormData
       user.avatar = req.body.avatar;
     }
@@ -404,7 +407,8 @@ const updateProfile = async (req, res) => {
     if (cityName) user.cityName = cityName;
     if (barangay) user.barangay = barangay;
     if (postalCode) user.postalCode = postalCode;
-    if (ownerSetupCompleted !== undefined) user.ownerSetupCompleted = ownerSetupCompleted;
+    if (ownerSetupCompleted !== undefined)
+      user.ownerSetupCompleted = ownerSetupCompleted;
 
     // --- Update business fields ---
     if (businessName) user.businessName = businessName;
@@ -461,12 +465,10 @@ const updateProfile = async (req, res) => {
     });
   } catch (err) {
     console.error("[UPDATE PROFILE] Error:", err);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error updating profile: " + err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Error updating profile: " + err.message,
+    });
   }
 };
 

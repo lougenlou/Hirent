@@ -10,6 +10,7 @@ const session = require("express-session");
 const multer = require("multer");
 const errorHandler = require("./middleware/errorHandler");
 const path = require("path");
+const authRoutes = require("./routes/authRoutes");
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, ".env") });
@@ -25,6 +26,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use("/api/auth", authRoutes);
 
 // Configure multer for file uploads
 const storage = multer.memoryStorage(); // Store files in memory

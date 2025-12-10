@@ -1,16 +1,17 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../../assets/Auth.css";
 import logo from "../../assets/logo.png";
 import hirentLogo from "../../assets/hirent-logo-purple.png";
 import bg from "../../assets/auth-owner-bg.jpg";
 import Footer from "../../components/layouts/Footer";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { makeAPICall, ENDPOINTS } from "../../config/api"; // ✓ Use centralized API
 
 const OwnerSignup = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
@@ -18,9 +19,22 @@ const OwnerSignup = () => {
     email: "",
     password: "",
   });
-
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  // -------------------------------
+  // Show GoogleCallback errors if any
+  // -------------------------------
+  useEffect(() => {
+    if (location.state?.error) {
+      setError(location.state.error);
+      // Clear state after showing
+      const timer = setTimeout(() => {
+        navigate(location.pathname, { replace: true, state: {} });
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [location, navigate]);
 
   // -------------------------------
   // Validation Helpers
@@ -42,33 +56,16 @@ const OwnerSignup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate name
-    if (!formData.name.trim()) {
-      setError("Name is required.");
-      return;
-    }
-
-    // Validate email
-    if (!formData.email) {
-      setError("Email is required.");
-      return;
-    }
-    if (!validateEmail(formData.email)) {
-      setError("Enter a valid email address.");
-      return;
-    }
-
-    // Validate password
+    // Validate inputs
+    if (!formData.name.trim()) return setError("Name is required.");
+    if (!formData.email) return setError("Email is required.");
+    if (!validateEmail(formData.email)) return setError("Enter a valid email.");
     const passwordError = validatePassword(formData.password);
-    if (passwordError) {
-      setError(passwordError);
-      return;
-    }
+    if (passwordError) return setError(passwordError);
 
     setError("");
 
     try {
-      // ✓ Call backend through centralized API config
       const data = await makeAPICall(ENDPOINTS.AUTH.REGISTER, {
         method: "POST",
         body: JSON.stringify({
@@ -79,24 +76,31 @@ const OwnerSignup = () => {
         }),
       });
 
-      if (!data || !data.token) {
-        setError(data?.msg || data?.message || "Registration failed.");
-        return;
+      if (!data || !data.token)
+        return setError(data?.msg || data?.message || "Registration failed.");
+
+      const user = data.user || { email: formData.email, role: "owner" };
+
+      // Enforce owner role
+      if (user.role !== "owner") {
+        return setError(
+          user.role === "renter"
+            ? "Account is registered as a renter. Use renter login."
+            : "Invalid account role."
+        );
       }
 
-      // Save Auth
-      const user = data.user || { email: formData.email, role: "owner" };
+      // Log in
       login(data.token, user);
-
-      // Clear any previous owner setup data for fresh start
       localStorage.removeItem("ownerFormData");
 
-      // ✓ Redirect owners to setup flow
+      // Redirect to setup flow
       navigate("/ownersetup", { replace: true });
-
     } catch (err) {
       console.error("Owner signup error:", err);
-      setError("Network error. Please try again.");
+      setError(
+        err?.message || "Network error or server issue. Please try again later."
+      );
     }
   };
 
@@ -104,8 +108,13 @@ const OwnerSignup = () => {
   // GOOGLE SIGNUP → Owner
   // -------------------------------
   const handleGoogleSignup = () => {
-    window.location.href =
-      "http://localhost:5000/api/auth/google/owner";
+    const from = "/ownersignup"; // or "/ownerlogin"
+    const state = "owner"; // tells backend this is owner signup flow
+
+    // Redirect to backend endpoint that starts Google OAuth
+    window.location.href = `http://localhost:5000/api/auth/google?state=${encodeURIComponent(
+      state
+    )}&from=${encodeURIComponent(from)}&prompt=select_account`;
   };
 
   return (
@@ -124,12 +133,21 @@ const OwnerSignup = () => {
 
         <div className="z-10 cursor-default bg-white w-[480px] h-[650px] rounded-2xl shadow-2xl flex flex-row overflow-hidden hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
           <div className="flex flex-col justify-center items-center w-full p-4">
-
             <div className="flex flex-col items-start justify-start ml-12 w-full">
-              <img src={hirentLogo} alt="Hirent Logo" className="w-24 h-auto mb-6" />
+              <img
+                src={hirentLogo}
+                alt="Hirent Logo"
+                className="w-24 h-auto mb-6"
+              />
             </div>
 
             <div className="w-full flex flex-col items-start ml-14">
+              <Link
+                to="/signup"
+                className="text-[13px] font-medium text-[#7a19aa] hover:underline mb-1"
+              >
+                ← Go Back
+              </Link>
               <h2 className="text-[23px] font-bold text-gray-900">
                 Become an Owner
               </h2>
@@ -204,12 +222,18 @@ const OwnerSignup = () => {
                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-[#7A1CA9]"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                    {showPassword ? (
+                      <FiEyeOff size={20} />
+                    ) : (
+                      <FiEye size={20} />
+                    )}
                   </span>
                 )}
               </div>
 
-              {error && <p className="text-red-500 text-xs text-center">{error}</p>}
+              {error && (
+                <p className="text-red-500 text-xs text-center">{error}</p>
+              )}
 
               {/* BUTTONS */}
               <div className="flex flex-col gap-2">
@@ -222,7 +246,7 @@ const OwnerSignup = () => {
 
                 <button
                   type="button"
-                  onClick={handleGoogleSignup}
+                  onClick={() => handleGoogleSignup("owner")}
                   className="w-full border border-gray-400 flex items-center justify-center gap-2 py-3 text-[14px] rounded-md text-gray-700 hover:text-[#9935cb] hover:border-[#9935cb] transition-all"
                 >
                   <img
@@ -237,26 +261,29 @@ const OwnerSignup = () => {
 
             <p className="text-[12.5px] text-gray-600 text-center mt-5 mb-8">
               Already have an account?{" "}
-              <Link to="/login" className="text-[#862bb3] hover:underline font-medium">
+              <Link
+                to="/ownerlogin"
+                className="text-[#862bb3] hover:underline font-medium"
+              >
                 Login ➔
               </Link>
             </p>
 
             <div className="w-full flex flex-col items-start ml-12">
-                <p className="text-[12px] text-gray-600 mb-3">
-                  By proceeding, you agree to the{" "}
-                  <span className="text-blue-600 cursor-pointer hover:underline">Terms and Conditions</span>{" "}
-                  and
-                  <br />
-                  <span className="text-blue-600 cursor-pointer hover:underline">
-                    Privacy Policy
-                  </span>
-                </p>
-              </div>
-              {/* BOTTOM LINKS */}
-            <div
-              className="w-full flex gap-3 text-[12px] text-gray-500 mt-4 justify-start ml-12"
-            >
+              <p className="text-[12px] text-gray-600 mb-3">
+                By proceeding, you agree to the{" "}
+                <span className="text-blue-600 cursor-pointer hover:underline">
+                  Terms and Conditions
+                </span>{" "}
+                and
+                <br />
+                <span className="text-blue-600 cursor-pointer hover:underline">
+                  Privacy Policy
+                </span>
+              </p>
+            </div>
+            {/* BOTTOM LINKS */}
+            <div className="w-full flex gap-3 text-[12px] text-gray-500 mt-4 justify-start ml-12">
               <span className="hover:underline cursor-pointer">Help</span>
               <span className="hover:underline cursor-pointer">Privacy</span>
               <span className="hover:underline cursor-pointer">Terms</span>

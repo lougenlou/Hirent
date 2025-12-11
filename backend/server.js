@@ -23,7 +23,7 @@ const app = express();
 // Middleware
 // -------------------------
 app.use(cors({
-  origin: "http://localhost:3001",
+  origin: "https://hirenttttttt.netlify.app",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],

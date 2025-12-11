@@ -19,7 +19,7 @@ export const ENDPOINTS = {
     REGISTER: `${API_PREFIX}/auth/register`,
     LOGIN: `${API_PREFIX}/auth/login`,
     GOOGLE: `${API_PREFIX}/auth/google`,
-    GOOGLE_CALLBACK: `${API_PREFIX}/auth/google/callback`,
+    GOOGLE_CALLBACK: `${API_PREFIX}api/auth/google/callback`,
     PROFILE: `${API_PREFIX}/auth/profile`,
   },
 

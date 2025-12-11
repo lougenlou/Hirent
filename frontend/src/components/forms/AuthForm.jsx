@@ -34,104 +34,98 @@ const AuthForm = ({ mode }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // --- NAME (signup only) ---
-    if (mode === "signup" && !formData.name.trim()) {
-      setError("Name is required.");
+  // --- Validation logic (unchanged) ---
+  if (mode === "signup" && !formData.name.trim()) {
+    setError("Name is required.");
+    return;
+  }
+
+  if (mode === "signup" && !validateName(formData.name)) {
+    setError("Name must be at least 2 characters.");
+    return;
+  }
+
+  if (!formData.email.trim()) {
+    setError("Email is required.");
+    return;
+  }
+
+  if (!validateEmail(formData.email)) {
+    setError("Enter a valid email address.");
+    return;
+  }
+
+  if (!formData.password) {
+    setError("Password is required.");
+    return;
+  }
+
+  if (formData.password.length < 6) {
+    setError("Password must be at least 6 characters.");
+    return;
+  }
+
+  if (!/[0-9]/.test(formData.password)) {
+    setError("Password must include at least one number.");
+    return;
+  }
+
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+    setError("Password must include at least one special character.");
+    return;
+  }
+
+  setError("");
+
+  // --- Backend API call ---
+  try {
+    const endpoint = mode === "signup" ? "/api/auth/register" : "/api/auth/login";
+    const payload = mode === "signup"
+      ? { name: formData.name, email: formData.email, password: formData.password }
+      : { email: formData.email, password: formData.password };
+
+    const response = await fetch(`${process.env.REACT_APP_API_URL}${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.msg || data.message || "Authentication failed");
       return;
     }
 
-    if (mode === "signup" && !validateName(formData.name)) {
-      setError("Name must be at least 2 characters.");
-      return;
+    if (data.token) {
+      const user = data.user || { email: formData.email };
+      login(data.token, user);
+
+      setTimeout(() => {
+        if (user.role === "owner") {
+          navigate("/owner/dashboard", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      }, 300);
+    } else {
+      setError("No token received from server");
     }
+  } catch (err) {
+    console.error("Auth error:", err);
+    setError("Network error. Please try again.");
+  }
+};
 
-    // --- EMAIL ---
-    if (!formData.email.trim()) {
-      setError("Email is required.");
-      return;
-    }
+// --- Google Auth handler ---
+const handleGoogleAuth = () => {
+  // For renter login/signup
+  const googleUrl = mode === "signup"
+    ? `${process.env.REACT_APP_API_URL}/api/auth/google`
+    : `${process.env.REACT_APP_API_URL}/api/auth/google`;
 
-    if (!validateEmail(formData.email)) {
-      setError("Enter a valid email address.");
-      return;
-    }
-
-    // --- PASSWORD ---
-    if (!formData.password) {
-      setError("Password is required.");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
-
-    if (!/[0-9]/.test(formData.password)) {
-      setError("Password must include at least one number.");
-      return;
-    }
-
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
-      setError("Password must include at least one special character.");
-      return;
-    }
-
-    // --- CLEAR ERRORS ---
-    setError("");
-
-    // CALL BACKEND API
-    try {
-      const endpoint = mode === "signup" ? "/api/auth/register" : "/api/auth/login";
-      const payload = mode === "signup" 
-        ? { name: formData.name, email: formData.email, password: formData.password }
-        : { email: formData.email, password: formData.password };
-
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.msg || data.message || "Authentication failed");
-        return;
-      }
-
-      if (data.token) {
-        // Store token and user data
-        const user = data.user || { email: formData.email };
-        login(data.token, user);
-        
-        // Redirect based on user role
-        setTimeout(() => {
-          if (user.role === 'owner') {
-            navigate('/owner/dashboard', { replace: true });
-          } else {
-            navigate('/', { replace: true });
-          }
-        }, 300);
-      } else {
-        setError("No token received from server");
-      }
-    } catch (err) {
-      console.error("Auth error:", err);
-      setError("Network error. Please try again.");
-    }
-  };
-
-  // GOOGLE LOGIN HANDLER
-  const handleGoogleAuth = () => {
-    // Redirect to backend Google OAuth endpoint
-    // For signup: uses standard /google route (creates renter by default)
-    // For login: uses standard /google route (logs in existing user)
-    window.location.href = 'http://localhost:5000/api/auth/google';
-  };
-
+  window.location.href = googleUrl;
+};
 
   return (
     <div className="flex flex-col min-h-screen">

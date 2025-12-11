@@ -103,8 +103,7 @@ const OwnerLogin = () => {
   // -------------------------------
   const handleGoogleLogin = () => {
   // Pass mode=ownerlogin so GoogleCallback knows this is owner login
-  window.location.href =
-    "http://localhost:5000/api/auth/google/owner?mode=ownerlogin";
+  window.location.href = `${process.env.REACT_APP_FRONTEND_URL}/auth-callback?token=${token}&user=${JSON.stringify(user)}`;
 };
 
   return (

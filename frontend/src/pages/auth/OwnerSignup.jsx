@@ -104,8 +104,7 @@ const OwnerSignup = () => {
   // GOOGLE SIGNUP → Owner
   // -------------------------------
   const handleGoogleSignup = () => {
-    window.location.href =
-      "http://localhost:5000/api/auth/google/owner";
+    window.location.href = `${process.env.REACT_APP_FRONTEND_URL}/auth-callback?token=${token}&user=${JSON.stringify(user)}`;
   };
 
   return (

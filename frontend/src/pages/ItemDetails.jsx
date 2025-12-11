@@ -6,7 +6,8 @@ import { AuthContext } from '../context/AuthContext';
 // Helper function to fetch updated count from backend
 const fetchWishlistCount = async (token) => {
   try {
-    const response = await fetch('http://localhost:5000/api/wishlist/count', {
+    const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+    const response = await fetch(`${API_URL}/wishlist/count`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
@@ -19,7 +20,8 @@ const fetchWishlistCount = async (token) => {
 
 const fetchCollectionCount = async (token) => {
   try {
-    const response = await fetch('http://localhost:5000/api/collection/count', {
+    const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+    const response = await fetch(`${API_URL}/collection/count`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
@@ -42,7 +44,8 @@ export default function ItemDetails() {
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/items/${id}`);
+        const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+        const response = await fetch(`${API_URL}/items/${id}`);
         const data = await response.json();
         setItem(data);
         setLoading(false);
@@ -62,9 +65,10 @@ export default function ItemDetails() {
     }
 
     try {
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
       const token = localStorage.getItem('token');
       const method = inWishlist ? 'remove' : 'add';
-      const response = await fetch(`http://localhost:5000/api/wishlist/${method}`, {
+      const response = await fetch(`${API_URL}/wishlist/${method}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,9 +95,10 @@ export default function ItemDetails() {
     }
 
     try {
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
       const token = localStorage.getItem('token');
       const method = inCollection ? 'remove' : 'add';
-      const response = await fetch(`http://localhost:5000/api/collection/${method}`, {
+      const response = await fetch(`${API_URL}/collection/${method}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

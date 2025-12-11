@@ -23,8 +23,9 @@ export default function EditItemModal({ open, onClose, item, onSave }) {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com';
       const response = await fetch(
-        `http://localhost:5000${ENDPOINTS.ITEMS.UPDATE(item._id)}`,
+        `${API_URL}${ENDPOINTS.ITEMS.UPDATE(item._id)}`,
         {
           method: "PUT",
           headers: {

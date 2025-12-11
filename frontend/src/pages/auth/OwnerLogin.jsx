@@ -103,8 +103,9 @@ const OwnerLogin = () => {
   // -------------------------------
   const handleGoogleLogin = () => {
   // Pass mode=ownerlogin so GoogleCallback knows this is owner login
+  const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
   window.location.href =
-    "http://localhost:5000/api/auth/google/owner?mode=ownerlogin";
+    `${API_URL}/auth/google/owner?mode=ownerlogin`;
 };
 
   return (

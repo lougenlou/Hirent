@@ -6,7 +6,8 @@ import { AuthContext } from "../../context/AuthContext";
 // Helper function to fetch updated count from backend
 const fetchWishlistCount = async (token) => {
   try {
-    const response = await fetch('http://localhost:5000/api/wishlist/count', {
+    const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+    const response = await fetch(`${API_URL}/wishlist/count`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
@@ -19,7 +20,8 @@ const fetchWishlistCount = async (token) => {
 
 const fetchCollectionCount = async (token) => {
   try {
-    const response = await fetch('http://localhost:5000/api/collection/count', {
+    const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+    const response = await fetch(`${API_URL}/collection/count`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
@@ -69,7 +71,8 @@ const BrowseItems = () => {
     try {
       const token = localStorage.getItem('token');
       const method = wishlist.includes(id) ? 'remove' : 'add';
-      const response = await fetch(`http://localhost:5000/api/wishlist/${method}`, {
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+      const response = await fetch(`${API_URL}/wishlist/${method}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +105,8 @@ const BrowseItems = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/collection/add`, {
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+      const response = await fetch(`${API_URL}/collection/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -26,11 +26,12 @@ export const AuthProvider = ({ children }) => {
     if (isLoggedIn && token) {
       const fetchCounts = async () => {
         try {
+          const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
           const [wishRes, collRes] = await Promise.all([
-            fetch("http://localhost:5000/api/wishlist/count", {
+            fetch(`${API_URL}/wishlist/count`, {
               headers: { "Authorization": `Bearer ${token}` }
             }),
-            fetch("http://localhost:5000/api/collection/count", {
+            fetch(`${API_URL}/collection/count`, {
               headers: { "Authorization": `Bearer ${token}` }
             })
           ]);

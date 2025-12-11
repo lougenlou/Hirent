@@ -39,7 +39,8 @@ export default function Profile() {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await fetch("http://localhost:5000/api/users/me", {
+        const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+        const res = await fetch(`${API_URL}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
           credentials: "include",
         });
@@ -142,7 +143,8 @@ export default function Profile() {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/users/update-profile", {
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+      const response = await fetch(`${API_URL}/users/update-profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

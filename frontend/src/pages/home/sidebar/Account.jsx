@@ -79,7 +79,8 @@ export default function RenterProfilePage() {
         const token = localStorage.getItem("token");
 
         // Fetch Addresses
-        const addrRes = await fetch("http://localhost:5000/api/users/addresses", {
+        const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+        const addrRes = await fetch(`${API_URL}/users/addresses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (addrRes.ok) {
@@ -88,7 +89,7 @@ export default function RenterProfilePage() {
         }
 
         // Fetch Payment Methods
-        const payRes = await fetch("http://localhost:5000/api/users/payment-methods", {
+        const payRes = await fetch(`${API_URL}/users/payment-methods`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (payRes.ok) {
@@ -125,7 +126,8 @@ export default function RenterProfilePage() {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+      const response = await fetch(`${API_URL}/users/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

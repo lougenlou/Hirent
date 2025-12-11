@@ -104,8 +104,9 @@ const OwnerSignup = () => {
   // GOOGLE SIGNUP → Owner
   // -------------------------------
   const handleGoogleSignup = () => {
+    const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
     window.location.href =
-      "http://localhost:5000/api/auth/google/owner";
+      `${API_URL}/auth/google/owner`;
   };
 
   return (

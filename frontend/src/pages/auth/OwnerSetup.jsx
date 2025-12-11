@@ -70,7 +70,8 @@ const OwnerSetup = () => {
       console.log("[OwnerSetup] Saving data with token:", token ? "present" : "missing");
       
       // Save to backend
-      const response = await fetch("http://localhost:5000/api/auth/profile", {
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+      const response = await fetch(`${API_URL}/auth/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -245,7 +246,8 @@ const OwnerSetup = () => {
       const handleCompleteSetup = async () => {
         try {
           // Mark setup as completed in backend
-          const response = await fetch("http://localhost:5000/api/auth/profile", {
+          const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+          const response = await fetch(`${API_URL}/auth/profile`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",

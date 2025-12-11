@@ -82,12 +82,13 @@ const AuthForm = ({ mode }) => {
 
     // CALL BACKEND API
     try {
-      const endpoint = mode === "signup" ? "/api/auth/register" : "/api/auth/login";
+      const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+      const endpoint = mode === "signup" ? "/auth/register" : "/auth/login";
       const payload = mode === "signup" 
         ? { name: formData.name, email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password };
 
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -129,7 +130,8 @@ const AuthForm = ({ mode }) => {
     // Redirect to backend Google OAuth endpoint
     // For signup: uses standard /google route (creates renter by default)
     // For login: uses standard /google route (logs in existing user)
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    const API_URL = process.env.REACT_APP_API_URL || 'https://hirent-2.onrender.com/api';
+    window.location.href = `${API_URL}/auth/google`;
   };
 
 

@@ -248,7 +248,7 @@ const OwnerSetup = () => {
           if (!token) {
             console.error("[OwnerSetup] No token found");
             alert("Authentication error. Please login again.");
-            navigate("/ownerlogin");
+            navigate("/login");
             return;
           }
 
@@ -499,15 +499,14 @@ const OwnerSetup = () => {
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Business Name <span className="text-red-500">*</span>
+              If you choose business <span className="text-gray-700">(optional)</span>
             </label>
             <input
               name="businessName"
-              required
               type="text"
               value={formData.businessName}
+              placeholder="Business Name"
               onChange={handleChange}
-              placeholder="Your Business Name"
               className="w-full bg-gray-100 rounded-md px-3 py-2 text-[14px] focus:outline-[#7A1CA9]"
             />
           </div>
@@ -668,7 +667,7 @@ const OwnerSetup = () => {
             type="text"
             value={formData.ownerAddress}
             onChange={handleChange}
-            placeholder="Full Owner Address"
+            placeholder="Complete Address"
             className="w-full bg-gray-100 rounded-md px-3 py-2 text-[14px] focus:outline-[#7A1CA9]"
           />
         </div>

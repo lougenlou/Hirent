@@ -32,9 +32,9 @@ const CollectionPage = () => {
   useEffect(() => {
     const fetchCollection = async () => {
       try {
-        const data = await makeAPICall(ENDPOINTS.CART.GET); // Assuming CART.GET returns user's collection
+        const data = await makeAPICall(ENDPOINTS.CART.GET); 
         if (data && Array.isArray(data.items)) {
-          setCollectionItems(data.items);
+          setCollectionItems(data.items); // keep cart entry _id
         }
       } catch (error) {
         console.error("Failed to fetch collection:", error);
@@ -43,17 +43,23 @@ const CollectionPage = () => {
     fetchCollection();
   }, []);
 
-  const handleRemoveItem = async (id) => {
+  // -----------------------------
+  // REMOVE ITEM FROM CART
+  // -----------------------------
+  const handleRemoveItem = async (cartEntryId) => {
     try {
-      await makeAPICall(ENDPOINTS.CART.REMOVE(id), { method: "DELETE" });
-      setCollectionItems((prev) => prev.filter((item) => item.id !== id));
+      await makeAPICall(ENDPOINTS.CART.REMOVE(cartEntryId), { method: "DELETE" });
+
+      // Remove locally
+      setCollectionItems((prev) => prev.filter(item => item._id !== cartEntryId));
     } catch (error) {
       console.error("Failed to remove item:", error);
+      alert("Error removing item. Please try again.");
     }
   };
 
   const calculateItemTotal = (item) => {
-    const pricePerDay = item.price || 0;
+    const pricePerDay = item.itemId?.pricePerDay || 0;
     let daysCount = item.days || 1;
 
     if (item.bookedFrom && item.bookedTo) {
@@ -81,9 +87,9 @@ const CollectionPage = () => {
     try {
       await makeAPICall(ENDPOINTS.BOOKINGS.CANCEL(selectedCancelId), { method: "POST" });
 
-      setCollectionItems((prev) =>
-        prev.map((item) =>
-          item.id === selectedCancelId
+      setCollectionItems(prev =>
+        prev.map(item =>
+          item._id === selectedCancelId
             ? { ...item, status: "not booked", bookedFrom: null, bookedTo: null }
             : item
         )
@@ -97,7 +103,10 @@ const CollectionPage = () => {
     }
   };
 
-  const filteredItems = collectionItems.filter((item) => {
+  // -----------------------------
+  // FILTER + SORT
+  // -----------------------------
+  const filteredItems = collectionItems.filter(item => {
     if (filter === "all") return true;
     if (filter === "approved") return item.status === "approved";
     if (filter === "pending") return item.status === "pending";
@@ -111,28 +120,25 @@ const CollectionPage = () => {
     return sortOrder === "latest" ? bDate - aDate : aDate - bDate;
   });
 
-  const notBookedItems = collectionItems.filter((item) => item.status !== "booked");
-  const approvedItems = collectionItems.filter((item) => item.status === "approved");
+  const notBookedItems = collectionItems.filter(item => item.status !== "booked");
+  const approvedItems = collectionItems.filter(item => item.status === "approved");
 
-  const approvedTotals = approvedItems.reduce(
-    (acc, item) => {
-      const itemTotals = calculateItemTotal(item);
-      acc.subtotal += itemTotals.subtotal;
-      acc.shipping += itemTotals.shippingFee;
-      acc.discount += itemTotals.discountAmount;
-      return acc;
-    },
-    { subtotal: 0, shipping: 0, discount: 0 }
-  );
+  const approvedTotals = approvedItems.reduce((acc, item) => {
+    const itemTotals = calculateItemTotal(item);
+    acc.subtotal += itemTotals.subtotal;
+    acc.shipping += itemTotals.shippingFee;
+    acc.discount += itemTotals.discountAmount;
+    return acc;
+  }, { subtotal: 0, shipping: 0, discount: 0 });
 
   const approvedSecurityDepositTotal = approvedItems.reduce(
-    (acc, item) => acc + (item.securityDeposit || 0),
+    (acc, item) => acc + (item.itemId?.securityDeposit || 0),
     0
   );
 
   const approvedGrandTotal = approvedTotals.subtotal + approvedTotals.shipping - approvedTotals.discount;
   const approvedGrandTotalWithDeposit = approvedGrandTotal + approvedSecurityDepositTotal;
-  const waitingCount = collectionItems.filter((item) => item.status === "pending").length;
+  const waitingCount = collectionItems.filter(item => item.status === "pending").length;
 
   return (
     <div className="flex min-h-screen px-4 md:px-6 lg:px-8">
@@ -228,11 +234,11 @@ const CollectionPage = () => {
           <div className="space-y-4">
             {sortedItems.map((item) => (
               <CollectionCard
-                key={item.id}
+                key={item._id}             // CART ENTRY ID
                 item={item}
                 calculateItemTotal={calculateItemTotal}
                 openCancelModal={openCancelModal}
-                handleRemoveItem={handleRemoveItem}
+                handleRemoveItem={handleRemoveItem} // passes CART ENTRY _id
                 navigate={navigate}
               />
             ))}

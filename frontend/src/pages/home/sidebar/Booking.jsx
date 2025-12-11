@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { makeAPICall, ENDPOINTS } from "../../../config/api";
+import emptyItems from "../../../assets/empty-listings.png"
 import ApplyCoupon from "../../../components/booking/ApplyCoupon";
 import DeliveryMethod from "../../../components/booking/DeliveryMethod";
 import ItemSummary from "../../../components/booking/ItemSummary";
@@ -80,7 +81,25 @@ const Booking = () => {
 
   const pricing = calculatePricing();
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  if (loading) return <div className="flex items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center mb-20 h-full w-full">
+      <img
+        src={emptyItems}
+        alt="No Rentals"
+        className="w-64 h-64 mb-3 object-contain"
+      />
+      <h2 className="text-[22px] font-bold text-gray-700">No bookings yet.</h2>
+      <p className="text-gray-400 text-center max-w-sm mb-4">
+        Looks like you haven’t booked any items yet.
+      </p>
+      <button
+        onClick={() => navigate("/collection")}
+        className="bg-white border border-[#7A1CA9]/20 text-[#7A1CA9] px-3 py-1.5 text-sm rounded-lg shadow hover:bg-gray-50"
+      >
+        Go to Collection ➔
+      </button>
+    </div>
+  </div>;
   if (error) return <div className="flex items-center justify-center min-h-screen text-red-500">{error}</div>;
   if (!productData) return <div className="flex items-center justify-center min-h-screen">Item not found</div>;
 

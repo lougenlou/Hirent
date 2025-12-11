@@ -1,4 +1,5 @@
-const Cart = require('../models/Cart');
+const mongoose = require("mongoose");
+const Cart = require("../models/Cart");
 
 exports.addToCart = async (req, res) => {
   const { itemId, quantity: qty } = req.body;
@@ -10,7 +11,7 @@ exports.addToCart = async (req, res) => {
 
     if (cart) {
       // Cart exists for user
-      let itemIndex = cart.items.findIndex(p => p.itemId == itemId);
+      let itemIndex = cart.items.findIndex((p) => p.itemId == itemId);
 
       if (itemIndex > -1) {
         // Product exists in the cart, update the quantity
@@ -27,7 +28,7 @@ exports.addToCart = async (req, res) => {
       // No cart for user, create new cart
       const newCart = await Cart.create({
         userId,
-        items: [{ itemId, quantity }]
+        items: [{ itemId, quantity }],
       });
 
       return res.status(201).send(newCart);
@@ -40,17 +41,40 @@ exports.addToCart = async (req, res) => {
 
 exports.removeFromCart = async (req, res) => {
   try {
-    const { itemId } = req.params;
-    return res.json({ message: `Remove ${itemId} from cart (placeholder)` });
+    const { itemId } = req.params; // this is the CART ITEM _id, not productId
+    const userId = req.user.userId;
+
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    // Remove the cart item by its _id
+    const itemIndex = cart.items.findIndex(
+      (item) => item._id.toString() === itemId
+    );
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: "Item not found in cart" });
+    }
+
+    cart.items.splice(itemIndex, 1);
+    await cart.save();
+
+    return res.json({ message: "Item removed successfully" });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    console.error(err);
+    return res.status(500).json({ message: "Failed to remove item from cart" });
   }
 };
 
 exports.updateCartItem = async (req, res) => {
   try {
     const payload = req.body || {};
-    return res.json({ message: 'Update cart item (placeholder)', data: payload });
+    return res.json({
+      message: "Update cart item (placeholder)",
+      data: payload,
+    });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -59,8 +83,8 @@ exports.updateCartItem = async (req, res) => {
 exports.getCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.user.userId }).populate({
-      path: 'items.itemId',
-      populate: { path: 'owner', select: 'name' }
+      path: "items.itemId",
+      populate: { path: "owner", select: "name" },
     });
     if (!cart) {
       return res.json({ items: [] });

@@ -22,7 +22,7 @@ const CollectionCard = ({
     >
       <div className="flex gap-6 relative">
         <img
-          src={item.itemId.images?.[0] || '/placeholder.png'}
+          src={item.itemId.images?.[0] || "/placeholder.png"}
           className="w-36 h-36 bg-gray-100 object-contain rounded-xl"
         />
 
@@ -32,7 +32,7 @@ const CollectionCard = ({
 
             <div className="text-[13px] mt-1 text-gray-700">
               <div className="flex items-center gap-1">
-                Listed by {item.itemId.owner?.name || 'Unknown'}
+                Listed by {item.itemId.owner?.name || "Unknown"}
               </div>
 
               {/* STATUS BADGE */}
@@ -45,7 +45,9 @@ const CollectionCard = ({
                     : "bg-gray-200 text-gray-700"
                 }`}
               >
-                {item.status === "approved" && <CircleCheckBig className="w-3 h-3" />}
+                {item.status === "approved" && (
+                  <CircleCheckBig className="w-3 h-3" />
+                )}
                 {item.status === "pending" && <Clock className="w-3 h-3" />}
                 {item.status !== "approved" && item.status !== "pending" && (
                   <CalendarOff className="w-3 h-3" />
@@ -78,16 +80,21 @@ const CollectionCard = ({
                   )}
 
                   {item.status !== "approved" && item.status !== "pending" && (
-                    <div className="flex items-center gap-1 text-gray-800 text-[13px] mb-3">
+                    <div className="flex items-center gap-1 text-gray-800 text-sm mb-3">
                       <Calendar size={15} />
-                      {item.daysAvailable || item.days || item.availableDays} days
+                      {item.itemId.minimumRentalDays &&
+                      item.itemId.maximumRentalDays
+                        ? `${item.itemId.minimumRentalDays} - ${item.itemId.maximumRentalDays} days`
+                        : item.daysAvailable ||
+                          item.days ||
+                          item.availableDays}{" "}
                       available
                     </div>
                   )}
 
-                  <div className="flex items-center text-[12px] gap-2 text-gray-500 mt-1">
+                  <div className="flex items-center gap-2 text-gray-500">
                     <div className="flex items-center gap-1">
-                      <Truck className="w-4 h-4" />
+                      <Truck size={15}/>
                       <span>
                         {item.shipping > 0
                           ? `Delivery (₱${Math.round(item.shipping)})`
@@ -95,7 +102,7 @@ const CollectionCard = ({
                       </span>
                     </div>
 
-                    <span className="text-[10px] text-gray-400">•</span>
+                    <span className="text-sm text-gray-400">•</span>
 
                     <div className="flex items-center gap-1">
                       <ShieldAlert className="w-4 h-4" />
@@ -107,34 +114,35 @@ const CollectionCard = ({
                 </div>
 
                 {/* RIGHT SIDE PRICE INFO */}
-                <div className="text-right text-[13px] flex flex-col gap-0.5">
+                <div className="text-right text-[14px] flex flex-col gap-0.5">
                   <span className="font-bold text-[15px] text-purple-900">
                     ₱{item.itemId.pricePerDay || 0}/day
                   </span>
 
-                  {(item.status === "approved" || item.status === "pending") && (() => {
-                    const itemTotals = calculateItemTotal(item);
-                    const totalWithDeposit =
-                      itemTotals.total + (item.securityDeposit || 0);
+                  {(item.status === "approved" || item.status === "pending") &&
+                    (() => {
+                      const itemTotals = calculateItemTotal(item);
+                      const totalWithDeposit =
+                        itemTotals.total + (item.securityDeposit || 0);
 
-                    return (
-                      <div className="flex justify-between w-full text-[13px] gap-1">
-                        <span className="text-gray-500">
-                          Subtotal{" "}
-                          <span className="text-gray-900">
-                            ₱{itemTotals.subtotal}
+                      return (
+                        <div className="flex justify-between w-full text-[13px] gap-1">
+                          <span className="text-gray-500">
+                            Subtotal{" "}
+                            <span className="text-gray-900">
+                              ₱{itemTotals.subtotal}
+                            </span>
                           </span>
-                        </span>
 
-                        <span className="text-gray-500">
-                          Total{" "}
-                          <span className="font-semibold text-gray-900">
-                            ₱{totalWithDeposit}
+                          <span className="text-gray-500">
+                            Total{" "}
+                            <span className="font-semibold text-gray-900">
+                              ₱{totalWithDeposit}
+                            </span>
                           </span>
-                        </span>
-                      </div>
-                    );
-                  })()}
+                        </div>
+                      );
+                    })()}
                 </div>
               </div>
             </div>
@@ -144,14 +152,14 @@ const CollectionCard = ({
           <div className="absolute bottom-1 right-0 flex items-center gap-1.5">
             {item.status === "approved" || item.status === "pending" ? (
               <button
-                onClick={() => openCancelModal(item._id) }
+                onClick={() => openCancelModal(item._id)}
                 className="px-3 py-1.5 text-[12.5px] shadow-sm rounded-full text-red-500 border border-red-300 bg-red-50 hover:bg-red-100"
               >
                 Cancel Booking
               </button>
             ) : (
               <button
-                onClick={() => handleRemoveItem(item.itemId._id)}
+                 onClick={() => handleRemoveItem(item._id)}
                 className="px-3 py-1.5 text-[12.5px] shadow-sm rounded-full text-red-500 border border-red-300 bg-red-50 hover:bg-red-100"
               >
                 Remove from collection

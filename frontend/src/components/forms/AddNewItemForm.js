@@ -285,7 +285,8 @@ export default function AddNewItemForm({ onCancel, onSuccess }) {
     if (!formData.condition) temp.condition = "Condition required";
     if (!formData.category) temp.category = "Category required";
     if (!formData.location) temp.location = "Location required";
-    if (document.getElementById("uploadImg")?.files?.length === 0) temp.photo = "At least 1 photo required";
+    if (document.getElementById("uploadImg")?.files?.length === 0)
+      temp.photo = "At least 1 photo required";
 
     setErrors(temp);
     return Object.keys(temp).length === 0;
@@ -305,8 +306,11 @@ export default function AddNewItemForm({ onCancel, onSuccess }) {
           const value = formData[key];
           // Map itemName to title for backend
           const fieldName = key === "itemName" ? "title" : key;
-          
-          if (Array.isArray(value) || (typeof value === "object" && value !== null)) {
+
+          if (
+            Array.isArray(value) ||
+            (typeof value === "object" && value !== null)
+          ) {
             form.append(fieldName, JSON.stringify(value));
           } else {
             form.append(fieldName, value);
@@ -389,7 +393,21 @@ export default function AddNewItemForm({ onCancel, onSuccess }) {
           <Select
             label="Category"
             required
-            options={["Camera", "Dress", "Electronics", "Tools", "Outdoor"]}
+            options={[
+              "Gadgets",
+              "Clothes",
+              "Bags & Accessories",
+              "Electronics",
+              "Vehicles",
+              "Cameras",
+              "Furniture",
+              "Musical Instruments",
+              "Tools",
+              "Books",
+              "Appliances",
+              "Sports",
+              "Outdoors",
+            ]}
             value={formData.category}
             error={errors.category}
             onChange={(e) =>

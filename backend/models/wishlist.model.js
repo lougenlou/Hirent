@@ -1,18 +1,25 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const WishlistSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-    unique: true,
-  },
-  items: [
-    {
+// Prevent model overwrite errors in dev
+if (mongoose.connection.models["Wishlist"]) {
+  delete mongoose.connection.models["Wishlist"];
+}
+
+const WishlistSchema = new mongoose.Schema(
+  {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Item",
+      ref: "User",
+      required: true,
     },
-  ],
-}, { timestamps: true });
+    items: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Item",
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Wishlist', WishlistSchema);
+module.exports = mongoose.model("Wishlist", WishlistSchema);

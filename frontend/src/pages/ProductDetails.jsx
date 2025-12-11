@@ -5,7 +5,6 @@ import Sidebar from "../components/layouts/Sidebar";
 import Footer from "../components/layouts/Footer";
 import ImageGallery from "../components/product/ImageGallery";
 import ProductInfo from "../components/product/ProductInfo";
-import RelatedItems from "../components/product/RelatedItems";
 import { makeAPICall, ENDPOINTS } from "../config/api";
 import {
   Flag,
@@ -95,13 +94,13 @@ const ReportModal = ({ isOpen, onClose, reportType }) => {
         onClick={handleClose}
       />
 
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
+      <div className="fixed inset-0 z-[9999] flex items-center mt-14 justify-center p-4 pointer-events-none">
         <div
           ref={modalRef}
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
-          className="relative bg-white rounded-2xl w-full max-w-md shadow-2xl pointer-events-auto animate-modalSlideIn max-h-[90vh] overflow-hidden flex flex-col"
+          className="relative bg-white rounded-2xl w-full max-w-md shadow-2xl pointer-events-auto animate-modalSlideIn max-h-[80vh] overflow-hidden flex flex-col"
         >
           <div className="sticky top-0 bg-white px-5 py-4 border-b border-gray-100 flex items-center justify-between z-10">
             <h2 className="text-lg font-bold text-gray-900">
@@ -397,16 +396,18 @@ const ProductDetails = () => {
   const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
-    const loadWishlist = async () => {
-      try {
-        const data = await makeAPICall(ENDPOINTS.WISHLIST.GET);
-        setWishlist(data.map(item => item._id) || []);
-      } catch (err) {
-        console.error("Error loading wishlist:", err);
-      }
-    };
-    loadWishlist();
-  }, []);
+  const loadWishlist = async () => {
+    try {
+      const data = await makeAPICall(ENDPOINTS.WISHLIST.GET);
+      // data is array of { _id, itemId: {...} }
+      setWishlist(data.map((w) => w.itemId._id)); // map to just IDs
+    } catch (err) {
+      console.error("Error loading wishlist:", err);
+    }
+  };
+  loadWishlist();
+}, []);
+
 
   const handleToggleWishlist = async (itemId) => {
     try {

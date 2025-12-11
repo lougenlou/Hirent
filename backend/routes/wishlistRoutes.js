@@ -7,7 +7,7 @@ const auth = require("../middleware/authMiddleware");
 // ADD ITEM
 router.post("/", auth, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.userId;   // FIXED
     const { itemId } = req.body;
 
     const itemExists = await Item.findById(itemId);
@@ -36,7 +36,7 @@ router.post("/", auth, async (req, res) => {
 // REMOVE ITEM
 router.delete("/:itemId", auth, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.userId;  // FIXED
     const { itemId } = req.params;
 
     const wishlist = await Wishlist.findOne({ userId });
@@ -57,10 +57,10 @@ router.delete("/:itemId", auth, async (req, res) => {
 // FETCH USER WISHLIST
 router.get("/", auth, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.userId;  // FIXED
 
-    const wishlist = await Wishlist.findOne({ userId }).populate('items');
-    
+    const wishlist = await Wishlist.findOne({ userId }).populate("items");
+
     if (!wishlist) {
       return res.json([]);
     }

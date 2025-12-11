@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Slider from "@mui/material/Slider";
 
 const PriceRangeSlider = ({ onPriceChange }) => {
-  const [value, setValue] = useState([100, 1000]);
+  const [value, setValue] = useState([100, 5000]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -15,7 +15,7 @@ const PriceRangeSlider = ({ onPriceChange }) => {
         value={value}
         onChange={handleChange}
         min={10}
-        max={1000}
+        max={5000}
         step={10}
         valueLabelDisplay="auto"
         sx={{

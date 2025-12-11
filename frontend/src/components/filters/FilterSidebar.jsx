@@ -81,6 +81,7 @@ const FilterSidebar = ({ onApplyFilters }) => {
     const categories = [
         "Gadgets",
         "Clothes",
+        "Bags & Accessories",
         "Electronics",
         "Vehicles",
         "Cameras",

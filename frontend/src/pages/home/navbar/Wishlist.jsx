@@ -61,7 +61,7 @@ const WishlistPage = () => {
       try {
         const data = await makeAPICall(ENDPOINTS.WISHLIST.GET);
         if (Array.isArray(data)) {
-          setWishlistItems(data);
+          setWishlistItems(data.map((entry) => entry.itemId)); // only store item object
         }
       } catch (error) {
         console.error("Failed to fetch wishlist:", error);
@@ -79,10 +79,12 @@ const WishlistPage = () => {
       return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
     });
 
-  const removeFromWishlist = async (id) => {
+  const removeFromWishlist = async (itemId) => {
     try {
-      await makeAPICall(ENDPOINTS.WISHLIST.REMOVE(id), { method: "DELETE" });
-      setWishlistItems((prev) => prev.filter((item) => item._id !== id));
+      await makeAPICall(ENDPOINTS.WISHLIST.REMOVE(itemId), {
+        method: "DELETE",
+      });
+      setWishlistItems((prev) => prev.filter((item) => item._id !== itemId));
     } catch (error) {
       console.error("Failed to remove item:", error);
     }
@@ -156,7 +158,9 @@ const WishlistPage = () => {
                   <div className="ml-auto mt-4">
                     <SortDropdown
                       options={["Latest", "Oldest"]}
-                      onSortChange={(value) => setSortOrder(value.toLowerCase())}
+                      onSortChange={(value) =>
+                        setSortOrder(value.toLowerCase())
+                      }
                     />
                   </div>
                 </div>

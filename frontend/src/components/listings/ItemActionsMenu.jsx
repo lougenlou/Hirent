@@ -46,7 +46,7 @@ export default function ItemActionsMenu({
           </button>
 
           <button className="menu-btn" onClick={() => onViewPage(item)}>
-            <Eye size={14} /> View Item Page
+            <Eye size={14} /> View Item
           </button>
 
           <button className="menu-btn" onClick={() => onHistory(item)}>

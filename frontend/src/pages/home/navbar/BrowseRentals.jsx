@@ -58,37 +58,40 @@ const BrowseRentals = () => {
   // 🔥 FETCH USER WISHLIST
   // -----------------------------
   useEffect(() => {
-    const loadWishlist = async () => {
-      try {
-        const data = await makeAPICall(ENDPOINTS.WISHLIST.GET);
-        setWishlist(data.wishlist || []);
-      } catch (err) {
-        console.error("Error loading wishlist:", err);
-      }
-    };
+  const loadWishlist = async () => {
+    try {
+      const data = await makeAPICall(ENDPOINTS.WISHLIST.GET);
+      // data is array of { _id, itemId: {...} }
+      setWishlist(data.map((w) => w.itemId._id)); // map to just IDs
+    } catch (err) {
+      console.error("Error loading wishlist:", err);
+    }
+  };
+  loadWishlist();
+}, []);
 
-    loadWishlist();
-  }, []);
 
   // -----------------------------
   // 🔥 ADD/REMOVE WISHLIST
   // -----------------------------
   const toggleWishlist = async (itemId) => {
-    try {
-      if (wishlist.includes(itemId)) {
-        await makeAPICall(ENDPOINTS.WISHLIST.REMOVE(itemId), { method: "DELETE" });
-        setWishlist((prev) => prev.filter((id) => id !== itemId));
-      } else {
-        await makeAPICall(ENDPOINTS.WISHLIST.ADD, {
-          method: "POST",
-          body: JSON.stringify({ itemId }),
-        });
-        setWishlist((prev) => [...prev, itemId]);
-      }
-    } catch (err) {
-      console.error("Wishlist update failed:", err);
+  try {
+    if (wishlist.includes(itemId)) {
+      await makeAPICall(ENDPOINTS.WISHLIST.REMOVE(itemId), { method: "DELETE" });
+      setWishlist((prev) => prev.filter((id) => id !== itemId));
+    } else {
+      await makeAPICall(ENDPOINTS.WISHLIST.ADD, {
+        method: "POST",
+        body: JSON.stringify({ itemId }),
+        headers: { "Content-Type": "application/json" },
+      });
+      setWishlist((prev) => [...prev, itemId]);
     }
-  };
+  } catch (err) {
+    console.error("Wishlist update failed:", err);
+  }
+};
+
 
   // -----------------------------
   // 🔥 ADD TO COLLECTION (CART)
@@ -144,11 +147,16 @@ const BrowseRentals = () => {
       const end = dayjs(filters.toDate);
 
       filtered = filtered.filter((item) => {
-        if (item.availabilityType === 'always' || item.availabilityType === 'specific-dates') {
-          const isUnavailable = item.unavailableDates.some(range => {
+        if (
+          item.availabilityType === "always" ||
+          item.availabilityType === "specific-dates"
+        ) {
+          const isUnavailable = item.unavailableDates.some((range) => {
             const unavailableStart = dayjs(range.start);
             const unavailableEnd = dayjs(range.end);
-            return start.isBefore(unavailableEnd) && end.isAfter(unavailableStart);
+            return (
+              start.isBefore(unavailableEnd) && end.isAfter(unavailableStart)
+            );
           });
           return !isUnavailable;
         }
@@ -178,26 +186,36 @@ const BrowseRentals = () => {
       <BannerCarousel />
       <div className="mt-36"></div>
 
-      <div className="flex flex-1 overflow-hidden px-4 py-8 gap-4 bg-[#fbfbfb]">
+      <div className="flex flex-1 overflow-hidden px-4 py-8 gap-6 bg-[#fbfbfb]">
         <FilterSidebar onApplyFilters={handleApplyFilters} />
 
         <main className="flex-1 overflow-y-auto p-2 md:p-5 lg:p-2">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[20px] text-gray-800 font-semibold flex items-center gap-1">
+            <h2 className="text-[24px] text-gray-800 font-semibold flex items-center gap-1">
               <span className="inline-block w-3 h-6 bg-[#7A1CA9] rounded mr-2"></span>
               {filters.category || "All Rentals"}
-              <span className="text-[#9129c5] ml-1">({filteredListings.length})</span>
+              <span className="text-purple-700 font-medium ml-1">
+                ({filteredListings.length})
+              </span>
             </h2>
 
             <SortDropdown onSortChange={setSortOption} />
           </div>
 
           {loading ? (
-            <div className="text-center text-gray-500 py-20">Loading listings...</div>
+            <div className="text-center text-gray-500 py-20">
+              Loading listings...
+            </div>
           ) : filteredListings.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10">
-              <img src={emptyListingsVector} alt="No Listings" className="w-52 h-72 mb-4" />
-              <h2 className="text-[24px] font-bold text-gray-600 mb-1">No Rentals Found</h2>
+              <img
+                src={emptyListingsVector}
+                alt="No Listings"
+                className="w-52 h-72 mb-4"
+              />
+              <h2 className="text-[24px] font-bold text-gray-600 mb-1">
+                No Rentals Found
+              </h2>
               <p className="text-[16px] text-gray-400 mb-6 text-center max-w-sm">
                 Try adjusting your search or filters.
               </p>
@@ -208,11 +226,10 @@ const BrowseRentals = () => {
                 <RentalItemCard
                   key={item._id}
                   item={item}
-                  wishlist={wishlist.map(i => i._id)}
+                  wishlist={wishlist} // now it's always array of IDs
                   justAdded={justAdded}
                   toggleWishlist={toggleWishlist}
                   handleAddToCollection={handleAddToCollection}
-                  navigate={navigate}
                 />
               ))}
             </div>

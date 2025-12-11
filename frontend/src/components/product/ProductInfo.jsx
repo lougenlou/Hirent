@@ -158,10 +158,10 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
   });
 
   return (
-    <div className="w-[400px] space-y-3">
+    <div className="w-[500px] space-y-2">
 
       {/* TITLE */}
-      <h1 className="text-lg font-semibold  text-gray-900  tracking-tight">
+      <h1 className="text-xl font-semibold  text-gray-900  tracking-tight">
         {product.title}
       </h1>
 
@@ -184,13 +184,13 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
           ))}
         </div>
 
-        <span className="text-gray-600 text-[10px]">
+        <span className="text-gray-600 text-xs">
           ({product.reviews || 0} Reviews)
         </span>
 
-        <span className="text-gray-300 text-[10px]">•</span>
+        <span className="text-gray-300 text-xs">•</span>
 
-        <span className="text-green-600 text-[10px] font-medium">
+        <span className="text-green-600 text-xs font-medium">
           {product.status === 'active' ? 'In Stock' : 'Unavailable'}
         </span>
       </div>
@@ -208,7 +208,7 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
       </p>
 
       {/* PRODUCT ATTRIBUTES */}
-      <div className="space-y-1 text-xs text-gray-700 border-b pb-3">
+      <div className="space-y-1 text-[13px] text-gray-700 border-b pb-3">
         <p><strong>Condition:</strong> {product.condition || "Not specified"}</p>
         <p><strong>Platform Compatibility:</strong> {product.platformCompatibility || "Not specified"}</p>
         <p><strong>Connectivity:</strong> {product.connectivity || "Not specified"}</p>
@@ -216,16 +216,16 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
       </div>
 
       {/* FEES */}
-      <div className="border-b pb-3 space-y-3 text-xs text-gray-700">
+      <div className="border-b pb-3 space-y-2 text-sm text-gray-700">
         <div className="flex justify-between items-center">
           <span>Refundable Deposit:</span>
-          <span className="font-semibold  text-gray-900 ">₱{DEPOSIT_FEE}</span>
+          <span className="font-semibold text-[15px] text-gray-900 ">₱{DEPOSIT_FEE}</span>
         </div>
 
         <div className="flex justify-between items-center">
           <span>Damage Waiver (optional):</span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
@@ -234,11 +234,11 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
                 className="sr-only peer"
               />
 
-              <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-purple-600 transition-all" />
-              <div className="absolute left-1 top-1 w-3.5 h-3.5 bg-white  text-purple-900   rounded-full transition-all peer-checked:translate-x-5 shadow" />
+              <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-purple-800 transition-all" />
+              <div className="absolute left-1 top-1 w-3.5 h-3.5 bg-white  text-purple-900 rounded-full transition-all peer-checked:translate-x-5 shadow" />
             </label>
 
-            <span className="font-semibold  text-gray-900  text-xs">+₱{DAMAGE_FEE}</span>
+            <span className="font-semibold text-gray-900 text-[15px]">+₱{DAMAGE_FEE}</span>
           </div>
         </div>
       </div>
@@ -246,10 +246,10 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
       {/* DATE RANGE */}
       <div className="border-t pt-4">
         <div className="flex items-center justify-between mb-2">
-          <span className=" text-gray-900  font-medium text-[11px]">Date Range</span>
+          <span className=" text-gray-900  font-medium text-sm">Date Range</span>
           <button
             onClick={() => setDateRange({ start: null, end: null })}
-            className="text-purple-600 text-[11px] hover:text-[#7A1CA9]"
+            className="text-purple-600 text-sm hover:text-[#7A1CA9]"
           >
             Reset
           </button>
@@ -260,7 +260,7 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
 
           {/* START DATE */}
           <div ref={startCalendarRef} className="relative">
-            <label className="text-gray-500 text-[10px] block mb-1">From</label>
+            <label className="text-gray-500 text-xs block mb-1">From</label>
             <div className="relative">
               <input
                 type="text"
@@ -271,7 +271,7 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
                   setShowStartCalendar(!showStartCalendar);
                   setShowEndCalendar(false);
                 }}
-                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-[11px] cursor-pointer hover:border-purple-400 transition"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm cursor-pointer hover:border-purple-400 transition"
               />
               <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 text-[#7A1CA9] w-4 h-4" />
 
@@ -317,7 +317,7 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
 
           {/* END DATE */}
           <div ref={endCalendarRef} className="relative">
-            <label className="text-gray-500 text-[10px] block mb-1">To</label>
+            <label className="text-gray-500 text-xs block mb-1">To</label>
 
             <div className="relative">
               <input
@@ -329,13 +329,13 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
                   setShowEndCalendar(!showEndCalendar);
                   setShowStartCalendar(false);
                 }}
-                className="w-full px-2 py-1.5 border border-gray-300 rounded-lg text-[11px] cursor-pointer hover:border-purple-400 transition"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm cursor-pointer hover:border-purple-400 transition"
               />
 
               <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 text-[#7A1CA9] w-4 h-4" />
 
               {showEndCalendar && (
-                <div className="absolute top-14 left-0 w-60 bg-white  text-purple-900   border shadow-xl rounded-xl p-3 z-50">
+                <div className="absolute top-14 left-0 w-60 bg-white  text-purple-900 border shadow-xl rounded-xl p-3 z-50">
                   <div className="flex justify-between items-center mb-2">
                     <button
                       onClick={() =>
@@ -376,16 +376,16 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
         </div>
 
         {/* QUICK SELECT */}
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           {["Today", "This Week", "This Month"].map((period) => (
             <button
               key={period}
               onClick={() => handleQuickDate(period)}
-              className={`px-3 py-1.5 text-[11px] border rounded-lg font-medium transition-all
+              className={`w-full justify-between px-4 py-2 text-[13px] border rounded-lg font-medium transition-all
                 ${
                   selectedPeriod === period
                     ? "bg-[#7A1CA9] text-white border-[#7A1CA9]  shadow"
-                    : "bg-white  text-purple-900   text-gray-700 border-gray-300 hover:border-purple-400"
+                    : "bg-white  text-gray-700 border-gray-300 hover:border-purple-400"
                 }`}
             >
               {period}
@@ -400,35 +400,35 @@ const ProductInfo = ({ product, handleAddToCollection, handleToggleWishlist, wis
         <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
           <button
             onClick={decrementQuantity}
-            className="px-3 py-1 text-gray-600 hover:bg-gray-100 font-semibold text-sm"
+            className="px-4 py-3 text-gray-600 hover:bg-gray-100 font-semibold text-sm"
           >
             −
           </button>
 
-          <span className="px-4 py-1 bg-[#7A1CA9] text-white font-bold min-w-[40px] text-center text-sm">
+          <span className="px-4 py-2.5 bg-[#efddfa] text-[#5e0d86] font-bold min-w-[40px] text-center">
             {quantity}
           </span>
 
           <button
             onClick={incrementQuantity}
-            className="px-3 py-1 text-gray-600 hover:bg-gray-100 font-semibold text-sm"
+            className="px-4 py-3 text-gray-600 hover:bg-gray-100 font-semibold text-sm"
           >
             +
           </button>
         </div>
 
-        <button onClick={() => handleAddToCollection(product)} className="flex-1 bg-[#7A1CA9] text-white px-4 py-2 rounded-lg font-semibold text-xs shadow-md hover:bg-purple-800 transition">
+        <button onClick={() => handleAddToCollection(product)} className="flex-1 bg-[#7A1CA9] text-white px-4 py-3 rounded-lg font-medium text-sm shadow-md hover:bg-purple-800 transition">
           Add to Collection
         </button>
 
-        <button onClick={() => handleToggleWishlist(product._id)} className={`p-2 border rounded-lg transition-colors ${wishlist.includes(product._id) ? 'bg-red-500 border-red-500 text-white' : 'border-gray-300 hover:border-purple-600 hover:bg-purple-50'}`}>
-          <Heart className="w-4 h-4" />
+        <button onClick={() => handleToggleWishlist(product._id)} className={`px-3 py-3 border rounded-lg transition-colors ${wishlist.includes(product._id) ? 'bg-red-500 border-red-500 text-white' : 'border-gray-300 text-gray-700 hover:border-purple-600 hover:bg-purple-50'}`}>
+          <Heart className="w-5 h-5" strokeWidth={1.5} />
         </button>
       </div>
 
       {/* TOTAL */}
       <div className="flex items-center justify-between pt-4 border-t">
-        <span className=" text-gray-900  font-medium text-xs">Total:</span>
+        <span className=" text-gray-900  font-medium text-[15px]">Total:</span>
         <span className="text-2xl font-bold text-[#7A1CA9]">
           ₱ {totalPrice.toFixed(2)}
         </span>

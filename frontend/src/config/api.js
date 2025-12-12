@@ -3,7 +3,7 @@
 // =============================================
 
 // Base API URL
-export const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+export const API_URL = "https://hirent-yw32.onrender.com/api";
 
 // IMPORTANT — all endpoints must start with /api
 const API_PREFIX = "/api";

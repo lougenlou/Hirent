@@ -7,30 +7,11 @@ const RentalSummary = ({ rentals }) => {
 
   const completedRentals = rentals.filter((r) => r.status === "completed");
 
-  const subtotal = completedRentals.reduce((sum, item) => {
-    const price = Number(item.price || 0);
-    const days = item.days || 1;
-    return sum + price * days;
+  const subtotal = completedRentals.reduce((sum, booking) => {
+    return sum + (booking.totalAmount || 0);
   }, 0);
 
-  const totalShipping = completedRentals.reduce(
-    (sum, item) => sum + (item.shipping || 0),
-    0
-  );
-
-  const totalCoupon = completedRentals.reduce((sum, item) => {
-    const discount = item.couponDiscount || 0;
-    const price = Number(item.price || 0);
-    const days = item.days || 1;
-    return sum + (price * days * discount) / 100;
-  }, 0);
-
-  const totalSecurity = completedRentals.reduce(
-    (sum, item) => sum + (item.securityDeposit || 0),
-    0
-  );
-
-  const total = subtotal + totalShipping + totalSecurity - totalCoupon;
+  const total = subtotal;
 
   return (
     <div className="bg-white px-4 py-3 rounded-lg shadow-sm space-y-1 mr-5">
@@ -76,10 +57,10 @@ const RentalSummary = ({ rentals }) => {
           <p className="font-semibold mt-3 mb-2">Approved Rentals</p>
           {rentals
             .filter((r) => r.status === "approved")
-            .map((item) => (
-              <div key={item.id} className="flex justify-between">
-                <span>{item.name}</span>
-                <span>₱{item.price}</span>
+            .map((booking) => (
+              <div key={booking._id} className="flex justify-between">
+                <span>{booking.itemId?.title || "Unknown Item"}</span>
+                <span>₱{booking.totalAmount?.toFixed(2) || "0.00"}</span>
               </div>
             ))}
         </div>
@@ -91,37 +72,24 @@ const RentalSummary = ({ rentals }) => {
           <p className="font-semibold mt-3 mb-2">Pending Rentals</p>
           {rentals
             .filter((r) => r.status === "pending")
-            .map((item) => (
-              <div key={item.id} className="flex justify-between">
-                <span>{item.name}</span>
-                <span>₱{item.price}</span>
+            .map((booking) => (
+              <div key={booking._id} className="flex justify-between">
+                <span>{booking.itemId?.title || "Unknown Item"}</span>
+                <span>₱{booking.totalAmount?.toFixed(2) || "0.00"}</span>
               </div>
             ))}
         </div>
       )}
 
       {/* Totals */}
-      <div className="text-[13px] space-y-1 pt-3 border-t border-gray-200">
-        <div className="flex justify-between">
-          <span>Subtotal of Completed Items</span>
-          <span>₱{subtotal.toFixed(2)}</span>
+      {completedRentals.length > 0 && (
+        <div className="text-[13px] space-y-1 pt-3 border-t border-gray-200">
+          <div className="flex justify-between font-bold text-lg">
+            <span>Total Completed Rentals</span>
+            <span>₱{total.toFixed(2)}</span>
+          </div>
         </div>
-
-        <div className="flex justify-between">
-          <span>Total Coupon Discounts Used</span>
-          <span>-₱{totalCoupon.toFixed(2)}</span>
-        </div>
-
-        <div className="flex justify-between">
-          <span>Security Deposit Used</span>
-          <span>₱{totalSecurity.toFixed(2)}</span>
-        </div>
-
-        <div className="flex justify-between font-bold text-lg border-t border-gray-200 pt-2 pb-2">
-          <span>Total Expense</span>
-          <span>₱{total.toFixed(2)}</span>
-        </div>
-      </div>
+      )}
 
       {/* Info Box */}
       <div className="bg-blue-50 text-blue-700 border border-blue-200 p-3 rounded-md text-[13px]">

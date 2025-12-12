@@ -2,18 +2,13 @@ import React, { useContext, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
-/**
- * GoogleCallback - Handles the redirect from Google OAuth
- * Extracts token and user data from the URL query parameters
- */
 const GoogleCallback = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
-  const processedRef = useRef(false); // Prevent multiple executions
+  const processedRef = useRef(false); // prevent multiple executions
 
   useEffect(() => {
-    // Prevent running effect multiple times in StrictMode
     if (processedRef.current) return;
     processedRef.current = true;
 
@@ -27,67 +22,53 @@ const GoogleCallback = () => {
           throw new Error(decodeURIComponent(error));
         }
 
-        if (token) {
-          let userData = null;
-          
-          if (userParam) {
-            try {
-              userData = JSON.parse(decodeURIComponent(userParam));
-            } catch (parseErr) {
-              console.error("Error parsing user data:", parseErr);
-            }
-          }
-
-          login(token, userData);
-
-          setTimeout(() => {
-            const userRole = userData?.role || 'renter';
-            
-            // If new user (not previously in DB), redirect to appropriate signup
-            if (userData?.isNewUser) {
-              console.log("[GoogleCallback] New user detected, redirecting to signup");
-              if (userRole === 'owner') {
-                // New owner - redirect to OwnerSetup to complete profile
-                navigate('/ownersetup', { 
-                  replace: true,
-                  state: { 
-                    googleData: userData,
-                    message: "Complete your owner profile"
-                  }
-                });
-              } else {
-                navigate('/signup', { 
-                  replace: true,
-                  state: { 
-                    googleData: userData,
-                    message: "Complete your profile"
-                  }
-                });
-              }
-            } else {
-              // Existing user - redirect based on role
-              if (userRole === 'owner') {
-                // Check if owner has completed setup
-                const ownerSetupCompleted = userData?.ownerSetupCompleted;
-                if (!ownerSetupCompleted) {
-                  // Owner hasn't completed setup yet - redirect back to setup
-                  console.log("[GoogleCallback] Owner setup incomplete, redirecting to setup");
-                  navigate('/ownersetup', { replace: true });
-                } else {
-                  navigate('/owner/dashboard', { replace: true });
-                }
-              } else {
-                navigate('/', { replace: true });
-              }
-            }
-          }, 100);
-        } else {
+        if (!token) {
           throw new Error("Missing authentication token");
         }
+
+        let userData = null;
+        if (userParam) {
+          try {
+            userData = JSON.parse(decodeURIComponent(userParam));
+          } catch (parseErr) {
+            console.error("Error parsing user data:", parseErr);
+          }
+        }
+
+        // Log user in
+        login(token, userData);
+
+        const userRole = userData?.role || "renter";
+        const isNewUser = userData?.isNewUser;
+        const ownerSetupCompleted = userData?.ownerSetupCompleted;
+
+        setTimeout(() => {
+          if (userRole === "owner") {
+            if (isNewUser || !ownerSetupCompleted) {
+              // New owner OR existing owner with incomplete setup
+              navigate("/ownersetup", {
+                replace: true,
+                state: { googleData: userData, message: "Complete your owner profile" },
+              });
+            } else {
+              // Existing owner with setup completed
+              navigate("/owner", { replace: true });
+            }
+          } else {
+            // Renter
+            if (isNewUser) {
+              navigate("/signup", {
+                replace: true,
+                state: { googleData: userData, message: "Complete your profile" },
+              });
+            } else {
+              navigate("/", { replace: true });
+            }
+          }
+        }, 100); // slight delay to ensure login state
+
       } catch (err) {
         console.error("Google callback error:", err);
-        
-        // Redirect to signup with error message
         navigate("/signup", {
           replace: true,
           state: { error: err.message },
@@ -114,7 +95,9 @@ const GoogleCallback = () => {
         <div className="flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-200 border-t-purple-600"></div>
         </div>
-        <p className="text-sm text-gray-500 mt-4">Please wait while we complete your authentication</p>
+        <p className="text-sm text-gray-500 mt-4">
+          Please wait while we complete your authentication
+        </p>
       </div>
     </div>
   );

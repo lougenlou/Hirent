@@ -25,13 +25,14 @@ const VerifyEmail = () => {
 
         console.log("[VerifyEmail] Verifying with token...");
 
-        const response = await fetch("http://localhost:5000/api/auth/verify-email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token }),
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/auth/verify-email`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token }),
+          }
+        );
 
         console.log("[VerifyEmail] Response status:", response.status);
 

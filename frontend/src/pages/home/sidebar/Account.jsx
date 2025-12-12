@@ -79,7 +79,7 @@ export default function RenterProfilePage() {
         const token = localStorage.getItem("token");
 
         // Fetch Addresses
-        const addrRes = await fetch("http://localhost:5000/api/users/addresses", {
+        const addrRes = await fetch(`${process.env.REACT_APP_API_URL}/api/users/addresses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (addrRes.ok) {
@@ -88,9 +88,10 @@ export default function RenterProfilePage() {
         }
 
         // Fetch Payment Methods
-        const payRes = await fetch("http://localhost:5000/api/users/payment-methods", {
+        const payRes = await fetch(`${process.env.REACT_APP_API_URL}/api/users/payment-methods`,{
           headers: { Authorization: `Bearer ${token}` },
-        });
+        }
+      );
         if (payRes.ok) {
           const payData = await payRes.json();
           setPaymentMethods(payData?.paymentMethods || []);
@@ -125,7 +126,7 @@ export default function RenterProfilePage() {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+     const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

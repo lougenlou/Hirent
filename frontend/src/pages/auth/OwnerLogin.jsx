@@ -102,10 +102,8 @@ const OwnerLogin = () => {
   // GOOGLE LOGIN → Owner
   // -------------------------------
   const handleGoogleLogin = () => {
-  // Pass mode=ownerlogin so GoogleCallback knows this is owner login
-  window.location.href =
-    "http://localhost:5000/api/auth/google/owner?mode=ownerlogin";
-};
+  window.location.href = `${process.env.REACT_APP_BACKEND_URL}/api/auth/google/`;
+  };
 
   return (
     <div className="flex flex-col min-h-screen">

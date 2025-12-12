@@ -197,9 +197,7 @@ const googleAuth = async (req, res) => {
     const { googleId, email, name, avatar } = req.user;
     const { state } = req.query; // state=owner for owner signup flow
 
-    // Normalize email
     const normalizedEmail = email?.toLowerCase().trim();
-
     console.log("[GOOGLE AUTH] Processing:", { email: normalizedEmail, state });
 
     // Check if user exists
@@ -207,7 +205,7 @@ const googleAuth = async (req, res) => {
     let isNewUser = false;
 
     if (!user) {
-      // NEW USER - Determine role based on state parameter
+      // NEW USER
       const role = state === "owner" ? "owner" : "renter";
       console.log("[GOOGLE AUTH] Creating new user with role:", role);
 
@@ -218,7 +216,9 @@ const googleAuth = async (req, res) => {
         avatar,
         role,
         authProvider: "google",
+        ownerSetupCompleted: role === "owner" ? false : undefined, // default false for owners
       });
+
       await user.save();
       isNewUser = true;
       console.log("[GOOGLE AUTH] New user created:", user._id, "role:", role);
@@ -226,21 +226,17 @@ const googleAuth = async (req, res) => {
       // EXISTING USER
       console.log("[GOOGLE AUTH] User exists:", user._id);
 
-      // Link Google account if not already linked
       if (!user.googleId) {
         user.googleId = googleId;
         user.authProvider = "google";
         console.log("[GOOGLE AUTH] Linked Google account to existing user");
       }
 
-      // Update avatar if provided
-      if (avatar && !user.avatar) {
-        user.avatar = avatar;
-      }
+      if (avatar && !user.avatar) user.avatar = avatar;
 
-      // Add owner role if state=owner and user doesn't have it
       if (state === "owner" && user.role !== "owner") {
         user.role = "owner";
+        user.ownerSetupCompleted = false; // force setup for newly upgraded owners
         console.log("[GOOGLE AUTH] Upgraded user to owner role");
       }
 
@@ -254,7 +250,7 @@ const googleAuth = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // Build response with all user fields
+    // Send user data including ownerSetupCompleted
     const userResponse = {
       id: user._id,
       name: user.name,
@@ -262,15 +258,13 @@ const googleAuth = async (req, res) => {
       avatar: user.avatar,
       role: user.role,
       authProvider: user.authProvider,
-      isNewUser, // Flag for new users
-      ownerSetupCompleted: user.ownerSetupCompleted, // Owner setup status
-      // Personal info
+      isNewUser,
+      ownerSetupCompleted: user.ownerSetupCompleted,
       phone: user.phone,
       address: user.address,
       gender: user.gender,
       birthday: user.birthday,
       bio: user.bio,
-      // Owner setup fields
       sellerType: user.sellerType,
       ownerAddress: user.ownerAddress,
       pickupAddress: user.pickupAddress,
@@ -282,11 +276,9 @@ const googleAuth = async (req, res) => {
       cityName: user.cityName,
       barangay: user.barangay,
       postalCode: user.postalCode,
-      // Business fields
       businessName: user.businessName,
       businessType: user.businessType,
       taxId: user.taxId,
-      // Payment fields
       bankName: user.bankName,
       accountNumber: user.accountNumber,
       accountName: user.accountName,
@@ -295,23 +287,23 @@ const googleAuth = async (req, res) => {
       ewalletName: user.ewalletName,
     };
 
-    // Redirect to frontend with token in query parameter
-    const redirectUrl = `http://localhost:3000/auth-callback?token=${token}&user=${encodeURIComponent(
+    // Redirect to frontend with token and user info
+    const redirectUrl = `${process.env.FRONTEND_URL}/auth-callback?token=${token}&user=${encodeURIComponent(
       JSON.stringify(userResponse)
     )}`;
 
     console.log("[GOOGLE AUTH] Redirecting to:", redirectUrl);
     res.redirect(redirectUrl);
+
   } catch (err) {
     console.error("[GOOGLE AUTH] Error:", err.message);
     res.redirect(
-      `http://localhost:3000/signup?error=${encodeURIComponent(
+      `${process.env.FRONTEND_URL}/signup?error=${encodeURIComponent(
         "Google authentication failed: " + err.message
       )}`
     );
   }
 };
-
 // UPDATE PROFILE
 const updateProfile = async (req, res) => {
   try {

@@ -22,6 +22,8 @@ const CollectionCard = ({
     >
       <div className="flex gap-6 relative">
         <img
+          src={item.image}
+          alt="Description of image"
           src={item.itemId.images?.[0] || '/placeholder.png'}
           className="w-36 h-36 bg-gray-100 object-contain rounded-xl"
         />

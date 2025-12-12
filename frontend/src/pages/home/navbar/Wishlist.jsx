@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { MapPin, Calendar, Star, ShoppingBag } from "lucide-react";
+import { Star } from "lucide-react";
 import SortDropdown from "../../../components/dropdown/SortDropdown";
 import WishlistItemCard from "../../../components/cards/WishlistItemCard";
 import { AuthContext } from "../../../context/AuthContext";
@@ -9,7 +9,7 @@ import emptyItems from "../../../assets/empty-listings.png";
 import { ENDPOINTS, makeAPICall } from "../../../config/api";
 
 const WishlistPage = () => {
-  const { wishlist, toggleWishlist, addToCart, isInitialized } = useContext(AuthContext);
+  const { wishlist, setWishlist, toggleWishlist, addToCart } = useContext(AuthContext);
   const [filter, setFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("latest");
 
@@ -49,8 +49,25 @@ const WishlistPage = () => {
     scrollRef.current.scrollLeft = scrollLeft - walk;
   };
 
+  // Fetch wishlist from backend
+  const fetchWishlist = async () => {
+    try {
+      const data = await makeAPICall(ENDPOINTS.WISHLIST.GET);
+      if (data?.success && data.items) {
+        setWishlist(data.items);
+      }
+    } catch (err) {
+      console.error("Failed to fetch wishlist:", err);
+    }
+  };
+
+  const handleAddToCollection = async (item) => {
+    await addToCart(item, 1);
+  };
+
   useEffect(() => {
     document.title = "Hirent — Wishlist";
+    fetchWishlist();
     return () => {
       document.title = "Hirent";
     };
@@ -64,10 +81,6 @@ const WishlistPage = () => {
       const dateB = new Date(b.availableFrom);
       return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
     });
-
-  const handleAddToCollection = async (item) => {
-    await addToCart(item, 1);
-  };
 
   const hasWishlistItems = wishlist.length > 0;
   const hasFilteredItems = displayedItems.length > 0;

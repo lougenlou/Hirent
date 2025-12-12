@@ -1,14 +1,15 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { MapPin, Calendar, Star, ShoppingBag } from "lucide-react";
 import SortDropdown from "../../../components/dropdown/SortDropdown";
 import WishlistItemCard from "../../../components/cards/WishlistItemCard";
+import { AuthContext } from "../../../context/AuthContext";
 
 import emptyWishlist from "../../../assets/empty-wishlist.png";
 import emptyItems from "../../../assets/empty-listings.png";
 import { ENDPOINTS, makeAPICall } from "../../../config/api";
 
 const WishlistPage = () => {
-  const [wishlistItems, setWishlistItems] = useState([]);
+  const { wishlist, toggleWishlist, addToCart, isInitialized } = useContext(AuthContext);
   const [filter, setFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("latest");
 
@@ -55,23 +56,8 @@ const WishlistPage = () => {
     };
   }, []);
 
-  // Fetch wishlist items from API
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      try {
-        const data = await makeAPICall(ENDPOINTS.WISHLIST.GET);
-        if (Array.isArray(data)) {
-          setWishlistItems(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch wishlist:", error);
-      }
-    };
-    fetchWishlist();
-  }, []);
-
-  // Filter & sort items
-  const displayedItems = wishlistItems
+  // Filter & sort items using centralized wishlist state
+  const displayedItems = wishlist
     .filter((item) => filter === "All" || item.category === filter)
     .sort((a, b) => {
       const dateA = new Date(a.availableFrom);
@@ -79,16 +65,11 @@ const WishlistPage = () => {
       return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
     });
 
-  const removeFromWishlist = async (id) => {
-    try {
-      await makeAPICall(ENDPOINTS.WISHLIST.REMOVE(id), { method: "DELETE" });
-      setWishlistItems((prev) => prev.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error("Failed to remove item:", error);
-    }
+  const handleAddToCollection = async (item) => {
+    await addToCart(item, 1);
   };
 
-  const hasWishlistItems = wishlistItems.length > 0;
+  const hasWishlistItems = wishlist.length > 0;
   const hasFilteredItems = displayedItems.length > 0;
 
   return (
@@ -132,7 +113,7 @@ const WishlistPage = () => {
                         }`}
                       >
                         {cat === "All"
-                          ? `All Items (${wishlistItems.length})`
+                          ? `All Items (${wishlist.length})`
                           : `${cat}`}
                       </button>
                     ))}
@@ -183,12 +164,10 @@ const WishlistPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-3 gap-y-4 place-items-center">
                   {displayedItems.map((item) => (
                     <WishlistItemCard
-                      key={item.id}
+                      key={item._id}
                       item={item}
-                      removeFromWishlist={removeFromWishlist}
-                      onAddToCollection={() =>
-                        console.log("Add to collection", item)
-                      }
+                      removeFromWishlist={toggleWishlist}
+                      onAddToCollection={handleAddToCollection}
                     />
                   ))}
                 </div>

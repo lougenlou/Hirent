@@ -20,8 +20,10 @@ import GoogleCallback from "./pages/auth/GoogleCallback";
 import OwnerLogin from "./pages/auth/OwnerLogin";
 import OwnerSignup from "./pages/auth/OwnerSignup";
 import OwnerSetup from "./pages/auth/OwnerSetup";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 import AdminLogin from "./pages/auth/AdminLogin";
 import AdminSignup from "./pages/auth/AdminSignup";
+import BookingConfirmation from "./pages/BookingConfirmation";
 
 // ===== HOMEPAGE SECTIONS =====
 import HeroSection from "./components/home/HeroSection";
@@ -39,7 +41,6 @@ import AboutPage from "./pages/home/navbar/AboutPage";
 import { HowItWorksSection } from "./pages/home/navbar/HowItWorks";
 import NotificationsPage from "./pages/notifications/NotificationsPage";
 import ProductDetails from "./pages/ProductDetails";
-import ItemDetails from "./pages/ItemDetails";
 
 // ===== SIDEBAR PAGES =====
 import MyRentals from "./pages/home/sidebar/MyRentals";
@@ -161,11 +162,14 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/auth-callback" element={<GoogleCallback />} />
+            <Route path="/booking/confirmation/:bookingId" element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
+            <Route path="/my-rentals" element={<ProtectedRoute><MyRentals /></ProtectedRoute>} />
 
             {/* ===== OWNER ROUTES ===== */}
             <Route path="/ownerlogin" element={<OwnerLogin />} />
             <Route path="/ownersignup" element={<OwnerSignup />} />
             <Route path="/ownersetup" element={<OwnerSetup />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
 
             {/* ===== ADMIN ROUTES (PROTECTED) ===== */}
             <Route path="/admin-login" element={<AdminLogin />} />
@@ -269,11 +273,11 @@ function App() {
               <Route path="/how-it-works" element={<HowItWorksSection />} />
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/product/:id" element={<ProductDetails />} />
-              <Route path="/items/:id" element={<ItemDetails />} />
+              <Route path="/items/:id" element={<ProductDetails />} />
 
               {/* Sidebar Pages */}
               <Route path="/my-rentals" element={<MyRentals />} />
-              <Route path="/booking" element={<Booking />} />
+              <Route path="/booking/:itemId" element={<Booking />} />
               <Route path="/returns" element={<Returns />} />
               <Route path="/chat" element={<Messages />} />
               <Route path="/account" element={<Account />} />

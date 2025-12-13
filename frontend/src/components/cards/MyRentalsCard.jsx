@@ -25,10 +25,8 @@ const RentalCard = ({ item: booking, onViewDetails, onCancel }) => {
   }
 
   const countDays = () => {
-    const from = new Date(booking.startDate);
-    const to = new Date(booking.endDate);
-    const diff = Math.ceil((to - from) / (1000 * 60 * 60 * 24)) + 1;
-    return `${diff} day${diff > 1 ? 's' : ''}`;
+    const days = booking.duration || 1;
+    return `${days} day${days > 1 ? 's' : ''}`;
   };
 
   const canCancel = () => {

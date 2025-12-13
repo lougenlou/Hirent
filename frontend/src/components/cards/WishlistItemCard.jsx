@@ -18,7 +18,7 @@ const WishlistItemCard = ({ item, removeFromWishlist, onAddToCollection }) => {
         </button>
       </div>
       <p className="text-sm font-semibold text-gray-800 truncate mb-1">{item.title}</p>
-      <p className="text-xs text-gray-500 mb-1">by {item.owner.name || 'Unknown'}</p>
+      <p className="text-xs text-gray-500 mb-1">by {item.owner?.name || 'Unknown'}</p>
       <div className="flex items-center gap-2 mb-1">
         <MapPin size={14} className="text-gray-400" />
         <span className="text-xs text-gray-600">{item.location}</span>

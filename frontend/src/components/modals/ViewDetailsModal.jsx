@@ -55,7 +55,7 @@ export function ViewDetailsModal({ isOpen, onClose, bookingId }) {
         }
 
         const { itemId: item, ownerId: owner } = booking;
-        const daysCount = Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000 * 60 * 60 * 24)) + 1;
+        const daysCount = booking.duration;
 
         return (
             <>

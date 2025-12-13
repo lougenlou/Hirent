@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, Plus, X } from "lucide-react";
-import { API_URL, ENDPOINTS } from "../../config/api";
+import { API_URL, ENDPOINTS, makeAPICall } from "../../config/api";
 
 /* -------------------------
    SMALL UI COMPONENTS
@@ -74,7 +74,7 @@ function Select({ label, options, required, error, ...props }) {
       >
         <option value="">Select {label}</option>
         {options.map((opt) => (
-          <option key={opt} value={opt.toLowerCase()}>
+          <option key={opt} value={opt}>
             {opt}
           </option>
         ))}
@@ -144,6 +144,22 @@ export default function AddNewItemForm({ onCancel, onSuccess }) {
 
   const [imagePreviews, setImagePreviews] = useState([]);
   const [errors, setErrors] = useState({});
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await makeAPICall(ENDPOINTS.ITEMS.GET_CATEGORIES);
+        if (response.success && Array.isArray(response.categories)) {
+          setCategories(response.categories);
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
   const [unavailableDate, setUnavailableDate] = useState({
     start: "",
     end: "",
@@ -285,7 +301,13 @@ export default function AddNewItemForm({ onCancel, onSuccess }) {
     if (!formData.condition) temp.condition = "Condition required";
     if (!formData.category) temp.category = "Category required";
     if (!formData.location) temp.location = "Location required";
-    if (document.getElementById("uploadImg")?.files?.length === 0) temp.photo = "At least 1 photo required";
+    const uploadInput = document.getElementById("uploadImg");
+    const fileCount = uploadInput?.files?.length || 0;
+    if (fileCount === 0) {
+      temp.photo = "At least 1 photo is required.";
+    } else if (fileCount > 5) {
+      temp.photo = "You can upload a maximum of 5 images.";
+    }
 
     setErrors(temp);
     return Object.keys(temp).length === 0;
@@ -341,7 +363,9 @@ export default function AddNewItemForm({ onCancel, onSuccess }) {
           onSuccess();
         }
       } else {
-        alert(data.message || data.msg || "Failed to add item.");
+        const errorMsg = data.msg || data.message || "Failed to add item.";
+        setErrors(prev => ({ ...prev, form: errorMsg }));
+        alert(`Item creation failed: ${errorMsg}`);
       }
     } catch (error) {
       console.error("Error adding item:", error);
@@ -389,7 +413,7 @@ export default function AddNewItemForm({ onCancel, onSuccess }) {
           <Select
             label="Category"
             required
-            options={["Camera", "Dress", "Electronics", "Tools", "Outdoor"]}
+            options={categories}
             value={formData.category}
             error={errors.category}
             onChange={(e) =>

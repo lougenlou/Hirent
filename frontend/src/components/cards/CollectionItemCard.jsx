@@ -22,7 +22,6 @@ const CollectionCard = ({
     >
       <div className="flex gap-6 relative">
         <img
-          src={item.image}
           alt="Description of image"
           src={item.itemId.images?.[0] || '/placeholder.png'}
           className="w-36 h-36 bg-gray-100 object-contain rounded-xl"
@@ -176,7 +175,7 @@ const CollectionCard = ({
               </button>
             ) : (
               <button
-                onClick={() => navigate(`/booking/${item._id}`)}
+                onClick={() => navigate(`/booking/${item.itemId._id}`)}
                 className="px-3 py-1.5 text-[12.5px] shadow-sm bg-[#7A1CA9] text-white rounded-full hover:bg-purple-800"
               >
                 Continue to Booking

@@ -17,7 +17,6 @@ const Booking = () => {
   const navigate = useNavigate();
   const { itemId } = useParams();
 
-  // Fetch item details from backend
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,7 +34,7 @@ const Booking = () => {
     type: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cod"); // default COD
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
   const [isBooking, setIsBooking] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -58,8 +57,8 @@ const Booking = () => {
       setError(null);
       try {
         const response = await makeAPICall(ENDPOINTS.ITEMS.GET_ONE(itemId));
-        if (response && response.item) {
-          setProductData(response.item);
+        if (response && response.success) {
+          setProductData(response.data || response.item);
         } else {
           setError("Item data not found in response.");
         }
@@ -71,17 +70,17 @@ const Booking = () => {
       }
     };
 
-    if (itemId) {
-      fetchItemDetails();
-    }
+    if (itemId) fetchItemDetails();
   }, [itemId]);
 
+  // Calculate pricing
   const calculatePricing = () => {
     if (!productData) return { subtotal: 0, discount: 0, shippingFee: 0, securityDeposit: 0, total: 0 };
     
     const price = productData.pricePerDay || 0;
     const subtotal = price * (rentalData.days || 1);
     let discountAmount = 0;
+
     if (couponData?.applied) {
       if (couponData.type === 'percentage') {
         discountAmount = (subtotal * (couponData.discount || 0)) / 100;
@@ -89,35 +88,28 @@ const Booking = () => {
         discountAmount = couponData.discount || 0;
       }
     }
+
     const shippingFee = deliveryMethod === "delivery" ? (productData.deliveryOptions?.deliveryFee || 0) : 0;
     const securityDeposit = productData.securityDeposit || 0;
     const total = subtotal - discountAmount + shippingFee + securityDeposit;
 
-    return {
-      subtotal,
-      discount: discountAmount,
-      shippingFee,
-      securityDeposit,
-      total,
-    };
+    return { subtotal, discount: discountAmount, shippingFee, securityDeposit, total };
   };
 
-    const pricing = calculatePricing();
+  const pricing = calculatePricing();
 
+  // Handle booking submission
   const handleBooking = async () => {
-    // Validate rental dates
     if (!rentalData.startDate || !rentalData.endDate) {
       alert("Please select rental dates.");
       return;
     }
 
-    // Validate payment method
     if (!paymentMethod) {
       alert("Please select a payment method.");
       return;
     }
 
-    // Validate terms acceptance
     if (!termsAccepted) {
       alert("Please accept the terms and conditions.");
       return;
@@ -142,17 +134,17 @@ const Booking = () => {
       const response = await makeAPICall(ENDPOINTS.BOOKINGS.CREATE, {
         method: "POST",
         body: JSON.stringify(bookingData),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
-      if (response.success) {
+
+      if (response?.success) {
+        alert("Booking successful!");
         navigate(`/booking/confirmation/${response.data._id}`);
       } else {
-        alert(response.message || "Failed to create booking. Please try again.");
+        alert(response?.msg || response?.message || "Failed to create booking. Please try again.");
       }
-    } catch (error) {
-      console.error("Error creating booking:", error);
+    } catch (err) {
+      console.error("Error creating booking:", err);
       alert("Failed to create booking. Please try again.");
     } finally {
       setIsBooking(false);
@@ -171,7 +163,6 @@ const Booking = () => {
         <div className="w-[430px] flex-shrink-0 sticky top-10 self-start">
           {/* Header */}
           <div className="bg-white p-5 rounded-xl shadow-sm mb-4">
-            {/* Back Button */}
             <div className="mb-4">
               <button
                 onClick={() => navigate(-1)}
@@ -190,14 +181,12 @@ const Booking = () => {
                   Complete Your Booking
                 </h1>
                 <p className="text-gray-500 text-sm mt-0.5">
-                  Finalize rental details and review before confirming your
-                  booking.
+                  Finalize rental details and review before confirming your booking.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Order Summary */}
           <div className="sticky top-36">
             <OrderSummary
               product={productData}
@@ -226,6 +215,7 @@ const Booking = () => {
 
           <LateReturnPolicy />
 
+          {/* Integrated PaymentMethod */}
           <PaymentMethod
             paymentMethod={paymentMethod}
             setPaymentMethod={setPaymentMethod}

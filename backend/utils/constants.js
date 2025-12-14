@@ -1,6 +1,7 @@
 const RENTABLE_CATEGORIES = [
   'Gadgets',
   'Clothes',
+  'Bags & Accessories',
   'Electronics',
   'Vehicles',
   'Cameras',

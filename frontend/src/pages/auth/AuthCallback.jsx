@@ -22,15 +22,19 @@ const AuthCallback = () => {
       try {
         const user = JSON.parse(decodeURIComponent(userStr));
         console.log("Google auth successful, user role:", user.role);
-        
-        // Login with token
-        login(token);
 
-        // Redirect based on role
+        // Login with token
+        login(token, user);
+
+        // Redirect strictly based on backend role
         if (user.role === "owner") {
-          navigate("/owner/dashboard");
+          if (!user?.ownerSetupCompleted) {
+            navigate("/ownersetup", { replace: true });
+          } else {
+            navigate("/owner/dashboard", { replace: true });
+          }
         } else {
-          navigate("/homepage");
+          navigate("/", { replace: true });
         }
       } catch (err) {
         console.error("Failed to parse auth data:", err);

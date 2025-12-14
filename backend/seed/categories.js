@@ -3,7 +3,9 @@ require("dotenv").config();
 const Category = require("../models/Category");
 
 const categories = [
+  "Gadgets",
   "Clothes",
+  "Bags & Accessories",
   "Electronics",
   "Furniture",
   "Instruments",

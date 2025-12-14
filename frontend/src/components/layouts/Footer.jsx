@@ -59,7 +59,7 @@ const Footer = () => {
           <ul className="text-xs text-gray-300 space-y-4">
             <li>
               <a
-                href="#"
+                href="/account"
                 className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200"
               >
                 My Account
@@ -67,7 +67,7 @@ const Footer = () => {
             </li>
             <li>
               <a
-                href="#"
+                href="/login"
                 className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200"
               >
                 Login / Register
@@ -75,15 +75,15 @@ const Footer = () => {
             </li>
             <li>
               <a
-                href="#"
+                href="/collection"
                 className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200"
               >
-                collection
+                Collection
               </a>
             </li>
             <li>
               <a
-                href="#"
+                href="/wishlist"
                 className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200"
               >
                 Wishlist
@@ -91,7 +91,7 @@ const Footer = () => {
             </li>
             <li>
               <a
-                href="#"
+                href="/browse"
                 className="no-underline hover:no-underline hover:text-[#e3c6ff] transition-colors duration-200"
               >
                 Shop

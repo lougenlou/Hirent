@@ -21,7 +21,7 @@ const ImageGallery = ({ images }) => {
           <button
             key={i}
             onClick={() => setSelectedImage(i)}
-            className={`w-16 h-16 p-1.5 rounded-xl border flex items-center justify-center cursor-pointer transition
+            className={`w-20 h-20 p-1.5 rounded-xl border flex items-center justify-center cursor-pointer transition
               ${
                 selectedImage === i
                   ? "border-purple-600 shadow-md"
@@ -38,7 +38,7 @@ const ImageGallery = ({ images }) => {
       </div>
 
       {/* Main Image */}
-      <div className="relative flex-1 bg-gray-100 border rounded-xl shadow-sm flex items-center justify-center p-3">
+      <div className="relative flex-1 bg-gray-100 border rounded-xl shadow-sm flex items-center justify-center max-h-[550px]" >
 
         {/* Prev Arrow */}
         <button
@@ -50,7 +50,7 @@ const ImageGallery = ({ images }) => {
 
         <img
           src={images[selectedImage]}
-          className="w-full max-h-[280px] object-contain"
+          className="w-full max-h-[550px] object-contain"
           alt="product"
         />
 

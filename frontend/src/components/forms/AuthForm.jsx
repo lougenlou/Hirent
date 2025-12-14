@@ -6,6 +6,7 @@ import Footer from "../layouts/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { makeAPICall, ENDPOINTS } from "../../config/api"; // <-- use API wrapper
 
 const AuthForm = ({ mode }) => {
   const navigate = useNavigate();
@@ -20,112 +21,67 @@ const AuthForm = ({ mode }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  // SIMPLE NAME VALIDATION
-  const validateName = (name) => {
-    return name.trim().length >= 2; // At least 2 characters
-  };
+  const validateName = (name) => name.trim().length >= 2;
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  // SIMPLE EMAIL VALIDATION
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  // SUBMIT HANDLER
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-  // --- Validation logic (unchanged) ---
-  if (mode === "signup" && !formData.name.trim()) {
-    setError("Name is required.");
-    return;
-  }
-
-  if (mode === "signup" && !validateName(formData.name)) {
-    setError("Name must be at least 2 characters.");
-    return;
-  }
-
-  if (!formData.email.trim()) {
-    setError("Email is required.");
-    return;
-  }
-
-  if (!validateEmail(formData.email)) {
-    setError("Enter a valid email address.");
-    return;
-  }
-
-  if (!formData.password) {
-    setError("Password is required.");
-    return;
-  }
-
-  if (formData.password.length < 6) {
-    setError("Password must be at least 6 characters.");
-    return;
-  }
-
-  if (!/[0-9]/.test(formData.password)) {
-    setError("Password must include at least one number.");
-    return;
-  }
-
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
-    setError("Password must include at least one special character.");
-    return;
-  }
-
-  setError("");
-
-  // --- Backend API call ---
-  try {
-    const endpoint = mode === "signup" ? "/api/auth/register" : "/api/auth/login";
-    const payload = mode === "signup"
-      ? { name: formData.name, email: formData.email, password: formData.password }
-      : { email: formData.email, password: formData.password };
-
-    const response = await fetch(`${process.env.REACT_APP_API_URL}${endpoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setError(data.msg || data.message || "Authentication failed");
-      return;
+    // --- Validation ---
+    if (mode === "signup" && !formData.name.trim()) {
+      setError("Name is required."); return;
     }
-
-    if (data.token) {
-      const user = data.user || { email: formData.email };
-      login(data.token, user);
-
-      setTimeout(() => {
-        if (user.role === "owner") {
-          navigate("/owner/dashboard", { replace: true });
-        } else {
-          navigate("/", { replace: true });
-        }
-      }, 300);
-    } else {
-      setError("No token received from server");
+    if (mode === "signup" && !validateName(formData.name)) {
+      setError("Name must be at least 2 characters."); return;
     }
-  } catch (err) {
-    console.error("Auth error:", err);
-    setError("Network error. Please try again.");
-  }
-};
+    if (!formData.email.trim()) { setError("Email is required."); return; }
+    if (!validateEmail(formData.email)) { setError("Enter a valid email address."); return; }
+    if (!formData.password) { setError("Password is required."); return; }
+    if (formData.password.length < 6) { setError("Password must be at least 6 characters."); return; }
+    if (!/[0-9]/.test(formData.password)) { setError("Password must include at least one number."); return; }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) { setError("Password must include at least one special character."); return; }
 
-// --- Google Auth handler ---
-const handleGoogleAuth = () => {
-  // For renter login/signup
-  const googleUrl = mode === "signup"
-    ? `${process.env.REACT_APP_API_URL}/api/auth/google`
-    : `${process.env.REACT_APP_API_URL}/api/auth/google`;
+    setError("");
 
-  window.location.href = googleUrl;
-};
+    // --- API call ---
+    try {
+      const endpoint = mode === "signup" ? ENDPOINTS.AUTH.REGISTER : ENDPOINTS.AUTH.LOGIN;
+
+      const payload = mode === "signup"
+        ? { name: formData.name, email: formData.email, password: formData.password }
+        : { email: formData.email, password: formData.password };
+
+      const data = await makeAPICall(endpoint, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      if (!data) return setError("No response from server");
+
+      if (data.token) {
+        const user = data.user || { email: formData.email };
+        login(data.token, user);
+
+        setTimeout(() => {
+          if (user.role === "owner") {
+            navigate("/owner/dashboard", { replace: true });
+          } else {
+            navigate("/", { replace: true });
+          }
+        }, 300);
+      } else {
+        setError(data.msg || data.message || "Authentication failed");
+      }
+    } catch (err) {
+      console.error("Auth error:", err);
+      setError("Network error. Please try again.");
+    }
+  };
+
+  const handleGoogleAuth = () => {
+    const googleUrl = ENDPOINTS.AUTH.GOOGLE;
+    window.location.href = googleUrl;
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -137,7 +93,6 @@ const handleGoogleAuth = () => {
           backgroundPosition: "center",
         }}
       >
-
         {/* AUTH CARD */}
         <div
           className={`z-10 cursor-default bg-white ${
@@ -159,7 +114,6 @@ const handleGoogleAuth = () => {
                   Be an Owner ➔
                 </Link>
               )}
-
               {mode === "login" && (
                 <Link
                   to="/ownerlogin"
@@ -186,9 +140,7 @@ const handleGoogleAuth = () => {
                     type="text"
                     id="name"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder=" "
                     className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]  text-gray-900  bg-[#f9f9f9] border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                   />
@@ -203,14 +155,13 @@ const handleGoogleAuth = () => {
                 </div>
               )}
 
+              {/* Email input */}
               <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type="email"
                   id="email"
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder=" "
                   className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]   text-gray-900  bg-[#f9f9f9]  border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                 />
@@ -224,19 +175,17 @@ const handleGoogleAuth = () => {
                 </label>
               </div>
 
+              {/* Password input */}
               <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder=" "
                   autoComplete="current-password"
                   className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]   text-gray-900  bg-[#f9f9f9]  border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                 />
-
                 <label
                   htmlFor="password"
                   className="absolute text-[14px] duration-300 transform -translate-y-3 scale-75 top-2 z-10 origin-[0] left-2
@@ -245,21 +194,16 @@ const handleGoogleAuth = () => {
                 >
                   Password
                 </label>
-
-                {/* Eye toggle */}
                 {formData.password.length > 0 && (
                   <span
                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-[#7A1CA9]"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <FiEyeOff size={20} />
-                    ) : (
-                      <FiEye size={20} />
-                    )}
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                   </span>
                 )}
               </div>
+
               {/* ERROR MESSAGE */}
               {error && <p className="text-red-500 text-xs text-center">{error}</p>}
 

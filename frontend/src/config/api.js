@@ -1,12 +1,7 @@
-// =============================================
-// FRONTEND API CONFIGURATION (FULLY FIXED)
-// =============================================
-
 // Base API URL
 export const API_URL = process.env.NODE_ENV === 'production'
-  ? "https://hirent-2-3rj2.onrender.com"
+  ? "https://hirent-2.onrender.com"
   : "http://localhost:5000";
-
 
 // IMPORTANT — all endpoints must start with /api
 const API_PREFIX = "/api";
@@ -15,9 +10,6 @@ const API_PREFIX = "/api";
 // CENTRALIZED ENDPOINTS
 // =============================================
 export const ENDPOINTS = {
-  // -----------------------
-  // AUTHENTICATION
-  // -----------------------
   AUTH: {
     REGISTER: `${API_PREFIX}/auth/register`,
     LOGIN: `${API_PREFIX}/auth/login`,
@@ -25,10 +17,6 @@ export const ENDPOINTS = {
     GOOGLE_CALLBACK: `${API_PREFIX}/auth/google/callback`,
     PROFILE: `${API_PREFIX}/auth/profile`,
   },
-
-  // -----------------------
-  // ITEMS
-  // -----------------------
   ITEMS: {
     GET_ALL: `${API_PREFIX}/items`,
     GET_CATEGORIES: `${API_PREFIX}/items/categories`,
@@ -40,48 +28,27 @@ export const ENDPOINTS = {
     UPDATE: (id) => `${API_PREFIX}/items/${id}`,
     DELETE: (id) => `${API_PREFIX}/items/${id}`,
   },
-
-  // -----------------------
-  // HOMEPAGE
-  // -----------------------
   HOMEPAGE: {
     FEATURED_CATEGORIES: `${API_PREFIX}/homepage/categories/featured`,
-    CATEGORY_ITEMS: (slug) =>
-      `${API_PREFIX}/homepage/categories/${slug}/items`,
+    CATEGORY_ITEMS: (slug) => `${API_PREFIX}/homepage/categories/${slug}/items`,
     FEATURED_ITEMS: `${API_PREFIX}/homepage/items/featured`,
     SEARCH: `${API_PREFIX}/homepage/search`,
     PERSONALIZED: `${API_PREFIX}/homepage/personalized`,
   },
-
-  // -----------------------
-  // CART
-  // -----------------------
   CART: {
     GET: `${API_PREFIX}/cart`,
     ADD: `${API_PREFIX}/cart/add`,
     REMOVE: (itemId) => `${API_PREFIX}/cart/${itemId}`,
     UPDATE: `${API_PREFIX}/cart/update`,
   },
-
-  // -----------------------
-  // WISHLIST
-  // -----------------------
   WISHLIST: {
     GET: `${API_PREFIX}/wishlist`,
     ADD: `${API_PREFIX}/wishlist`,
     REMOVE: (itemId) => `${API_PREFIX}/wishlist/${itemId}`,
   },
-
-  // -----------------------
-  // COUPONS
-  // -----------------------
   COUPONS: {
     VALIDATE: `${API_PREFIX}/coupons/validate`,
   },
-
-  // -----------------------
-  // BOOKINGS
-  // -----------------------
   BOOKINGS: {
     GET_MY: `${API_PREFIX}/bookings/me`,
     GET_USER_BOOKINGS: (userId) => `${API_PREFIX}/bookings/user/${userId}`,
@@ -91,55 +58,31 @@ export const ENDPOINTS = {
     UPDATE_STATUS: (id) => `${API_PREFIX}/bookings/${id}/status`,
     OWNER_BOOKINGS: `${API_PREFIX}/bookings/owner`,
   },
-
-  // -----------------------
-  // RETURNS
-  // -----------------------
   RETURNS: {
     GET_ALL: `${API_PREFIX}/returns`,
     GET_ONE: (id) => `${API_PREFIX}/returns/${id}`,
     CREATE: `${API_PREFIX}/returns`,
     UPDATE: (id) => `${API_PREFIX}/returns/${id}`,
   },
-
-  // -----------------------
-  // EARNINGS
-  // -----------------------
   EARNINGS: {
     GET_ALL: `${API_PREFIX}/earnings`,
     GET_SUMMARY: `${API_PREFIX}/earnings/summary`,
   },
-
-  // -----------------------
-  // MESSAGES
-  // -----------------------
   MESSAGES: {
     GET_ALL: `${API_PREFIX}/messages`,
     SEND: `${API_PREFIX}/messages/send`,
     BLOCK: (chatId) => `${API_PREFIX}/messages/${chatId}/block`,
   },
-
-  // -----------------------
-  // USERS
-  // -----------------------
   USERS: {
     GET_ALL: `${API_PREFIX}/users`,
     CREATE: `${API_PREFIX}/users`,
     GET_PROFILE: `${API_PREFIX}/users/profile`,
     UPDATE_PROFILE: `${API_PREFIX}/users/profile`,
   },
-
-  // -----------------------
-  // LOCATIONS
-  // -----------------------
   LOCATIONS: {
     ADD: `${API_PREFIX}/locations`,
     NEARBY: `${API_PREFIX}/locations/nearby`,
   },
-
-  // -----------------------
-  // NOTIFICATIONS
-  // -----------------------
   NOTIFICATIONS: {
     GET_ALL: `${API_PREFIX}/notifications`,
     READ: (id) => `${API_PREFIX}/notifications/${id}/read`,
@@ -149,7 +92,7 @@ export const ENDPOINTS = {
 };
 
 // =============================================
-// SAFE API CALL WRAPPER
+// SAFE API CALL WRAPPER (WITH OWNER LOGIN FIX)
 // =============================================
 export const makeAPICall = async (endpoint, options = {}) => {
   const token = localStorage.getItem("token");
@@ -161,14 +104,10 @@ export const makeAPICall = async (endpoint, options = {}) => {
   };
 
   // Don't override Content-Type if FormData is being sent
-  if (options.body instanceof FormData) {
-    delete headers["Content-Type"];
-  }
+  if (options.body instanceof FormData) delete headers["Content-Type"];
 
   // Inject Bearer token if available
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) headers.Authorization = `Bearer ${token}`;
 
   try {
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -181,7 +120,6 @@ export const makeAPICall = async (endpoint, options = {}) => {
 
     // Handle 401 Unauthorized - only redirect if not a profile update
     if (!response.ok && response.status === 401) {
-      // Don't logout on profile update 401 - it might be a validation error
       if (endpoint !== ENDPOINTS.AUTH.PROFILE) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -193,6 +131,12 @@ export const makeAPICall = async (endpoint, options = {}) => {
     return data ?? null;
   } catch (error) {
     console.error("API call failed:", error);
+
+    // Special handling for login endpoint to prevent network error confusion
+    if (endpoint === ENDPOINTS.AUTH.LOGIN) {
+      alert("Network error: Could not reach the server. Make sure backend is running.");
+    }
+
     throw error;
   }
 };

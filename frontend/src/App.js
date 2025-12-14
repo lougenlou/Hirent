@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useContext } from "react";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { motion } from "framer-motion";
 
@@ -155,13 +156,21 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <Router>
-          <Routes>
-            {/* ===== PUBLIC ROUTES ===== */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/auth-callback" element={<GoogleCallback />} />
+        <NotificationProvider>
+          <Router>
+            <Routes>
+              {/* ===== PUBLIC ROUTES ===== */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/auth-callback" element={<GoogleCallback />} />
+              <Route path="/booking/confirmation/:bookingId" element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
+              
+              {/* ===== OWNER ROUTES ===== */}
+              <Route path="/ownerlogin" element={<OwnerLogin />} />
+              <Route path="/ownersignup" element={<OwnerSignup />} />
+              <Route path="/ownersetup" element={<OwnerSetup />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/booking/confirmation/:bookingId" element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
             
             {/* ===== OWNER ROUTES ===== */}
@@ -285,8 +294,9 @@ function App() {
             </Route>
           </Routes>
         </Router>
-      </ThemeProvider>
-    </AuthProvider>
+      </NotificationProvider>
+    </ThemeProvider>
+  </AuthProvider>
   );
 }
 

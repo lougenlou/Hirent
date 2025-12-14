@@ -6,14 +6,7 @@ const Item = require('../models/Item');
 const getPopulatedWishlist = async (userId) => {
   if (!mongoose.Types.ObjectId.isValid(userId)) return [];
 
-  const user = await User.findById(userId).populate({
-    path: 'wishlist',
-    populate: {
-      path: 'owner',
-      model: 'User',
-      select: 'name'
-    }
-  });
+  const user = await User.findById(userId).populate('wishlist');
 
   // Ensure we return an array even if the user or wishlist is not found.
   return user?.wishlist || [];

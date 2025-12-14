@@ -2,7 +2,7 @@
 // Load Dependencies
 // -------------------------
 const express = require("express");
-const mongoose = require("mongoose");
+const connectDB = require("./config/db");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const passport = require("passport");
@@ -42,6 +42,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+// Connect to Database
+connectDB();
+
 // Configure multer for file uploads
 const storage = multer.memoryStorage(); // Store files in memory
 const upload = multer({ 
@@ -74,63 +77,6 @@ app.use((err, req, res, next) => {
   next();
 });
 
-// -------------------------
-// Database Connection
-// -------------------------
-let mongoConnected = false;
-
-const connectMongoDB = async () => {
-  try {
-    console.log('\n🔄 Connecting to MongoDB Atlas...');
-    console.log('📍 URI:', process.env.MONGO_URI ? 'Configured' : 'NOT SET - Will fail!');
-    
-    await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 15000,
-      socketTimeoutMS: 60000,
-      maxPoolSize: 10,
-      minPoolSize: 5,
-      retryWrites: true,
-      maxConnecting: 2,
-      ssl: true,
-      tls: true,
-      tlsAllowInvalidCertificates: false
-    });
-    
-    mongoConnected = true;
-    console.log('✅ MongoDB connected successfully!');
-    console.log('   Database:', mongoose.connection.db.databaseName);
-    console.log('   Host:', mongoose.connection.host);
-    
-  } catch (err) {
-    console.error('\n❌ MongoDB Connection Failed:');
-    console.error('   Error:', err.message);
-    console.error('\n⚠️  TROUBLESHOOTING:');
-    console.error('   1. Verify your MONGO_URI in .env is correct');
-    console.error('   2. Check IP whitelist in MongoDB Atlas (allow 0.0.0.0/0)');
-    console.error('   3. Ensure MongoDB Atlas cluster is running (not paused)');
-    console.error('   4. Test connection: mongosh "' + process.env.MONGO_URI + '"');
-    console.error('\n   Retrying in 5 seconds...\n');
-    
-    setTimeout(connectMongoDB, 5000);
-  }
-};
-
-connectMongoDB();
-
-mongoose.connection.on('connected', () => {
-  console.log('📡 Mongoose connected to MongoDB');
-  mongoConnected = true;
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('📡 Mongoose disconnected from MongoDB');
-  mongoConnected = false;
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('📡 Mongoose connection error:', err);
-  mongoConnected = false;
-});
 
 // -------------------------
 // ROUTES
@@ -163,6 +109,9 @@ app.use("/api/cart", require("./routes/cartRoutes"));
 
 // Booking Routes
 app.use("/api/bookings", require("./routes/bookingRoutes"));
+
+// Notification Routes
+app.use("/api/notifications", require("./routes/notificationRoutes"));
 
 // Message Routes
 app.use("/api/messages", require("./routes/messageRoutes"));
@@ -219,7 +168,6 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
   console.log(`\n✅ EXPRESS SERVER RUNNING on port ${PORT}`);
   console.log('📍 API available at: http://localhost:' + PORT);
-  console.log('\n⏳ Database connection status:', mongoConnected ? '✅ CONNECTED' : '⏳ CONNECTING...');
   console.log('\n💡 If MongoDB not connected yet, server will retry automatically.\n');
 });
 

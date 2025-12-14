@@ -57,8 +57,8 @@ const updateBookingStatusValidator = [
   body("status")
     .notEmpty()
     .withMessage("Status is required")
-    .isIn(["pending", "confirmed", "completed", "cancelled", "rejected"])
-    .withMessage("Status must be pending, confirmed, completed, cancelled, or rejected"),
+    .isIn(["pending", "approved", "completed", "cancelled", "rejected"])
+    .withMessage("Status must be pending, approved, completed, cancelled, or rejected"),
 
   body("notes")
     .optional()

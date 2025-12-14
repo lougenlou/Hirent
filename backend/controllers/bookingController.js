@@ -1,6 +1,7 @@
 const Booking = require('../models/Booking');
 const Item = require('../models/Item');
 const { createNotification } = require('./notificationController');
+const { differenceInDays } = require('date-fns');
 
 // Create a new booking
 exports.createBooking = async (req, res) => {
@@ -64,8 +65,21 @@ exports.getMyBookings = async (req, res) => {
       .populate('itemId', 'title images pricePerDay category')
       .populate('ownerId', 'name email profileImage')
       .sort({ createdAt: -1 });
-    res.json({ success: true, data: bookings });
+
+    // Filter out bookings where the item has been deleted and add rental duration
+    const validBookings = bookings
+      .filter(booking => booking.itemId)
+      .map(booking => {
+        const bookingObject = booking.toObject();
+        return {
+          ...bookingObject,
+          rentalDuration: Math.max(1, differenceInDays(new Date(bookingObject.endDate), new Date(bookingObject.startDate))),
+        };
+      });
+
+    res.json({ success: true, data: validBookings });
   } catch (err) {
+    console.error('[GET MY BOOKINGS] Error:', err);
     res.status(500).json({ success: false, msg: 'Error fetching bookings', message: err.message });
   }
 };
@@ -87,11 +101,23 @@ exports.getUserBookings = async (req, res) => {
 exports.getBookingsForMyItems = async (req, res) => {
   try {
     const bookings = await Booking.find({ ownerId: req.user.userId })
-      .populate('itemId', 'title images pricePerDay category')
-      .populate('userId', 'name email profileImage')
+      .populate('itemId', 'title images pricePerDay category') // Populating necessary item fields
+      .populate('userId', 'name email') // Populating necessary renter fields
       .sort({ createdAt: -1 });
-    res.json({ success: true, data: bookings });
+
+    const validBookings = bookings
+      .filter(booking => booking.itemId)
+      .map(booking => {
+        const bookingObject = booking.toObject();
+        return {
+          ...bookingObject,
+          rentalDuration: Math.max(1, differenceInDays(new Date(bookingObject.endDate), new Date(bookingObject.startDate))),
+        };
+      });
+
+    res.json({ success: true, data: validBookings });
   } catch (err) {
+    console.error('[GET OWNER BOOKINGS] Error:', err);
     res.status(500).json({ success: false, msg: 'Error fetching owner bookings', message: err.message });
   }
 };
@@ -112,8 +138,8 @@ exports.getOwnerBookings = async (req, res) => {
 // Update booking status (by owner)
 exports.updateBookingStatus = async (req, res) => {
   try {
-    const { status } = req.body; // 'approved' or 'cancelled'
-    const booking = await Booking.findById(req.params.bookingId).populate('itemId');
+    const { status } = req.body;
+    const booking = await Booking.findById(req.params.id).populate('itemId');
 
     if (!booking) {
       return res.status(404).json({ success: false, msg: 'Booking not found' });
@@ -122,25 +148,28 @@ exports.updateBookingStatus = async (req, res) => {
     if (booking.ownerId.toString() !== req.user.userId) {
       return res.status(403).json({ success: false, msg: 'You are not authorized to update this booking' });
     }
-    
+
     if (booking.status !== 'pending') {
-        return res.status(400).json({ success: false, msg: `Cannot update status of a booking that is already '${booking.status}'` });
+      return res.status(400).json({ success: false, msg: `Cannot update status of a booking that is already '${booking.status}'` });
     }
 
     booking.status = status;
     await booking.save();
 
-    // Notify renter of the status update
-    await createNotification({
+    // Create notification for the renter on approval or cancellation
+    if (status === 'approved' || status === 'cancelled') {
+      await createNotification({
         recipientId: booking.userId,
         senderId: booking.ownerId,
-        type: status === 'approved' ? 'booking_approved' : 'booking_cancelled',
+        type: `booking_${status}`,
         bookingId: booking._id,
-        message: `Your booking for ${booking.itemId.title} has been ${status}.`
-    });
+        message: `Your booking for '${booking.itemId.title}' has been ${status}.`,
+      });
+    }
 
     res.json({ success: true, message: `Booking ${status}`, data: booking });
   } catch (err) {
+    console.error('[UPDATE BOOKING STATUS] Error:', err);
     res.status(500).json({ success: false, msg: 'Error updating booking status', message: err.message });
   }
 };

@@ -1,79 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { Bell, CheckCircle, Info, AlertCircle, Dot, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { makeAPICall, ENDPOINTS } from "../../config/api";
+import { useNotifications } from "../../contexts/NotificationContext";
 
 const NotificationsPage = () => {
   const navigate = useNavigate();
-
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    notifications,
+    loading,
+    markAsRead: markNotificationAsRead,
+    fetchNotifications,
+  } = useNotifications();
   const [filter, setFilter] = useState("all");
 
-  // Set document title
   useEffect(() => {
     document.title = "Hirent — Notifications";
+    fetchNotifications(); // Re-fetch notifications when the page is loaded
     return () => {
       document.title = "Hirent";
     };
-  }, []);
+  }, [fetchNotifications]);
 
-  // Fetch notifications from backend
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      setLoading(true);
-      try {
-        const data = await makeAPICall(ENDPOINTS.NOTIFICATIONS.GET_ALL);
-        if (Array.isArray(data)) {
-          setNotifications(data);
-        } else {
-          setNotifications([]);
-        }
-      } catch (err) {
-        console.error("Failed fetching notifications:", err);
-        setError("Failed to load notifications.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNotifications();
-  }, []);
-
-  // Mark single notification as read and optionally navigate
-  const markAsRead = async (id, redirect) => {
-    try {
-      await makeAPICall(ENDPOINTS.NOTIFICATIONS.READ(id), { method: "POST" });
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
-      );
-
-      if (redirect) navigate(redirect);
-    } catch (err) {
-      console.error("Failed to mark notification as read:", err);
+  const handleNotificationClick = async (notification) => {
+    if (!notification.isRead) {
+      await markNotificationAsRead(notification._id);
+    }
+    // If the notification is related to a booking, navigate to the My Rentals page
+    if (notification.type.startsWith('booking_')) {
+      navigate('/my-rentals');
     }
   };
 
-  // Mark all as read
-  const markAllAsRead = async () => {
-    try {
-      await makeAPICall(ENDPOINTS.NOTIFICATIONS.READ_ALL, { method: "POST" });
-      setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
-    } catch (err) {
-      console.error("Failed to mark all notifications as read:", err);
-    }
-  };
-
-  // Clear all notifications
-  const clearAll = async () => {
-    try {
-      await makeAPICall(ENDPOINTS.NOTIFICATIONS.CLEAR_ALL, { method: "POST" });
-      setNotifications([]);
-    } catch (err) {
-      console.error("Failed to clear notifications:", err);
-    }
-  };
 
   // Render notification icon
   const renderIcon = (type) => {
@@ -110,26 +67,6 @@ const NotificationsPage = () => {
           </div>
         </div>
 
-        <div className="flex gap-2">
-          {notifications.some((n) => n.unread) && (
-            <button
-              onClick={markAllAsRead}
-              className="px-4 py-1.5 rounded-full text-sm bg-purple-50 text-[#8417bb] border border-[#7A1CA9]/20 hover:bg-[#7A1CA9]/20 transition"
-            >
-              Mark All Read
-            </button>
-          )}
-
-          {notifications.length > 0 && (
-            <button
-              onClick={clearAll}
-              className="px-4 py-1.5 rounded-full text-sm text-red-500 hover:text-red-700 text-[13px] font-medium border border-red-300 bg-red-50 flex items-center gap-1 shadow-sm"
-            >
-              <Trash2 className="w-4 h-4" />
-              Clear All
-            </button>
-          )}
-        </div>
       </div>
 
       {/* FILTERS */}
@@ -154,31 +91,27 @@ const NotificationsPage = () => {
         <p className="text-center text-gray-500 text-sm">Loading notifications...</p>
       )}
 
-      {/* ERROR */}
-      {error && <p className="text-center text-red-500 text-sm">{error}</p>}
 
       {/* NOTIFICATION LIST */}
-      {!loading && !error && (
+      {!loading && (
         <div className="space-y-5">
           {filteredNotifications.map((notif) => (
             <div
-              key={notif.id}
-              onClick={() => markAsRead(notif.id, notif.redirect)}
-              className={`w-full px-5 py-4 rounded-2xl bg-white shadow-md cursor-pointer transform transition hover:scale-[1.01] ${
-                notif.unread ? "border-l-4 border-[#7A1CA9]" : "opacity-90"
-              }`}
+              key={notif._id}
+              onClick={() => handleNotificationClick(notif)}
+              className={`w-full px-5 py-4 rounded-2xl bg-white shadow-md cursor-pointer transform transition hover:scale-[1.01] ${!notif.isRead ? "border-l-4 border-[#7A1CA9]" : "opacity-90"}`}
             >
               <div className="flex items-start gap-4">
                 {renderIcon(notif.type)}
 
                 <div className="flex-1">
-                  <p className={`text-[15px] ${notif.unread ? "font-semibold" : "font-normal"}`}>
+                  <p className={`text-[15px] ${!notif.isRead ? "font-semibold" : "font-normal"}`}>
                     {notif.message}
                   </p>
                   <p className="text-gray-500 text-xs mt-1">{notif.time}</p>
                 </div>
 
-                {notif.unread && <Dot className="text-[#7A1CA9] w-6 h-6 mt-1" />}
+                {!notif.isRead && <Dot className="text-[#7A1CA9] w-6 h-6 mt-1" />}
               </div>
             </div>
           ))}
@@ -186,7 +119,7 @@ const NotificationsPage = () => {
       )}
 
       {/* EMPTY STATE */}
-      {!loading && !error && filteredNotifications.length === 0 && (
+      {!loading && filteredNotifications.length === 0 && (
         <div className="text-center text-gray-500 py-10 text-sm">No notifications found.</div>
       )}
     </div>

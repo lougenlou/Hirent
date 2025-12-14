@@ -12,37 +12,63 @@ const {
 } = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 
-// Configure multer for avatar uploads
+// -------------------------------------
+// Multer for avatar uploads
+// -------------------------------------
 const storage = multer.memoryStorage();
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit for avatars
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
 
-// Google OAuth - Standard (renter) flow
+// =====================================
+// GOOGLE AUTH ROUTES
+// =====================================
+
+// Step 1 — Start Google Login (renter)
 router.get("/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-// Google OAuth - Owner signup flow
+// Step 1 — Start Google Login (owner signup)
 router.get("/google/owner",
   passport.authenticate("google", { scope: ["profile", "email"], state: "owner" })
 );
 
-// Google OAuth callback (handles both renter and owner flows)
-router.get("/google/callback",
+// Step 2 — Google CALLBACK ROUTE (Render backend)
+// After success → redirect to Netlify frontend with token
+router.get(
+  "/google/callback",
   passport.authenticate("google", { session: false }),
-  googleAuth
+  (req, res) => {
+
+    // googleAuth returns: { token, user, isNew }
+    googleAuth(req, res, (data) => {
+
+      const frontendURL = process.env.FRONTEND_URL;
+
+      // Successful login redirect:
+      return res.redirect(
+        `${frontendURL}/auth/google/success?token=${data.token}`
+      );
+    });
+  }
 );
 
-// Standard Auth
+// =====================================
+// STANDARD AUTH
+// =====================================
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 
-// Profile management (requires authentication)
+// =====================================
+// PROFILE
+// =====================================
 router.put("/profile", authMiddleware, upload.single("avatar"), updateProfile);
 
-// Email Verification (requires authentication)
+// =====================================
+// OWNER EMAIL VERIFICATION
+// =====================================
 router.post("/send-verification-email", authMiddleware, sendOwnerVerificationEmailEndpoint);
 router.post("/verify-email", verifyOwnerEmail);
 

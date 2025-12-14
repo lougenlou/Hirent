@@ -28,16 +28,14 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+ origin: [
+  "https://hirenttttttt.netlify.app",
+  "http://localhost:3001",
+  "http://localhost:3000"
+],
+credentials: true,
+methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -191,7 +189,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: process.env.FRONTEND_URL, 
     methods: ["GET", "POST"]
   }
 });
@@ -218,11 +216,10 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, () => {
   console.log(`\n✅ EXPRESS SERVER RUNNING on port ${PORT}`);
-  console.log('📍 API available at: http://localhost:' + PORT);
+  console.log(`📍 API available at: ${process.env.BACKEND_URL || 'http://localhost:' + PORT}`);
   console.log('\n⏳ Database connection status:', mongoConnected ? '✅ CONNECTED' : '⏳ CONNECTING...');
   console.log('\n💡 If MongoDB not connected yet, server will retry automatically.\n');
 });
-
 // Prevent server from exiting
 server.keepAliveTimeout = 65000;
 

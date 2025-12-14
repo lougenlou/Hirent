@@ -119,7 +119,7 @@ const Booking = () => {
     };
   };
 
-    const pricing = calculatePricing();
+  const pricing = calculatePricing();
 
   const handleBooking = async () => {
     // Validate rental dates
@@ -142,32 +142,56 @@ const Booking = () => {
 
     setIsBooking(true);
 
-    const bookingData = {
-      itemId,
-      startDate: rentalData.startDate,
-      endDate: rentalData.endDate,
-      totalAmount: pricing.total,
-      subtotal: pricing.subtotal,
-      shippingFee: pricing.shippingFee,
-      securityDeposit: pricing.securityDeposit,
-      discount: pricing.discount,
-      deliveryMethod,
-      couponCode: couponData?.applied ? couponData.code : null,
-    };
-
     try {
-      const response = await makeAPICall(ENDPOINTS.BOOKINGS.CREATE, {
+      // 1. Create booking first
+      const bookingData = {
+        itemId,
+        startDate: rentalData.startDate,
+        endDate: rentalData.endDate,
+        totalAmount: pricing.total,
+        subtotal: pricing.subtotal,
+        shippingFee: pricing.shippingFee,
+        securityDeposit: pricing.securityDeposit,
+        discount: pricing.discount,
+        deliveryMethod,
+        couponCode: couponData?.applied ? couponData.code : null,
+      };
+
+      const bookingResponse = await makeAPICall(ENDPOINTS.BOOKINGS.CREATE, {
         method: "POST",
         body: JSON.stringify(bookingData),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
-      if (response.success) {
-        navigate(`/booking/confirmation/${response.data._id}`);
-      } else {
-        alert(response.message || "Failed to create booking. Please try again.");
+
+      if (!bookingResponse.success) {
+        alert(bookingResponse.message || "Failed to create booking. Please try again.");
+        setIsBooking(false);
+        return;
       }
+
+      const bookingId = bookingResponse.data._id;
+
+      // 2. Handle GCash checkout (polling version)
+      if (paymentMethod === 'gcash') {
+        await makeAPICall(ENDPOINTS.PAYMENTS.GCASH, {
+          method: "POST",
+          body: JSON.stringify({
+            bookingId,
+            amount: pricing.total,
+            description: `Rental for ${productData.title}`,
+          }),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        // <-- EDITED: Navigate to polling page instead of redirecting directly
+        navigate(`/booking/payment-status/${bookingId}`);
+        return;
+      }
+
+
+      // 3. Default flow (COD or other payment methods)
+      navigate(`/booking/confirmation/${bookingId}`);
+
     } catch (error) {
       console.error("Error creating booking:", error);
       alert("Failed to create booking. Please try again.");

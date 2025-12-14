@@ -18,6 +18,7 @@ const {
   updateBookingStatus,
   getBookingById,
   getBookingsForItem,
+  getBookingPaymentStatus, // NEW: import the payment status function
 } = require('../controllers/bookingController');
 
 // ============================
@@ -55,6 +56,31 @@ router.put(
   validationHandler,
   cancelBooking
 );
+
+// Poll payment status for a booking (NEW)
+router.get(
+  '/:id/payment-status',
+  auth,
+  getBookingPaymentStatus
+);
+
+// GET /bookings/:id/payment-status
+router.get("/:id/payment-status", auth, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ success: false, message: "Booking not found" });
+
+    // Return payment status (pending, paid, failed)
+    res.json({
+      success: true,
+      data: { paymentStatus: booking.paymentStatus || "pending" },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 // ============================
 // OWNER ROUTES

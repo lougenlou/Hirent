@@ -1,7 +1,9 @@
 const Booking = require('../models/Booking');
 const Item = require('../models/Item');
+const Payment = require("../models/Payment");
 const { createNotification } = require('./notificationController');
 const dayjs = require('dayjs');
+
 
 // Create a new booking
 exports.createBooking = async (req, res) => {
@@ -282,5 +284,23 @@ exports.getBookingsForItem = async (req, res) => {
     res.json({ success: true, data: bookings });
   } catch (err) {
     res.status(500).json({ success: false, msg: 'Error fetching bookings for item', message: err.message });
+  }
+};
+
+
+exports.getBookingPaymentStatus = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ success: false, msg: "Booking not found" });
+
+    const payment = await Payment.findOne({ bookingId: booking._id });
+    res.json({
+      success: true,
+      bookingStatus: booking.status,
+      paymentStatus: payment?.status || "pending",
+    });
+  } catch (err) {
+    console.error('[GET PAYMENT STATUS] Error:', err);
+    res.status(500).json({ success: false, msg: "Failed to fetch payment status", message: err.message });
   }
 };

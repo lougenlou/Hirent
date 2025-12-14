@@ -169,6 +169,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/booking/payment/:bookingId"
+                element={
+                  <ProtectedRoute>
+                    <BookingPaymentStatus />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* ===== OWNER ROUTES ===== */}
               <Route path="/ownersignup" element={<OwnerSignup />} />

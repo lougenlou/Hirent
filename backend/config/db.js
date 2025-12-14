@@ -1,23 +1,30 @@
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
+  if (!process.env.MONGO_URI) {
+    console.error('FATAL: MONGO_URI environment variable is not set');
+    process.exit(1);
+  }
+
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 60000, // Increased timeout to 60 seconds
-      socketTimeoutMS: 120000, // Increased socket timeout to 2 minutes
-      connectTimeoutMS: 60000, // Initial connection timeout
-      maxPoolSize: 5, // Reduced pool size to prevent exhaustion
-      minPoolSize: 1, // Keep minimal connections
-      maxIdleTimeMS: 30000, // Close idle connections after 30 seconds
-      heartbeatFrequencyMS: 10000, // Check connection health every 10 seconds
+      serverSelectionTimeoutMS: 60000,
+      socketTimeoutMS: 120000,
+      connectTimeoutMS: 60000,
+      maxPoolSize: 5,
+      minPoolSize: 1,
+      maxIdleTimeMS: 30000,
+      heartbeatFrequencyMS: 10000,
       retryWrites: true,
       retryReads: true,
       w: 'majority',
     });
-    console.log('✅ MongoDB connected successfully!');
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ MongoDB connected successfully!');
+    }
   } catch (err) {
-    console.error('❌ MongoDB Connection Failed:', err.message);
-    // Exit process with failure
+    console.error('FATAL: MongoDB Connection Failed:', err.message);
     process.exit(1);
   }
 };

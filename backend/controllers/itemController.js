@@ -32,8 +32,6 @@ exports.getAllItems = async (req, res) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 12;
 
-    console.time("[GET ALL ITEMS] Query Time");
-    
     // Only fetch active items for browse
     const items = await Item.find({ status: 'active' })
       .select("title pricePerDay location images rating status _id category")
@@ -41,9 +39,6 @@ exports.getAllItems = async (req, res) => {
       .limit(limit)
       .lean()
       .exec();
-    
-    console.timeEnd("[GET ALL ITEMS] Query Time");
-    console.log(`[GET ALL ITEMS] Found ${items.length} items on page ${page}`);
 
     const sanitized = items.map(item => ({
       _id: item._id,

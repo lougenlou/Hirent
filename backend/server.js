@@ -14,6 +14,22 @@ const path = require("path");
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, ".env") });
 
+// Validate required environment variables
+const requiredEnvVars = [
+  'MONGO_URI',
+  'JWT_SECRET',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET'
+];
+
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error('❌ FATAL ERROR: Missing required environment variables:');
+  missingEnvVars.forEach(varName => console.error(`   - ${varName}`));
+  process.exit(1);
+}
+
 // -------------------------
 // Initialize App
 // -------------------------
@@ -24,7 +40,7 @@ const app = express();
 // -------------------------
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://hirentttttt.netlify.app",
+  "https://hirent-yw32.onrender.com",
 ];
 
 app.use(cors({
@@ -59,7 +75,10 @@ app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // Set true in production with HTTPS
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -123,6 +142,15 @@ app.use("/api/reports", require("./routes/reportRoutes"));
 // Admin Routes
 app.use("/api/admin", require("./routes/adminRoutes"));
 
+// Health Check Endpoint
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // Root Test Route
 app.get("/", (req, res) => {
   res.send("API is running...");
@@ -136,7 +164,7 @@ app.use(errorHandler);
 // -------------------------
 // Start Server
 // -------------------------
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 const http = require('http');
 const { Server } = require("socket.io");
 
@@ -150,22 +178,15 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected', socket.id);
-
   // Handle joining a room
   socket.on('join', (userId) => {
     socket.join(userId);
-    console.log(`User ${userId} joined their room`);
   });
 
   // Handle sending a message
   socket.on('message:send', ({ conversationId, senderId, receiverId, text }) => {
     // When a message is sent, emit it to the receiver's room
     io.to(receiverId).emit('message:receive', { conversationId, senderId, text });
-  });
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected', socket.id);
   });
 });
 

@@ -8,7 +8,6 @@ const { sendOwnerVerificationEmail, sendWelcomeEmail } = require("../services/em
 // REGISTER
 const registerUser = async (req, res) => {
   try {
-    console.log("[REGISTER] Request received");
     const { name, email, password, role = "renter" } = req.body;
 
     // Validate input
@@ -27,10 +26,8 @@ const registerUser = async (req, res) => {
       });
     }
 
-    console.log("[REGISTER] Checking if user exists:", email);
     let user = await User.findOne({ email });
     if (user) {
-      console.log("[REGISTER] User already exists:", email);
       return res.status(400).json({
         success: false,
         message: "Email already registered",
@@ -38,12 +35,10 @@ const registerUser = async (req, res) => {
     }
 
     // Hash password
-    console.log("[REGISTER] Hashing password...");
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user with specified role
-    console.log("[REGISTER] Creating new user with role:", role);
     user = new User({
       name,
       email,
@@ -52,17 +47,9 @@ const registerUser = async (req, res) => {
       authProvider: "email",
     });
 
-    console.log("[REGISTER] Saving user to database...");
     await user.save();
-    console.log(
-      "[REGISTER] User saved successfully:",
-      user._id,
-      "with role:",
-      user.role
-    );
 
     // Generate JWT token (7 days)
-    console.log("[REGISTER] Generating JWT token...");
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
@@ -70,7 +57,6 @@ const registerUser = async (req, res) => {
     );
 
     // Return success with token and user data
-    console.log("[REGISTER] Sending success response...");
     return res.status(201).json({
       success: true,
       token,
@@ -114,15 +100,7 @@ const loginUser = async (req, res) => {
     
     const normalizedEmail = email.toLowerCase().trim();
     
-    console.log("[LOGIN] Admin check - Email match:", normalizedEmail === adminEmail);
-    console.log("[LOGIN] Admin check - Password match:", password === adminPassword);
-    console.log("[LOGIN] Admin email from env:", adminEmail);
-    console.log("[LOGIN] Admin password from env:", adminPassword);
-    console.log("[LOGIN] Provided password:", password);
-    
     if (normalizedEmail === adminEmail && password === adminPassword) {
-      console.log("[LOGIN] Admin authentication successful");
-      
       // Generate JWT token for admin (7 days)
       const token = jwt.sign(
         { userId: "admin", email: adminEmail, role: "admin" },
@@ -145,10 +123,8 @@ const loginUser = async (req, res) => {
     }
 
     // Find user by email
-    console.log("[LOGIN] Finding user:", email);
     const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
-      console.log("[LOGIN] User not found:", email);
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
@@ -156,10 +132,8 @@ const loginUser = async (req, res) => {
     }
 
     // Compare passwords
-    console.log("[LOGIN] Comparing passwords...");
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("[LOGIN] Password mismatch for user:", email);
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
@@ -167,15 +141,11 @@ const loginUser = async (req, res) => {
     }
 
     // Generate JWT token (7 days)
-    console.log("[LOGIN] Generating JWT token...");
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-
-    // Return success with token and all user data
-    console.log("[LOGIN] Sending success response...");
     return res.status(200).json({
       success: true,
       token,

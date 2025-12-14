@@ -4,12 +4,20 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
+// Validate required Google OAuth environment variables
+const requiredGoogleEnvVars = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_REDIRECT_URI'];
+const missingGoogleVars = requiredGoogleEnvVars.filter(varName => !process.env[varName]);
+
+if (missingGoogleVars.length > 0 && process.env.NODE_ENV === 'production') {
+  console.error('WARNING: Missing Google OAuth environment variables:', missingGoogleVars.join(', '));
+}
+
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_REDIRECT_URI || "/api/auth/google/callback",
+      clientID: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      callbackURL: process.env.GOOGLE_REDIRECT_URI || '/api/auth/google/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

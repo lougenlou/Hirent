@@ -64,8 +64,7 @@ exports.createBooking = async (req, res) => {
       data: newBooking,
     });
   } catch (err) {
-    console.error('[CREATE BOOKING] Error:', err);
-    res.status(500).json({ success: false, msg: 'Error creating booking', message: err.message });
+    res.status(500).json({ success: false, msg: 'Error creating booking' });
   }
 };
 
@@ -90,8 +89,7 @@ exports.getMyBookings = async (req, res) => {
 
     res.json({ success: true, data: validBookings });
   } catch (err) {
-    console.error('[GET MY BOOKINGS] Error:', err);
-    res.status(500).json({ success: false, msg: 'Error fetching bookings', message: err.message });
+    res.status(500).json({ success: false, msg: 'Error fetching bookings' });
   }
 };
 
@@ -145,8 +143,7 @@ exports.getBookingsForMyItems = async (req, res) => {
     res.set("Cache-Control", "private, max-age=30, stale-while-revalidate=60");
     res.json({ success: true, data: validBookings });
   } catch (err) {
-    console.error('[GET OWNER BOOKINGS] Error:', err);
-    res.status(500).json({ success: false, msg: 'Error fetching owner bookings', message: err.message });
+    res.status(500).json({ success: false, msg: 'Error fetching owner bookings' });
   }
 };
 
@@ -159,7 +156,7 @@ exports.getOwnerBookings = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json({ success: true, data: bookings });
   } catch (err) {
-    res.status(500).json({ success: false, msg: 'Error fetching owner bookings', message: err.message });
+    res.status(500).json({ success: false, msg: 'Error fetching owner bookings' });
   }
 };
 
@@ -199,8 +196,7 @@ exports.updateBookingStatus = async (req, res) => {
 
     res.json({ success: true, message: `Booking ${status}`, data: booking });
   } catch (err) {
-    console.error('[UPDATE BOOKING STATUS] Error:', err);
-    res.status(500).json({ success: false, msg: 'Error updating booking status', message: err.message });
+    res.status(500).json({ success: false, msg: 'Error updating booking status' });
   }
 };
 
@@ -268,7 +264,7 @@ exports.getBookingById = async (req, res) => {
 
     res.json({ success: true, data: booking });
   } catch (err) {
-    res.status(500).json({ success: false, msg: 'Error fetching booking', message: err.message });
+    res.status(500).json({ success: false, msg: 'Error fetching booking' });
   }
 };
 

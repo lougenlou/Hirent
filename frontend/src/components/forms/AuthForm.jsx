@@ -6,7 +6,7 @@ import Footer from "../layouts/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { makeAPICall, ENDPOINTS, API_URL } from "../../config/api"; // <- use centralized API
+import { makeAPICall, ENDPOINTS } from "../../config/api"; // <-- use API wrapper
 
 const AuthForm = ({ mode }) => {
   const navigate = useNavigate();
@@ -21,65 +21,32 @@ const AuthForm = ({ mode }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  // SIMPLE NAME VALIDATION
-  const validateName = (name) => {
-    return name.trim().length >= 2;
-  };
+  const validateName = (name) => name.trim().length >= 2;
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  // SIMPLE EMAIL VALIDATION
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  // SUBMIT HANDLER
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // --- Validation ---
     if (mode === "signup" && !formData.name.trim()) {
-      setError("Name is required.");
-      return;
+      setError("Name is required."); return;
     }
-
     if (mode === "signup" && !validateName(formData.name)) {
-      setError("Name must be at least 2 characters.");
-      return;
+      setError("Name must be at least 2 characters."); return;
     }
-
-    if (!formData.email.trim()) {
-      setError("Email is required.");
-      return;
-    }
-
-    if (!validateEmail(formData.email)) {
-      setError("Enter a valid email address.");
-      return;
-    }
-
-    if (!formData.password) {
-      setError("Password is required.");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
-
-    if (!/[0-9]/.test(formData.password)) {
-      setError("Password must include at least one number.");
-      return;
-    }
-
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
-      setError("Password must include at least one special character.");
-      return;
-    }
+    if (!formData.email.trim()) { setError("Email is required."); return; }
+    if (!validateEmail(formData.email)) { setError("Enter a valid email address."); return; }
+    if (!formData.password) { setError("Password is required."); return; }
+    if (formData.password.length < 6) { setError("Password must be at least 6 characters."); return; }
+    if (!/[0-9]/.test(formData.password)) { setError("Password must include at least one number."); return; }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) { setError("Password must include at least one special character."); return; }
 
     setError("");
 
+    // --- API call ---
     try {
-      // --- Use centralized API call ---
       const endpoint = mode === "signup" ? ENDPOINTS.AUTH.REGISTER : ENDPOINTS.AUTH.LOGIN;
+
       const payload = mode === "signup"
         ? { name: formData.name, email: formData.email, password: formData.password }
         : { email: formData.email, password: formData.password };
@@ -89,10 +56,7 @@ const AuthForm = ({ mode }) => {
         body: JSON.stringify(payload),
       });
 
-      if (!data) {
-        setError("Network error. Please try again.");
-        return;
-      }
+      if (!data) return setError("No response from server");
 
       if (data.token) {
         const user = data.user || { email: formData.email };
@@ -106,7 +70,7 @@ const AuthForm = ({ mode }) => {
           }
         }, 300);
       } else {
-        setError(data.msg || "No token received from server");
+        setError(data.msg || data.message || "Authentication failed");
       }
     } catch (err) {
       console.error("Auth error:", err);
@@ -114,9 +78,8 @@ const AuthForm = ({ mode }) => {
     }
   };
 
-  // --- Google Auth handler ---
   const handleGoogleAuth = () => {
-    const googleUrl = `${API_URL}/api/auth/google`;
+    const googleUrl = ENDPOINTS.AUTH.GOOGLE;
     window.location.href = googleUrl;
   };
 
@@ -151,7 +114,6 @@ const AuthForm = ({ mode }) => {
                   Be an Owner ➔
                 </Link>
               )}
-
               {mode === "login" && (
                 <Link
                   to="/ownerlogin"
@@ -178,9 +140,7 @@ const AuthForm = ({ mode }) => {
                     type="text"
                     id="name"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder=" "
                     className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]  text-gray-900  bg-[#f9f9f9] border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                   />
@@ -195,14 +155,13 @@ const AuthForm = ({ mode }) => {
                 </div>
               )}
 
+              {/* Email input */}
               <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type="email"
                   id="email"
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder=" "
                   className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]   text-gray-900  bg-[#f9f9f9]  border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                 />
@@ -216,19 +175,17 @@ const AuthForm = ({ mode }) => {
                 </label>
               </div>
 
+              {/* Password input */}
               <div className="relative w-full mx-auto rounded-b-md overflow-hidden">
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder=" "
                   autoComplete="current-password"
                   className="block rounded-t-lg px-2 pb-2 pt-4 w-full text-[14px]   text-gray-900  bg-[#f9f9f9]  border-0 border-b-2 border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-[#bb84d6] peer"
                 />
-
                 <label
                   htmlFor="password"
                   className="absolute text-[14px] duration-300 transform -translate-y-3 scale-75 top-2 z-10 origin-[0] left-2
@@ -237,23 +194,20 @@ const AuthForm = ({ mode }) => {
                 >
                   Password
                 </label>
-
                 {formData.password.length > 0 && (
                   <span
                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-[#7A1CA9]"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <FiEyeOff size={20} />
-                    ) : (
-                      <FiEye size={20} />
-                    )}
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                   </span>
                 )}
               </div>
 
+              {/* ERROR MESSAGE */}
               {error && <p className="text-red-500 text-xs text-center">{error}</p>}
 
+              {/* SUBMIT BUTTON */}
               <button
                 type="submit"
                 className="w-full border bg-[#7A1CA9] text-white py-3 text-[14px] font-medium rounded-md hover:bg-[#65188a] transition-all"
@@ -261,6 +215,7 @@ const AuthForm = ({ mode }) => {
                 Continue with email
               </button>
 
+              {/* GOOGLE BUTTON */}
               <button
                 type="button"
                 onClick={handleGoogleAuth}
@@ -275,6 +230,7 @@ const AuthForm = ({ mode }) => {
               </button>
             </form>
 
+            {/* SWITCH LOGIN / SIGNUP */}
             <p className="text-[12.5px] text-gray-600 text-center mt-5 mb-8">
               {mode === "signup" ? "Already have an account?" : "Don’t have an account?"}{" "}
               <Link
@@ -285,6 +241,7 @@ const AuthForm = ({ mode }) => {
               </Link>
             </p>
 
+            {/* FOOTNOTE */}
             {mode === "signup" && (
               <div className="w-full flex flex-col items-start ml-12">
                 <p className="text-[12px] text-gray-600 mb-3">
@@ -299,6 +256,7 @@ const AuthForm = ({ mode }) => {
               </div>
             )}
 
+            {/* BOTTOM LINKS */}
             <div
               className={`w-full flex gap-3 text-[12px] text-gray-500 mt-4 ${
                 mode === "login" ? "justify-center" : "justify-start ml-12"

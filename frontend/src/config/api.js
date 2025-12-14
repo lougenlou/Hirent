@@ -4,7 +4,7 @@
 
 // Base API URL
 export const API_URL = process.env.NODE_ENV === 'production'
-  ? "https://hirent-2-3rj2.onrender.com"
+  ? "https://hirent-2.onrender.com"
   : "http://localhost:5000";
 
 

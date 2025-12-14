@@ -26,40 +26,41 @@ export default function EditItemModal({ open, onClose, item, onSave }) {
   if (!item) return null;
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const { name, value } = e.target;
+  setFormData((prev) => ({ ...prev, [name]: value }));
+};
 
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:5000${ENDPOINTS.ITEMS.UPDATE(item._id)}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (response.ok) {
-        alert("Item updated successfully!");
-        if (onSave) onSave();
-        onClose();
-      } else {
-        alert("Failed to update item");
+const handleSave = async () => {
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}${ENDPOINTS.ITEMS.UPDATE(item._id)}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
       }
-    } catch (error) {
-      console.error("Error updating item:", error);
-      alert("Error updating item");
-    } finally {
-      setLoading(false);
+    );
+
+    if (response.ok) {
+      alert("Item updated successfully!");
+      if (onSave) onSave();
+      onClose();
+    } else {
+      alert("Failed to update item");
     }
-  };
+  } catch (error) {
+    console.error("Error updating item:", error);
+    alert("Error updating item");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <AnimatePresence>

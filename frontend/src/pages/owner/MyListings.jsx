@@ -62,14 +62,14 @@ const MyListings = () => {
     try {
       const newStatus = item.status === "active" ? "inactive" : "active";
       const token = localStorage.getItem("token");
-      await fetch(`http://localhost:5000/api/items/${item._id}/status`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/items/${item._id}/status`, {
         method: "PATCH",
         body: JSON.stringify({ status: newStatus }),
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      });
+    });
       fetchListings(); // Refetch to show the updated status
     } catch (err) {
       console.error("Error toggling status:", err);
@@ -94,14 +94,13 @@ const MyListings = () => {
       }
 
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000${ENDPOINTS.ITEMS.CREATE}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}${ENDPOINTS.ITEMS.CREATE}`, {
         method: "POST",
         body: formData,
         headers: {
-          Authorization: token ? `Bearer ${token}` : undefined,
-        },
+        Authorization: token ? `Bearer ${token}` : undefined,
+      },
       });
-
       if (response.ok) {
         fetchListings(); // Refetch to show the new item
       } else {

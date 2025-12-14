@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { MapPin, Calendar, Star, ShoppingBag } from "lucide-react";
+import { Star } from "lucide-react";
 import SortDropdown from "../../../components/dropdown/SortDropdown";
 import WishlistItemCard from "../../../components/cards/WishlistItemCard";
 import { AuthContext } from "../../../context/AuthContext";
 
 import emptyWishlist from "../../../assets/empty-wishlist.png";
 import emptyItems from "../../../assets/empty-listings.png";
-import { ENDPOINTS, makeAPICall } from "../../../config/api";
 
 const WishlistPage = () => {
   const { wishlist, toggleWishlist, addToCart, isInitialized } = useContext(AuthContext);
@@ -55,6 +54,15 @@ const WishlistPage = () => {
       document.title = "Hirent";
     };
   }, []);
+
+  // WAIT FOR CONTEXT INITIALIZATION
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">Loading your wishlist...</p>
+      </div>
+    );
+  }
 
   // Filter & sort items using centralized wishlist state
   const displayedItems = wishlist

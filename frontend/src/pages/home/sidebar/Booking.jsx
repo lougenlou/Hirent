@@ -34,59 +34,49 @@ const Booking = () => {
     type: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("cod"); // default COD
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
   const [isBooking, setIsBooking] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
+  // Set default delivery based on product
   useEffect(() => {
-    if (productData && productData.deliveryOptions) {
+    if (productData?.deliveryOptions) {
       const { offersDelivery, offersPickup } = productData.deliveryOptions;
-      if (offersDelivery && !offersPickup) {
-        setDeliveryMethod('delivery');
-      } else if (!offersDelivery && offersPickup) {
-        setDeliveryMethod('pickup');
-      }
+      if (offersDelivery && !offersPickup) setDeliveryMethod('delivery');
+      else if (!offersDelivery && offersPickup) setDeliveryMethod('pickup');
     }
   }, [productData]);
 
-  // Fetch item details from backend
+  // Fetch item details
   useEffect(() => {
-    const fetchItemDetails = async () => {
+    const fetchItem = async () => {
       setLoading(true);
       setError(null);
       try {
         const response = await makeAPICall(ENDPOINTS.ITEMS.GET_ONE(itemId));
-        if (response && response.success) {
-          setProductData(response.data || response.item);
-        } else {
-          setError("Item data not found in response.");
-        }
+        if (response?.item) setProductData(response.item);
+        else setError("Item data not found");
       } catch (err) {
-        console.error("Error fetching item details:", err);
+        console.error(err);
         setError("Failed to load item details");
       } finally {
         setLoading(false);
       }
     };
-
-    if (itemId) fetchItemDetails();
+    if (itemId) fetchItem();
   }, [itemId]);
 
-  // Calculate pricing
+  // Pricing calculation
   const calculatePricing = () => {
     if (!productData) return { subtotal: 0, discount: 0, shippingFee: 0, securityDeposit: 0, total: 0 };
-    
     const price = productData.pricePerDay || 0;
     const subtotal = price * (rentalData.days || 1);
     let discountAmount = 0;
 
     if (couponData?.applied) {
-      if (couponData.type === 'percentage') {
-        discountAmount = (subtotal * (couponData.discount || 0)) / 100;
-      } else if (couponData.type === 'fixed') {
-        discountAmount = couponData.discount || 0;
-      }
+      if (couponData.type === 'percentage') discountAmount = (subtotal * couponData.discount) / 100;
+      else if (couponData.type === 'fixed') discountAmount = couponData.discount;
     }
 
     const shippingFee = deliveryMethod === "delivery" ? (productData.deliveryOptions?.deliveryFee || 0) : 0;
@@ -98,22 +88,11 @@ const Booking = () => {
 
   const pricing = calculatePricing();
 
-  // Handle booking submission
+  // Handle booking
   const handleBooking = async () => {
-    if (!rentalData.startDate || !rentalData.endDate) {
-      alert("Please select rental dates.");
-      return;
-    }
-
-    if (!paymentMethod) {
-      alert("Please select a payment method.");
-      return;
-    }
-
-    if (!termsAccepted) {
-      alert("Please accept the terms and conditions.");
-      return;
-    }
+    if (!rentalData.startDate || !rentalData.endDate) return alert("Select rental dates");
+    if (!paymentMethod) return alert("Select payment method");
+    if (!termsAccepted) return alert("Accept the terms and conditions");
 
     setIsBooking(true);
 
@@ -128,6 +107,7 @@ const Booking = () => {
       discount: pricing.discount,
       deliveryMethod,
       couponCode: couponData?.applied ? couponData.code : null,
+      paymentMethod, // Pass selected payment method
     };
 
     try {
@@ -137,15 +117,15 @@ const Booking = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (response?.success) {
-        alert("Booking successful!");
+      if (response.success) {
+        // Redirect to confirmation page
         navigate(`/booking/confirmation/${response.data._id}`);
       } else {
-        alert(response?.msg || response?.message || "Failed to create booking. Please try again.");
+        alert(response.message || "Failed to create booking");
       }
     } catch (err) {
-      console.error("Error creating booking:", err);
-      alert("Failed to create booking. Please try again.");
+      console.error(err);
+      alert("Error creating booking. Try again.");
     } finally {
       setIsBooking(false);
     }
@@ -161,15 +141,10 @@ const Booking = () => {
       <div className="flex w-full gap-4">
         {/* LEFT COLUMN */}
         <div className="w-[430px] flex-shrink-0 sticky top-10 self-start">
-          {/* Header */}
           <div className="bg-white p-5 rounded-xl shadow-sm mb-4">
             <div className="mb-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="flex items-center text-[#7A1CA9] text-sm font-medium hover:underline"
-              >
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                Go back
+              <button onClick={() => navigate(-1)} className="flex items-center text-[#7A1CA9] text-sm font-medium hover:underline">
+                <ArrowLeft className="w-4 h-4 mr-1" /> Go back
               </button>
             </div>
             <div className="flex items-start gap-4">
@@ -177,16 +152,13 @@ const Booking = () => {
                 <CalendarCheck className="w-10 h-10 text-[#a12fda]" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-purple-900 mt-1">
-                  Complete Your Booking
-                </h1>
-                <p className="text-gray-500 text-sm mt-0.5">
-                  Finalize rental details and review before confirming your booking.
-                </p>
+                <h1 className="text-xl font-bold text-purple-900 mt-1">Complete Your Booking</h1>
+                <p className="text-gray-500 text-sm mt-0.5">Finalize rental details and review before confirming your booking.</p>
               </div>
             </div>
           </div>
 
+          {/* Order Summary */}
           <div className="sticky top-36">
             <OrderSummary
               product={productData}
@@ -203,34 +175,14 @@ const Booking = () => {
 
         {/* RIGHT COLUMN */}
         <div className="flex-1 space-y-4">
-          <ItemSummary
-            product={productData}
-            days={rentalData.days}
-            coupon={couponData}
-          />
-
+          <ItemSummary product={productData} days={rentalData.days} coupon={couponData} />
           <ApplyCoupon couponData={couponData} setCouponData={setCouponData} />
-
           <RentalPeriod rentalData={rentalData} setRentalData={setRentalData} />
-
           <LateReturnPolicy />
-
-          {/* Integrated PaymentMethod */}
-          <PaymentMethod
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
-          />
-
-          <DeliveryMethod
-            deliveryMethod={deliveryMethod}
-            setDeliveryMethod={setDeliveryMethod}
-            deliveryOptions={productData.deliveryOptions}
-          />
-
+          <PaymentMethod paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
+          <DeliveryMethod deliveryMethod={deliveryMethod} setDeliveryMethod={setDeliveryMethod} deliveryOptions={productData.deliveryOptions} />
           <ReturnDetails deliveryMethod={deliveryMethod} />
-
           <CancellationPolicy />
-
           <RentalTerms />
         </div>
       </div>

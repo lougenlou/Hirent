@@ -15,6 +15,11 @@ const CollectionCard = ({
   handleRemoveItem,
   navigate,
 }) => {
+  // 🔒 REQUIRED GUARD — prevents white screen crashes
+  if (!item || !item.itemId) {
+    return null;
+  }
+
   return (
     <div
       key={item._id}
@@ -22,18 +27,20 @@ const CollectionCard = ({
     >
       <div className="flex gap-6 relative">
         <img
-          alt="Description of image"
-          src={item.itemId.images?.[0] || '/placeholder.png'}
+          alt="Item image"
+          src={item.itemId.images?.[0] || "/placeholder.png"}
           className="w-36 h-36 bg-gray-100 object-contain rounded-xl"
         />
 
         <div className="flex-1 flex flex-col justify-between">
           <div>
-            <h2 className="font-semibold text-[16px]">{item.itemId.title}</h2>
+            <h2 className="font-semibold text-[16px]">
+              {item.itemId.title || "Untitled Item"}
+            </h2>
 
             <div className="text-[13px] mt-1 text-gray-700">
               <div className="flex items-center gap-1">
-                Listed by {item.itemId.owner?.name || 'Unknown'}
+                Listed by {item.itemId.owner?.name || "Unknown"}
               </div>
 
               {/* STATUS BADGE */}
@@ -46,11 +53,14 @@ const CollectionCard = ({
                     : "bg-gray-200 text-gray-700"
                 }`}
               >
-                {item.status === "approved" && <CircleCheckBig className="w-3 h-3" />}
-                {item.status === "pending" && <Clock className="w-3 h-3" />}
-                {item.status !== "approved" && item.status !== "pending" && (
-                  <CalendarOff className="w-3 h-3" />
+                {item.status === "approved" && (
+                  <CircleCheckBig className="w-3 h-3" />
                 )}
+                {item.status === "pending" && <Clock className="w-3 h-3" />}
+                {item.status !== "approved" &&
+                  item.status !== "pending" && (
+                    <CalendarOff className="w-3 h-3" />
+                  )}
 
                 <span>
                   {item.status === "approved"
@@ -78,13 +88,16 @@ const CollectionCard = ({
                     </>
                   )}
 
-                  {item.status !== "approved" && item.status !== "pending" && (
-                    <div className="flex items-center gap-1 text-gray-800 text-[13px] mb-3">
-                      <Calendar size={15} />
-                      {item.daysAvailable || item.days || item.availableDays} days
-                      available
-                    </div>
-                  )}
+                  {item.status !== "approved" &&
+                    item.status !== "pending" && (
+                      <div className="flex items-center gap-1 text-gray-800 text-[13px] mb-3">
+                        <Calendar size={15} />
+                        {item.daysAvailable ||
+                          item.days ||
+                          item.availableDays}{" "}
+                        days available
+                      </div>
+                    )}
 
                   <div className="flex items-center text-[12px] gap-2 text-gray-500 mt-1">
                     <div className="flex items-center gap-1">
@@ -101,7 +114,8 @@ const CollectionCard = ({
                     <div className="flex items-center gap-1">
                       <ShieldAlert className="w-4 h-4" />
                       <span>
-                        Security Deposit (₱{item.itemId.securityDeposit || 0})
+                        Security Deposit (₱
+                        {item.itemId.securityDeposit ?? 0})
                       </span>
                     </div>
                   </div>
@@ -110,32 +124,34 @@ const CollectionCard = ({
                 {/* RIGHT SIDE PRICE INFO */}
                 <div className="text-right text-[13px] flex flex-col gap-0.5">
                   <span className="font-bold text-[15px] text-purple-900">
-                    ₱{item.itemId.pricePerDay || 0}/day
+                    ₱{item.itemId.pricePerDay ?? 0}/day
                   </span>
 
-                  {(item.status === "approved" || item.status === "pending") && (() => {
-                    const itemTotals = calculateItemTotal(item);
-                    const totalWithDeposit =
-                      itemTotals.total + (item.securityDeposit || 0);
+                  {(item.status === "approved" ||
+                    item.status === "pending") &&
+                    (() => {
+                      const itemTotals = calculateItemTotal(item);
+                      const totalWithDeposit =
+                        itemTotals.total + (item.securityDeposit || 0);
 
-                    return (
-                      <div className="flex justify-between w-full text-[13px] gap-1">
-                        <span className="text-gray-500">
-                          Subtotal{" "}
-                          <span className="text-gray-900">
-                            ₱{itemTotals.subtotal}
+                      return (
+                        <div className="flex justify-between w-full text-[13px] gap-1">
+                          <span className="text-gray-500">
+                            Subtotal{" "}
+                            <span className="text-gray-900">
+                              ₱{itemTotals.subtotal}
+                            </span>
                           </span>
-                        </span>
 
-                        <span className="text-gray-500">
-                          Total{" "}
-                          <span className="font-semibold text-gray-900">
-                            ₱{totalWithDeposit}
+                          <span className="text-gray-500">
+                            Total{" "}
+                            <span className="font-semibold text-gray-900">
+                              ₱{totalWithDeposit}
+                            </span>
                           </span>
-                        </span>
-                      </div>
-                    );
-                  })()}
+                        </div>
+                      );
+                    })()}
                 </div>
               </div>
             </div>
@@ -145,7 +161,7 @@ const CollectionCard = ({
           <div className="absolute bottom-1 right-0 flex items-center gap-1.5">
             {item.status === "approved" || item.status === "pending" ? (
               <button
-                onClick={() => openCancelModal(item._id) }
+                onClick={() => openCancelModal(item._id)}
                 className="px-3 py-1.5 text-[12.5px] shadow-sm rounded-full text-red-500 border border-red-300 bg-red-50 hover:bg-red-100"
               >
                 Cancel Booking
@@ -161,7 +177,7 @@ const CollectionCard = ({
 
             {item.status === "approved" ? (
               <button
-                onClick={() => alert(`Contacting owner: ${item.owner}`)}
+                onClick={() => alert(`Contacting owner`)}
                 className="px-3 py-1.5 text-[12.5px] shadow-sm bg-[#7A1CA9] text-white rounded-full hover:bg-purple-800"
               >
                 Message Owner

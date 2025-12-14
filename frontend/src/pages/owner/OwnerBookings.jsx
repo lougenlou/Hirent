@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import OwnerSidebar from "../../components/layouts/OwnerSidebar";
 import { makeAPICall, ENDPOINTS } from "../../config/api";
+import { format } from 'date-fns';
 import { AuthContext } from "../../context/AuthContext";
 import {
   Search,
@@ -30,7 +31,6 @@ import {
   Shield,
 } from "lucide-react";
 
-
 export default function OwnerBookings() {
   const [bookings, setBookings] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
@@ -46,14 +46,13 @@ export default function OwnerBookings() {
   const { user } = useContext(AuthContext);
 
 
-  const calculateDays = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diffTime = Math.abs(end - start);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+  const formatDate = (dateStr) => {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
-
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -74,10 +73,8 @@ export default function OwnerBookings() {
       }
     };
 
-
     fetchBookings();
   }, []);
-
 
   const stats = {
     total: bookings.length,
@@ -87,12 +84,10 @@ export default function OwnerBookings() {
     rejected: bookings.filter((b) => b.status === "rejected").length,
   };
 
-
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchQuery), 300);
     return () => clearTimeout(handler);
   }, [searchQuery]);
-
 
   const filteredBookings = (() => {
     let filtered = [...bookings];
@@ -117,7 +112,6 @@ export default function OwnerBookings() {
     return filtered;
   })();
 
-
   const handleApprove = async (booking) => {
     try {
       await makeAPICall(ENDPOINTS.BOOKINGS.UPDATE_STATUS(booking._id), {
@@ -135,7 +129,6 @@ export default function OwnerBookings() {
       setError("Failed to approve booking");
     }
   };
-
 
   const handleReject = async (booking) => {
     try {
@@ -156,7 +149,6 @@ export default function OwnerBookings() {
     }
   };
 
-
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -172,7 +164,6 @@ export default function OwnerBookings() {
       setIsRefreshing(false);
     }
   };
-
 
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -209,20 +200,9 @@ export default function OwnerBookings() {
     );
   };
 
-
-  const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-
   return (
     <div className="flex min-h-screen bg-gray-50">
       <OwnerSidebar />
-
 
       <main className="flex-1 p-8 ml-60">
         <div className="flex justify-between items-start mb-4">
@@ -248,7 +228,6 @@ export default function OwnerBookings() {
             </button>
           </div>
         </div>
-
 
         <div className="grid grid-cols-4 gap-4 mb-4">
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
@@ -305,7 +284,6 @@ export default function OwnerBookings() {
           </div>
         </div>
 
-
         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-md">
@@ -318,7 +296,6 @@ export default function OwnerBookings() {
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7A1CA9] focus:border-transparent"
               />
             </div>
-
 
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-gray-400" />
@@ -355,7 +332,6 @@ export default function OwnerBookings() {
             </div>
           </div>
         </div>
-
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <table className="w-full">
@@ -404,11 +380,7 @@ export default function OwnerBookings() {
                   </td>
                 </tr>
               ) : (
-                filteredBookings.map((booking) => {
-                  const calculatedDays = calculateDays(booking.startDate, booking.endDate);
-                  const calculatedDailyRate = booking.subtotal / calculatedDays;
-
-                  return (
+                filteredBookings.map((booking) => (
                   <React.Fragment key={booking._id}>
                     <tr
                       className={`hover:bg-gray-50 cursor-pointer transition ${
@@ -445,7 +417,6 @@ export default function OwnerBookings() {
                         </div>
                       </td>
 
-
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
@@ -464,14 +435,12 @@ export default function OwnerBookings() {
                         </div>
                       </td>
 
-
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-1">
                             <ClockFading className="w-4 h-4 text-yellow-600" />
                             <p className="text-sm text-yellow-600">
-                              {calculatedDays} day
-                              {calculatedDays !== 1 ? "s" : ""}
+                              {booking.rentalDuration} {booking.rentalDuration > 1 ? 'days' : 'day'}
                             </p>
                           </div>
                           <div className="flex items-center gap-1">
@@ -484,18 +453,15 @@ export default function OwnerBookings() {
                         </div>
                       </td>
 
-
                       <td className="py-4 px-6">
                         <p className="font-semibold text-gray-800">
                           ₱{(booking.totalAmount || 0).toLocaleString()}
                         </p>
                       </td>
 
-
                       <td className="py-4 px-6">
                         {getStatusBadge(booking.status)}
                       </td>
-
 
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
@@ -542,7 +508,6 @@ export default function OwnerBookings() {
                         </div>
                       </td>
                     </tr>
-
 
                     {expandedRow === booking._id && (
                       <tr className="bg-gray-50">
@@ -593,13 +558,15 @@ export default function OwnerBookings() {
                                   <span className="text-gray-800">
                                     ₱
                                     {(
-                                      calculatedDailyRate || 0
+                                      booking.rentalDuration
+                                        ? booking.totalAmount /
+                                          booking.rentalDuration
+                                        : 0
                                     ).toLocaleString()}
                                   </span>
                                 </div>
                               </div>
                             </div>
-
 
                             <div className="bg-white p-4 rounded-xl border border-gray-100">
                               <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -634,7 +601,6 @@ export default function OwnerBookings() {
                               </div>
                             </div>
 
-
                             <div className="bg-white p-4 rounded-xl border border-gray-100">
                               <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <CalendarClock className="w-4 h-4 text-[#7A1CA9]" />
@@ -647,15 +613,13 @@ export default function OwnerBookings() {
                                   </span>
                                   <span className="text-gray-800">
                                     ₱
-                                    {(
-                                      calculatedDailyRate || 0
-                                    ).toLocaleString()}
+                                    {(booking.totalAmount / booking.rentalDuration).toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-500">Days</span>
                                   <span className="text-gray-800">
-                                    {calculatedDays}
+                                    {booking.rentalDuration}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
@@ -714,8 +678,7 @@ export default function OwnerBookings() {
                       </tr>
                     )}
                   </React.Fragment>
-                  );
-                })
+                ))
               )}
             </tbody>
           </table>

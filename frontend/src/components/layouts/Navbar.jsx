@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Search, Heart, ShoppingBag, Bell, Menu } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
+import { useNotifications } from "../../contexts/NotificationContext";
 import hirentLogo from "../../assets/hirent-logo.png";
 
 const Navbar = ({ onSearch }) => {
@@ -10,6 +11,7 @@ const Navbar = ({ onSearch }) => {
   const navigate = useNavigate();
   const { isLoggedIn, logout, user, wishlistCount, collectionCount } =
     useContext(AuthContext);
+  const { unreadCount } = useNotifications();
 
   const handleSearch = () => {
     if (onSearch) onSearch(inputValue.trim());
@@ -144,9 +146,14 @@ const Navbar = ({ onSearch }) => {
                   {/* Notifications */}
                   <button
                     onClick={handleNotificationsClick}
-                    className="text-white hover:opacity-80 transition"
+                    className="relative text-white hover:opacity-80 transition"
                   >
                     <Bell className="w-5 h-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                        {unreadCount}
+                      </span>
+                    )}
                   </button>
                 </div>
 

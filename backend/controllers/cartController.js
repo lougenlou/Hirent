@@ -72,10 +72,7 @@ exports.updateCartItem = async (req, res) => {
 
 exports.getCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ userId: req.user.userId }).populate({
-      path: 'items.itemId',
-      populate: { path: 'owner', select: 'name' }
-    });
+    const cart = await Cart.findOne({ userId: req.user.userId }).populate('items.itemId');
     if (!cart) {
       return res.json({ items: [] });
     }

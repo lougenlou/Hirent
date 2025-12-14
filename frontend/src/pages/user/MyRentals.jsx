@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { makeAPICall, ENDPOINTS } from '../../config/api';
-import { useAuth } from '../../contexts/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
+import { useContext } from 'react';
 import { format } from 'date-fns';
 
 const MyRentals = () => {
-  const { user } = useAuth();
+  const { user } = useContext(AuthContext);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,11 +15,13 @@ const MyRentals = () => {
     const fetchBookings = async () => {
       if (!user) return;
       try {
-        const response = await makeAPICall(ENDPOINTS.BOOKINGS.GET_USER_BOOKINGS(user._id), {
+        // Use the /me endpoint which is more secure and doesn't require passing a user ID.
+        const response = await makeAPICall(ENDPOINTS.BOOKINGS.GET_MY, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         if (response.success) {
-          setBookings(response.data);
+          setBookings(response.data || []);
+          setError(null); // Clear previous errors on success
         } else {
           setError(response.message || 'Failed to fetch bookings.');
         }
@@ -103,7 +106,7 @@ const MyRentals = () => {
               <img src={booking.itemId.images[0]} alt={booking.itemId.title} className="w-24 h-24 object-cover rounded-md mr-4"/>
               <div className="flex-grow">
                 <h2 className="font-bold text-lg">{booking.itemId.title}</h2>
-                <p className="text-sm text-gray-500">{format(new Date(booking.startDate), 'PPP')} - {format(new Date(booking.endDate), 'PPP')}</p>
+                <p className="text-sm text-gray-500">{format(new Date(booking.startDate), 'PPP')} - {format(new Date(booking.endDate), 'PPP')} ({booking.rentalDuration} days)</p>
                 <p className="text-sm">Owner: {booking.ownerId.name}</p>
                 <p className="text-sm">Booked on: {format(new Date(booking.createdAt), 'PPP')}</p>
               </div>

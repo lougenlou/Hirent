@@ -16,7 +16,7 @@ exports.createNotification = async (data) => {
 
 exports.getUserNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({ recipientId: req.params.userId })
+    const notifications = await Notification.find({ recipientId: req.user.userId })
       .populate('senderId', 'name profileImage')
       .populate('bookingId', 'status')
       .sort({ createdAt: -1 });

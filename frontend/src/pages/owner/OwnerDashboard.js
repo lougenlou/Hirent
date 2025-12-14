@@ -54,13 +54,12 @@ export default function OwnerDashboard() {
       setError(null);
 
       try {
-        // TODO: Confirm backend endpoint returns only items where ownerId matches user.id
-        const [bookingsData, listingsData] = await Promise.all([
-          makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS(ownerId)),
+        const [bookingsResponse, listingsData] = await Promise.all([
+          makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS),
           makeAPICall(ENDPOINTS.ITEMS.BY_OWNER(ownerId)), // ⭐ REAL OWNER LISTINGS
         ]);
 
-        setBookings(Array.isArray(bookingsData) ? bookingsData : []);
+        setBookings(bookingsResponse?.data && Array.isArray(bookingsResponse.data) ? bookingsResponse.data : []);
         setListings(Array.isArray(listingsData) ? listingsData : []);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);

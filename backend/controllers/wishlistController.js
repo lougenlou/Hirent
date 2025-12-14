@@ -8,8 +8,11 @@ const getPopulatedWishlist = async (userId) => {
 
   const user = await User.findById(userId).populate({
     path: 'wishlist',
-    model: 'Item',
-    select: 'title images pricePerDay category',
+    populate: {
+      path: 'owner',
+      model: 'User',
+      select: 'name'
+    }
   });
 
   // Ensure we return an array even if the user or wishlist is not found.

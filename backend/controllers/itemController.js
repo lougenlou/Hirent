@@ -1,4 +1,5 @@
 const Item = require("../models/Item");
+const { RENTABLE_CATEGORIES } = require('../utils/constants');
 
 // ------------------------
 // GET SINGLE ITEM
@@ -43,6 +44,7 @@ exports.searchItems = async (req, res) => {
 
     const items = await Item.find({
       title: { $regex: q, $options: "i" },
+      status: 'active'
     })
       .limit(50)
       .populate("category");
@@ -61,18 +63,13 @@ exports.createItem = async (req, res) => {
     console.log("[CREATE ITEM] Request body:", req.body);
     console.log("[CREATE ITEM] Files:", req.files?.length || 0);
 
-    // Manually construct itemData from req.body as multer might not populate it fully
     const itemData = { ...req.body };
-
-    // Ensure owner is set from the authenticated user
     itemData.owner = req.user.userId;
 
-    // Map itemName to title for consistency, as frontend uses itemName
     if (itemData.itemName) {
       itemData.title = itemData.itemName;
     }
 
-    // Manually parse fields that are sent as JSON strings
     const fieldsToParse = ['unavailableDates', 'itemOptions'];
     fieldsToParse.forEach(field => {
       if (itemData[field] && typeof itemData[field] === 'string') {
@@ -84,25 +81,33 @@ exports.createItem = async (req, res) => {
       }
     });
 
-    // Handle images
+    if (itemData.category) {
+      itemData.category = itemData.category.charAt(0).toUpperCase() + itemData.category.slice(1);
+    }
+
     if (req.files && req.files.length > 0) {
       itemData.images = req.files.map(file => {
-        // Convert buffer to base64 for storage
         return `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
       });
     }
 
-    console.log("[CREATE ITEM] Creating item with data:", { 
-      title: itemData.title, 
-      owner: itemData.owner,
-      imagesCount: itemData.images?.length || 0 
-    });
+    if (!itemData.images || itemData.images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "At least one image is required."
+      });
+    }
+
+    if (itemData.images.length > 5) {
+      return res.status(400).json({
+        success: false,
+        msg: "You can upload a maximum of 5 images."
+      });
+    }
 
     const item = new Item(itemData);
     await item.save();
     
-    console.log("[CREATE ITEM] Item saved successfully:", item._id);
-
     res.status(201).json({
       success: true,
       _id: item._id,
@@ -111,6 +116,14 @@ exports.createItem = async (req, res) => {
     });
   } catch (err) {
     console.error("[CREATE ITEM] Error:", err);
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({
+        success: false,
+        msg: messages.join(', ')
+      });
+    }
+
     res.status(500).json({ 
       success: false,
       msg: "Error creating item",
@@ -248,6 +261,17 @@ exports.updateItemStatus = async (req, res) => {
 };
 
 // ------------------------
+// GET RENTABLE CATEGORIES
+// ------------------------
+exports.getRentableCategories = (req, res) => {
+  try {
+    res.json({ success: true, categories: RENTABLE_CATEGORIES });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: 'Error fetching categories' });
+  }
+};
+
+// ------------------------
 // FEATURED ITEMS
 // ------------------------
 exports.getFeaturedItems = async (req, res) => {
@@ -255,6 +279,7 @@ exports.getFeaturedItems = async (req, res) => {
     const items = await Item.find({
       featured: true,
       available: true,
+      status: 'active'
     })
       .limit(12)
       .populate("category");

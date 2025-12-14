@@ -1,7 +1,8 @@
 // src/pages/owner/OwnerBookings.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import OwnerSidebar from "../../components/layouts/OwnerSidebar";
 import { makeAPICall, ENDPOINTS } from "../../config/api";
+import { AuthContext } from "../../context/AuthContext";
 import {
   Search,
   Filter,
@@ -29,6 +30,7 @@ import {
   Shield,
 } from "lucide-react";
 
+
 export default function OwnerBookings() {
   const [bookings, setBookings] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
@@ -41,15 +43,29 @@ export default function OwnerBookings() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useContext(AuthContext);
 
-  // Fetch owner bookings from backend
+
+  const calculateDays = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+
   useEffect(() => {
     const fetchBookings = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS);
-        setBookings(Array.isArray(data) ? data : []);
+        const response = await makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS);
+        if (response.success && Array.isArray(response.data)) {
+          setBookings(response.data);
+        } else {
+          setBookings([]);
+        }
       } catch (err) {
         console.error("Error fetching bookings:", err);
         setError("Failed to load bookings");
@@ -58,10 +74,11 @@ export default function OwnerBookings() {
       }
     };
 
+
     fetchBookings();
   }, []);
 
-  // Calculate stats dynamically from bookings
+
   const stats = {
     total: bookings.length,
     pending: bookings.filter((b) => b.status === "pending").length,
@@ -70,40 +87,37 @@ export default function OwnerBookings() {
     rejected: bookings.filter((b) => b.status === "rejected").length,
   };
 
-  // Debounced search
+
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchQuery), 300);
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // Filter and search bookings from backend data
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
+
+  const filteredBookings = (() => {
     let filtered = [...bookings];
 
-    // Search filter
     if (debouncedSearch.trim()) {
       const q = debouncedSearch.toLowerCase();
       filtered = filtered.filter(
         (b) =>
-          (b.item?.name || "").toLowerCase().includes(q) ||
-          (b.renter?.name || "").toLowerCase().includes(q) ||
-          (b.item?.category || "").toLowerCase().includes(q) ||
+          (b.itemId?.title || "").toLowerCase().includes(q) ||
+          (b.userId?.name || "").toLowerCase().includes(q) ||
+          (b.itemId?.category || "").toLowerCase().includes(q) ||
           (b._id || "").toLowerCase().includes(q)
       );
     }
 
-    // Status filter
     if (statusFilter !== "All") {
       filtered = filtered.filter(
         (b) => b.status === statusFilter.toLowerCase()
       );
     }
 
-    setBookings(filtered);
-  }, [debouncedSearch, statusFilter]);
+    return filtered;
+  })();
 
-  // Update booking status on backend
+
   const handleApprove = async (booking) => {
     try {
       await makeAPICall(ENDPOINTS.BOOKINGS.UPDATE_STATUS(booking._id), {
@@ -122,7 +136,7 @@ export default function OwnerBookings() {
     }
   };
 
-  // Reject booking on backend
+
   const handleReject = async (booking) => {
     try {
       await makeAPICall(ENDPOINTS.BOOKINGS.UPDATE_STATUS(booking._id), {
@@ -142,11 +156,12 @@ export default function OwnerBookings() {
     }
   };
 
-  // Refresh bookings from backend
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      const data = await makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS);
+      const response = await makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS(user._id));
+      const data = response.success ? response.data : [];
       setBookings(Array.isArray(data) ? data : []);
       setSearchQuery("");
       setStatusFilter("All");
@@ -157,6 +172,7 @@ export default function OwnerBookings() {
       setIsRefreshing(false);
     }
   };
+
 
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -193,6 +209,7 @@ export default function OwnerBookings() {
     );
   };
 
+
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
       month: "short",
@@ -201,12 +218,13 @@ export default function OwnerBookings() {
     });
   };
 
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       <OwnerSidebar />
 
+
       <main className="flex-1 p-8 ml-60">
-        {/* Header */}
         <div className="flex justify-between items-start mb-4">
           <div>
             <h1 className="text-3xl font-bold mb-1">Bookings</h1>
@@ -231,7 +249,7 @@ export default function OwnerBookings() {
           </div>
         </div>
 
-        {/* Stats Cards */}
+
         <div className="grid grid-cols-4 gap-4 mb-4">
           <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
             <div className="flex items-center gap-3">
@@ -287,10 +305,9 @@ export default function OwnerBookings() {
           </div>
         </div>
 
-        {/* Search & Filters */}
+
         <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-4">
           <div className="flex items-center gap-4">
-            {/* Search */}
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -302,7 +319,7 @@ export default function OwnerBookings() {
               />
             </div>
 
-            {/* Status Filter */}
+
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-gray-400" />
               <div className="flex gap-2">
@@ -339,7 +356,7 @@ export default function OwnerBookings() {
           </div>
         </div>
 
-        {/* Bookings Table */}
+
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -377,7 +394,7 @@ export default function OwnerBookings() {
                     <p className="text-red-500">{error}</p>
                   </td>
                 </tr>
-              ) : bookings.length === 0 ? (
+              ) : filteredBookings.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-32 text-center">
                     <div className="flex flex-col items-center gap-3">
@@ -387,7 +404,11 @@ export default function OwnerBookings() {
                   </td>
                 </tr>
               ) : (
-                bookings.map((booking) => (
+                filteredBookings.map((booking) => {
+                  const calculatedDays = calculateDays(booking.startDate, booking.endDate);
+                  const calculatedDailyRate = booking.subtotal / calculatedDays;
+
+                  return (
                   <React.Fragment key={booking._id}>
                     <tr
                       className={`hover:bg-gray-50 cursor-pointer transition ${
@@ -399,15 +420,14 @@ export default function OwnerBookings() {
                         )
                       }
                     >
-                      {/* Item column */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <img
                             src={
-                              booking.item?.image ||
+                              booking.itemId?.images?.[0] ||
                               "https://via.placeholder.com/48"
                             }
-                            alt={booking.item?.name || "Item"}
+                            alt={booking.itemId?.title || "Item"}
                             className="w-12 h-12 rounded-lg object-cover bg-gray-100"
                             onError={(e) => {
                               e.target.src = "https://via.placeholder.com/48";
@@ -415,7 +435,7 @@ export default function OwnerBookings() {
                           />
                           <div>
                             <p className="font-medium text-gray-800 text-sm">
-                              {booking.item?.name || "Unknown Item"}
+                              {booking.itemId?.title || "Unknown Item"}
                             </p>
                             <p className="text-xs text-gray-500 flex items-center gap-1">
                               <Hash className="w-3 h-3" />
@@ -425,17 +445,17 @@ export default function OwnerBookings() {
                         </div>
                       </td>
 
-                      {/* Renter column */}
+
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
                             <span className="text-xs font-medium text-[#7A1CA9]">
-                              {(booking.renter?.name || "U").charAt(0)}
+                              {(booking.userId?.name || "U").charAt(0)}
                             </span>
                           </div>
                           <div>
                             <p className="font-medium text-gray-800 text-sm">
-                              {booking.renter?.name || "Unknown"}
+                              {booking.userId?.name || "Unknown"}
                             </p>
                             <p className="text-xs text-gray-500">
                               {booking.renter?.email || "N/A"}
@@ -444,39 +464,39 @@ export default function OwnerBookings() {
                         </div>
                       </td>
 
-                      {/* Duration column */}
+
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-1">
                             <ClockFading className="w-4 h-4 text-yellow-600" />
                             <p className="text-sm text-yellow-600">
-                              {booking.days || 1} day
-                              {booking.days !== 1 ? "s" : ""}
+                              {calculatedDays} day
+                              {calculatedDays !== 1 ? "s" : ""}
                             </p>
                           </div>
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4 text-gray-400" />
                             <p className="text-[13px] text-gray-500">
-                              {formatDate(booking.bookedFrom)} –{" "}
-                              {formatDate(booking.bookedTo)}
+                              {formatDate(booking.startDate)} –{" "}
+                              {formatDate(booking.endDate)}
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      {/* Total column */}
+
                       <td className="py-4 px-6">
                         <p className="font-semibold text-gray-800">
-                          ₱{(booking.totalPrice || 0).toLocaleString()}
+                          ₱{(booking.totalAmount || 0).toLocaleString()}
                         </p>
                       </td>
 
-                      {/* Status column */}
+
                       <td className="py-4 px-6">
                         {getStatusBadge(booking.status)}
                       </td>
 
-                      {/* Actions column */}
+
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
                           {booking.status === "pending" && (
@@ -523,12 +543,11 @@ export default function OwnerBookings() {
                       </td>
                     </tr>
 
-                    {/* Expanded Row with booking details */}
+
                     {expandedRow === booking._id && (
                       <tr className="bg-gray-50">
                         <td colSpan={6} className="px-5 py-6">
                           <div className="grid grid-cols-3 gap-6">
-                            {/* Product Info */}
                             <div className="bg-white p-4 rounded-xl border border-gray-100">
                               <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <Package className="w-4 h-4 text-[#7A1CA9]" />
@@ -541,7 +560,7 @@ export default function OwnerBookings() {
                                     Item ID:
                                   </span>
                                   <span className="text-gray-800 font-medium">
-                                    {booking.item?._id?.substring(0, 8) ||
+                                    {booking.itemId?._id?.substring(0, 8) ||
                                       "N/A"}
                                   </span>
                                 </div>
@@ -551,7 +570,7 @@ export default function OwnerBookings() {
                                     Category:
                                   </span>
                                   <span className="text-gray-800">
-                                    {booking.item?.category || "N/A"}
+                                    {booking.itemId?.category || "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
@@ -574,14 +593,14 @@ export default function OwnerBookings() {
                                   <span className="text-gray-800">
                                     ₱
                                     {(
-                                      booking.item?.price || 0
+                                      calculatedDailyRate || 0
                                     ).toLocaleString()}
                                   </span>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Renter Info */}
+
                             <div className="bg-white p-4 rounded-xl border border-gray-100">
                               <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <User className="w-4 h-4 text-[#7A1CA9]" />
@@ -591,31 +610,31 @@ export default function OwnerBookings() {
                                 <div className="flex items-center gap-2 text-sm">
                                   <Mail className="w-4 h-4 text-gray-400" />
                                   <span className="text-gray-600">
-                                    {booking.renter?.email || "N/A"}
+                                    {booking.userId?.email || "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                   <Phone className="w-4 h-4 text-gray-400" />
                                   <span className="text-gray-600">
-                                    {booking.renter?.phone || "N/A"}
+                                    {booking.userId?.phone || "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                   <MapPin className="w-4 h-4 text-gray-400" />
                                   <span className="text-gray-600">
-                                    {booking.renter?.address || "N/A"}
+                                    {booking.userId?.address || "N/A"}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
                                   <Star className="w-4 h-4 text-yellow-500" />
                                   <span className="text-gray-600">
-                                    {booking.renter?.rating || "N/A"} rating
+                                    {booking.userId?.rating || "N/A"} rating
                                   </span>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Payment Summary */}
+
                             <div className="bg-white p-4 rounded-xl border border-gray-100">
                               <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <CalendarClock className="w-4 h-4 text-[#7A1CA9]" />
@@ -629,14 +648,14 @@ export default function OwnerBookings() {
                                   <span className="text-gray-800">
                                     ₱
                                     {(
-                                      booking.item?.price || 0
+                                      calculatedDailyRate || 0
                                     ).toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-500">Days</span>
                                   <span className="text-gray-800">
-                                    {booking.days || 1}
+                                    {calculatedDays}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
@@ -646,8 +665,7 @@ export default function OwnerBookings() {
                                   <span className="text-gray-800">
                                     ₱
                                     {(
-                                      (booking.item?.price || 0) *
-                                      (booking.days || 1)
+                                      booking.subtotal || 0
                                     ).toLocaleString()}
                                   </span>
                                 </div>
@@ -678,7 +696,7 @@ export default function OwnerBookings() {
                                   <span className="text-gray-800">Total</span>
                                   <span className="text-[#7A1CA9]">
                                     ₱
-                                    {(booking.totalPrice || 0).toLocaleString()}
+                                    {(booking.totalAmount || 0).toLocaleString()}
                                   </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
@@ -696,13 +714,14 @@ export default function OwnerBookings() {
                       </tr>
                     )}
                   </React.Fragment>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
 
-        {/* Approval Modal */}
+
         {showApprovalModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-modalSlideIn">
@@ -720,15 +739,15 @@ export default function OwnerBookings() {
                 </div>
               </div>
 
-              {/* Booking summary from backend data */}
+
               <div className="bg-gray-50 p-4 rounded-xl mb-4">
                 <div className="flex items-center gap-3 mb-3">
                   <img
                     src={
-                      showApprovalModal.item?.image ||
+                      showApprovalModal.itemId?.images?.[0] ||
                       "https://via.placeholder.com/56"
                     }
-                    alt={showApprovalModal.item?.name || "Item"}
+                    alt={showApprovalModal.itemId?.title || "Item"}
                     className="w-14 h-14 rounded-lg object-cover"
                     onError={(e) => {
                       e.target.src = "https://via.placeholder.com/56";
@@ -736,14 +755,14 @@ export default function OwnerBookings() {
                   />
                   <div>
                     <p className="font-medium text-gray-800">
-                      {showApprovalModal.item?.name || "Unknown"}
+                      {showApprovalModal.itemId?.title || "Unknown"}
                     </p>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <Hash className="w-3 h-3" />
                       {showApprovalModal._id?.substring(0, 8) || "N/A"}
                     </p>
                     <p className="text-sm font-semibold text-[#7A1CA9]">
-                      ₱{(showApprovalModal.totalPrice || 0).toLocaleString()}
+                      ₱{(showApprovalModal.totalAmount || 0).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -760,6 +779,7 @@ export default function OwnerBookings() {
                   </span>
                 </div>
               </div>
+
 
               <div className="flex gap-3">
                 <button
@@ -779,7 +799,7 @@ export default function OwnerBookings() {
           </div>
         )}
 
-        {/* Reject Modal */}
+
         {showRejectModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-modalSlideIn">
@@ -797,7 +817,7 @@ export default function OwnerBookings() {
                 </div>
               </div>
 
-              {/* Booking summary from backend data */}
+
               <div className="bg-gray-50 p-4 rounded-xl mb-4">
                 <div className="flex items-center gap-3">
                   <img
@@ -826,7 +846,7 @@ export default function OwnerBookings() {
                 </div>
               </div>
 
-              {/* Rejection reason input */}
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Reason for Rejection
@@ -839,6 +859,7 @@ export default function OwnerBookings() {
                   rows={3}
                 />
               </div>
+
 
               <div className="flex gap-3">
                 <button
@@ -862,7 +883,7 @@ export default function OwnerBookings() {
         )}
       </main>
 
-      {/* Modal Animation Style */}
+
       <style>{`
         @keyframes modalSlideIn {
           from {

@@ -1,206 +1,218 @@
-import React, { useState, useEffect, useMemo, useContext } from 'react';
-import { makeAPICall, ENDPOINTS } from '../../../config/api';
-import { AuthContext } from '../../../context/AuthContext';
-import { format } from 'date-fns';
-import MainLayout from '../../../components/layouts/MainLayout';
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Package, AlertTriangle, Loader } from "lucide-react";
+import CancelConfirmationModal from "../../../components/modals/CancelModal";
+import { ViewDetailsModal } from "../../../components/modals/ViewDetailsModal";
+import RentalSummary from "../../../components/cards/RentalSummary";
+import SortDropdown from "../../../components/dropdown/SortDropdown";
+import RentalCard from "../../../components/cards/MyRentalsCard";
+import { AuthContext } from "../../../context/AuthContext";
+import { makeAPICall, ENDPOINTS } from "../../../config/api";
 
-const MyRentals = () => {
-  const { user } = useContext(AuthContext);
-  console.log("User from AuthContext:", user);
-  console.log("User ID:", user?.userId || user?._id);
-  const [bookings, setBookings] = useState([]);
+const MyRentalsPage = () => {
+  const navigate = useNavigate();
+  const { user, token } = useContext(AuthContext);
+
+  const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('All');
+
+  const [filter, setFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("latest");
+
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchBookings = async () => {
-      if (!user) {
-        console.log("No user found, skipping fetch");
-        return;
-      }
-
-      console.log("Fetching bookings for user:", user.userId || user._id);
-      setLoading(true);
-
-      try {
-        const response = await makeAPICall(ENDPOINTS.BOOKINGS.GET_MY);
-        
-        // LOG EVERYTHING
-        console.log("=== FULL API RESPONSE ===");
-        console.log("Response:", response);
-        console.log("Response type:", typeof response);
-        console.log("Is array?", Array.isArray(response));
-        console.log("Response.data:", response?.data);
-        console.log("Response.success:", response?.success);
-        
-        // Handle different response structures
-        let bookingsData = [];
-        
-        if (Array.isArray(response)) {
-          bookingsData = response;
-        } else if (response?.success && Array.isArray(response.data)) {
-          bookingsData = response.data;
-        } else if (response?.data && Array.isArray(response.data)) {
-          bookingsData = response.data;
-        } else if (response?.bookings && Array.isArray(response.bookings)) {
-          bookingsData = response.bookings;
-        }
-        
-        console.log("Extracted bookings data:", bookingsData);
-        console.log("Number of bookings:", bookingsData.length);
-        
-        if (bookingsData.length > 0) {
-          console.log("First booking sample:", bookingsData[0]);
-          console.log("First booking itemId:", bookingsData[0]?.itemId);
-          console.log("First booking ownerId:", bookingsData[0]?.ownerId);
-        }
-        
-        setBookings(bookingsData);
-        setError(null);
-        
-      } catch (err) {
-        console.error("=== ERROR FETCHING BOOKINGS ===");
-        console.error("Error object:", err);
-        console.error("Error message:", err.message);
-        console.error("Error response:", err.response);
-        setError('Failed to fetch bookings. Check console for details.');
-      } finally {
-        setLoading(false);
-      }
+    document.title = "Hirent — My Rentals";
+    return () => {
+      document.title = "Hirent";
     };
+  }, []);
 
-    fetchBookings();
-  }, [user]);
+  const fetchRentals = async () => {
+    if (!user || !token) {
+      setError("You must be logged in to view your rentals.");
+      setLoading(false);
+      return;
+    }
 
-  const filteredBookings = useMemo(() => {
-    if (activeTab === 'All') return bookings;
-    return bookings.filter(b => b.status.toLowerCase() === activeTab.toLowerCase());
-  }, [bookings, activeTab]);
+    setLoading(true);
+    try {
+      const response = await makeAPICall(ENDPOINTS.BOOKINGS.GET_MY, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-  const summary = useMemo(() => {
-    const completed = bookings.filter(b => b.status === 'completed');
-    return {
-      totalItems: bookings.length,
-      subtotalCompleted: completed.reduce((sum, b) => sum + (b.subtotal || 0), 0),
-      totalDiscounts: bookings.reduce((sum, b) => sum + (b.discount || 0), 0),
-      totalSecurityDeposit: bookings.reduce((sum, b) => sum + (b.securityDeposit || 0), 0),
-      totalExpense: completed.reduce((sum, b) => sum + (b.totalAmount || 0), 0),
-    };
-  }, [bookings]);
+      if (response.success && Array.isArray(response.data)) {
+        setRentals(response.data);
+      } else {
+        setError(response.msg || "Failed to fetch rentals.");
+      }
+    } catch (err) {
+      setError("An error occurred while fetching your rentals.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (loading) return <MainLayout><div className="text-center p-8">Loading your rentals...</div></MainLayout>;
-  if (error) return <MainLayout><div className="text-center p-8 text-red-500">{error}</div></MainLayout>;
+  useEffect(() => {
+    fetchRentals();
+  }, [user, token]);
 
-  const tabs = ['All', 'Approved', 'Pending', 'Cancelled', 'Completed'];
+  const handleCancelBooking = async () => {
+    if (!selectedBookingId) return;
+
+    try {
+      const response = await makeAPICall(
+        ENDPOINTS.BOOKINGS.CANCEL(selectedBookingId),
+        { method: "PUT" }
+      );
+
+      if (response.success) {
+        setRentals((prev) =>
+          prev.map((r) =>
+            r._id === selectedBookingId ? { ...r, status: "cancelled" } : r
+          )
+        );
+      } else {
+        console.error("Failed to cancel booking:", response.msg);
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+    } finally {
+      setShowCancelModal(false);
+      setSelectedBookingId(null);
+    }
+  };
+
+  const filteredRentals = rentals.filter((r) => {
+    if (filter === "all") return true;
+    return r.status === filter;
+  });
+
+  const sortedRentals = [...filteredRentals].sort((a, b) => {
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
+    return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
+  });
 
   return (
-    <MainLayout>
-      <div className="p-4 sm:ml-64">
-        <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">My Rentals</h1>
-      
-      {/* Summary Section */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-          <p className="text-2xl font-bold">{summary.totalItems}</p>
-          <p className="text-gray-500">Total Items Rented</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-          <p className="text-2xl font-bold">₱{summary.subtotalCompleted.toFixed(2)}</p>
-          <p className="text-gray-500">Subtotal of Completed</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-          <p className="text-2xl font-bold">₱{summary.totalDiscounts.toFixed(2)}</p>
-          <p className="text-gray-500">Total Discounts</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-          <p className="text-2xl font-bold">₱{summary.totalSecurityDeposit.toFixed(2)}</p>
-          <p className="text-gray-500">Security Deposits</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-          <p className="text-2xl font-bold">₱{summary.totalExpense.toFixed(2)}</p>
-          <p className="text-gray-500">Total Expense</p>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="mb-6 flex border-b">
-        {tabs.map(tab => (
-          <button 
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`py-2 px-4 ${activeTab === tab ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-500'}`}>
-            {tab} ({tab === 'All' ? bookings.length : bookings.filter(b => b.status.toLowerCase() === tab.toLowerCase()).length})
+    <div className="flex min-h-screen px-4 md:px-6 lg:px-8">
+      <div className="w-[560px] pl-16 flex-shrink-0 sticky top-10 self-start h-fit bg-gray-50 border-r border-gray-200">
+        <div className="flex items-center justify-between mb-3 mt-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-[#7A1CA9] text-sm font-medium hover:underline"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Go back
           </button>
-        ))}
+        </div>
+
+        <div className="flex items-start gap-4 mb-5">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-50 via-purple-100 to-purple-200">
+            <Package className="w-8 h-8 text-[#a12fda]" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-purple-900 mt-1">
+              My Rentals
+            </h1>
+            <p className="text-gray-500 text-sm mr-4">
+              View and manage your booked items
+            </p>
+          </div>
+          <div className="mt-4">
+            <SortDropdown
+              options={["Latest", "Oldest"]}
+              onSortChange={(value) => setSortOrder(value.toLowerCase())}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-4 mr-5">
+          {["all", "approved", "pending", "cancelled", "completed"].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setFilter(cat)}
+              className={`px-2 py-1 rounded-lg text-[13px] transition ${
+                filter === cat
+                  ? "bg-[#7A1CA9] text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-[#7A1CA9]/10"
+              }`}
+            >
+              {cat.charAt(0).toUpperCase() + cat.slice(1)} (
+              {
+                rentals.filter((r) => (cat === "all" ? true : r.status === cat))
+                  .length
+              }
+              )
+            </button>
+          ))}
+        </div>
+
+        <RentalSummary rentals={rentals} />
+
+        <div className="bg-purple-100 p-4 mt-3 mb-10 mr-5 rounded-lg text-purple-700 text-[13px]">
+          <ul className="space-y-1">
+            <li>✓ View and manage all your booked items in one place</li>
+            <li>✓ Keep track of rental status</li>
+            <li>✓ Get notified of updates and messages from owners</li>
+          </ul>
+        </div>
       </div>
 
-      {/* Bookings List */}
-      <div className="space-y-4">
-        {filteredBookings.length > 0 ? (
-          filteredBookings.map(booking => {
-            console.log("Rendering booking:", booking._id, booking);
-
-            // Check if data exists
-            if (!booking) {
-              console.warn("Booking is null/undefined");
-              return null;
-            }
-
-            if (!booking.itemId) {
-              console.warn("Booking missing itemId:", booking._id);
-              return (
-                <div key={booking._id} className="bg-red-50 p-4 rounded">
-                  Booking {booking._id}: Item data not found
-                </div>
-              );
-            }
-
-            if (!booking.ownerId) {
-              console.warn("Booking missing ownerId:", booking._id);
-            }
-
-            const imageUrl = booking.itemId?.images?.[0] || 'https://via.placeholder.com/150';
-            const itemTitle = booking.itemId?.title || 'Unknown Item';
-            const ownerName = booking.ownerId?.name || 'Unknown Owner';
-
-            return (
-              <div key={booking._id} className="bg-white p-4 rounded-lg shadow-sm flex items-center">
-                <img src={imageUrl} alt={itemTitle} className="w-24 h-24 object-cover rounded-md mr-4"/>
-                <div className="flex-grow">
-                  <h2 className="font-bold text-lg">{itemTitle}</h2>
-                  <p className="text-sm text-gray-500">
-                    {booking.startDate ? format(new Date(booking.startDate), 'PPP') : 'N/A'} - 
-                    {booking.endDate ? format(new Date(booking.endDate), 'PPP') : 'N/A'}
-                  </p>
-                  <p className="text-sm">Owner: {ownerName}</p>
-                  <p className="text-sm">Booked on: {booking.createdAt ? format(new Date(booking.createdAt), 'PPP') : 'N/A'}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-lg">₱{(booking.totalAmount || 0).toFixed(2)}</p>
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    booking.status === 'pending' ? 'bg-yellow-200 text-yellow-800' :
-                    booking.status === 'approved' ? 'bg-green-200 text-green-800' :
-                    booking.status === 'cancelled' ? 'bg-red-200 text-red-800' :
-                    booking.status === 'completed' ? 'bg-blue-200 text-blue-800' :
-                    'bg-gray-200 text-gray-800'
-                  }`}>
-                    {booking.status || 'unknown'}
-                  </span>
-                  <p className="text-sm capitalize mt-1">{booking.deliveryMethod || 'N/A'}</p>
-                </div>
-              </div>
-            );
-          })
+      <div className="flex-1 pl-6 pb-20 pt-10">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <Loader className="animate-spin text-purple-600" size={48} />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-full text-red-600">
+            <AlertTriangle size={48} className="mb-4" />
+            <p className="text-center">{error}</p>
+          </div>
+        ) : sortedRentals.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4">
+            {sortedRentals.map((booking) => (
+              <RentalCard
+                key={booking._id}
+                item={booking} // Pass the whole booking object
+                onViewDetails={() => {
+                  setSelectedBookingId(booking._id);
+                  setDetailsModalOpen(true);
+                }}
+                onCancel={() => {
+                  setSelectedBookingId(booking._id);
+                  setShowCancelModal(true);
+                }}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="text-center py-8"> <p className="mb-2">No bookings found for this category.</p> <p className="text-sm text-gray-500">Total bookings loaded: {bookings.length}</p> </div>
+          <div className="text-center text-gray-500 pt-20">
+            <Package size={64} className="mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold">No Rentals Yet</h2>
+            <p>You haven't rented any items. Start exploring and find something to rent!</p>
+          </div>
         )}
       </div>
-      </div>
+
+      <CancelConfirmationModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelBooking}
+      />
+
+      <ViewDetailsModal
+        isOpen={detailsModalOpen}
+        onClose={() => setDetailsModalOpen(false)}
+        bookingId={selectedBookingId} // Pass bookingId instead of itemId
+      />
     </div>
-    </MainLayout>
   );
 };
 
-export default MyRentals;
+export default MyRentalsPage;

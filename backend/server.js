@@ -22,6 +22,11 @@ const app = express();
 // -------------------------
 // Middleware
 // -------------------------
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://hirentttttt.netlify.app",
+];
+
 app.use(cors({
  origin: [
   "https://hirenttttttt.netlify.app",

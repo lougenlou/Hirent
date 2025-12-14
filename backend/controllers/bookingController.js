@@ -158,8 +158,18 @@ exports.cancelBooking = async (req, res) => {
       return res.status(403).json({ success: false, msg: 'You are not authorized to cancel this booking' });
     }
 
-    if (booking.status !== 'pending') {
-      return res.status(400).json({ success: false, msg: 'You can only cancel pending bookings' });
+    // Cancellation logic: today < startDate - 1 day
+    const today = new Date();
+    const startDate = new Date(booking.startDate);
+    const oneDay = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round((startDate.getTime() - today.getTime()) / oneDay);
+
+    if (diffDays < 1) {
+        return res.status(400).json({ success: false, msg: 'Cancellation is only allowed up to one day before the start date.' });
+    }
+
+    if (booking.status !== 'pending' && booking.status !== 'approved') {
+        return res.status(400).json({ success: false, msg: `You can only cancel pending or approved bookings. Current status: ${booking.status}` });
     }
 
     booking.status = 'cancelled';

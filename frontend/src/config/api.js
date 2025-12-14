@@ -3,7 +3,10 @@
 // =============================================
 
 // Base API URL
-export const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+export const API_URL = process.env.NODE_ENV === 'production'
+  ? "https://hirent-2-3rj2.onrender.com"
+  : "http://localhost:5000";
+
 
 // IMPORTANT — all endpoints must start with /api
 const API_PREFIX = "/api";
@@ -28,6 +31,7 @@ export const ENDPOINTS = {
   // -----------------------
   ITEMS: {
     GET_ALL: `${API_PREFIX}/items`,
+    GET_CATEGORIES: `${API_PREFIX}/items/categories`,
     GET_ONE: (id) => `${API_PREFIX}/items/${id}`,
     SEARCH: `${API_PREFIX}/items/search`,
     FEATURED: `${API_PREFIX}/items/featured`,
@@ -85,7 +89,7 @@ export const ENDPOINTS = {
     GET_ONE: (id) => `${API_PREFIX}/bookings/${id}`,
     CANCEL: (id) => `${API_PREFIX}/bookings/${id}/cancel`,
     UPDATE_STATUS: (id) => `${API_PREFIX}/bookings/${id}/status`,
-    OWNER_BOOKINGS: (ownerId) => `${API_PREFIX}/bookings/owner/${ownerId}`,
+    OWNER_BOOKINGS: `${API_PREFIX}/bookings/owner`,
   },
 
   // -----------------------

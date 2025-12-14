@@ -17,6 +17,7 @@ const upload = multer({
 });
 
 // PUBLIC
+router.get("/categories", itemsController.getRentableCategories);
 router.get("/search", itemsController.searchItems);
 router.get("/:id", itemsController.getSingleItem);
 router.get("/", itemsController.getAllItems);

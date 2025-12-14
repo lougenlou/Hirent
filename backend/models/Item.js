@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { RENTABLE_CATEGORIES } = require('../utils/constants');
 
 const ItemSchema = new mongoose.Schema({
   // Basic Info
@@ -14,7 +15,11 @@ const ItemSchema = new mongoose.Schema({
   },
 
   // Category and images
-  category: String,
+  category: {
+    type: String,
+    required: true,
+    enum: RENTABLE_CATEGORIES,
+  },
   images: [{ type: String }],
   
   // Pricing

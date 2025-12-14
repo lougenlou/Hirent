@@ -56,7 +56,7 @@ export default function OwnerDashboard() {
       try {
         // TODO: Confirm backend endpoint returns only items where ownerId matches user.id
         const [bookingsData, listingsData] = await Promise.all([
-          makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS),
+          makeAPICall(ENDPOINTS.BOOKINGS.OWNER_BOOKINGS(ownerId)),
           makeAPICall(ENDPOINTS.ITEMS.BY_OWNER(ownerId)), // ⭐ REAL OWNER LISTINGS
         ]);
 

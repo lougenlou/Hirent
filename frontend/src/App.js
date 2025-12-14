@@ -163,8 +163,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/auth-callback" element={<GoogleCallback />} />
             <Route path="/booking/confirmation/:bookingId" element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
-            <Route path="/my-rentals" element={<ProtectedRoute><MyRentals /></ProtectedRoute>} />
-
+            
             {/* ===== OWNER ROUTES ===== */}
             <Route path="/ownerlogin" element={<OwnerLogin />} />
             <Route path="/ownersignup" element={<OwnerSignup />} />
